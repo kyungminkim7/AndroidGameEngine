@@ -1,0 +1,3 @@
+[submodule "app/src/main/cpp/android_game_engine/glm"]
+	path = app/src/main/cpp/android_game_engine/glm
+	url = https://github.com/g-truc/glm.git
