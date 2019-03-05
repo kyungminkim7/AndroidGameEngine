@@ -66,6 +66,7 @@ void appCmdCallback(android_app *app, int32_t cmd) {
             ManagerAssets::init(app->activity->assetManager);
             game.reset(new T);
             game->init();
+            game->loadWorld();
             state = State::RUNNING;
             break;
         

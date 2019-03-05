@@ -1,7 +1,10 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
 
+#include "Camera.h"
+#include "GameObject.h"
 #include "ShaderProgram.h"
 
 namespace age {
@@ -12,6 +15,7 @@ public:
     virtual ~Game() = default;
     
     virtual void init();
+    virtual void loadWorld();
     
     virtual void onUpdate(std::chrono::duration<float> updateDuration);
     virtual void render();
@@ -19,7 +23,10 @@ public:
 private:
     ShaderProgram defaultShader;
     
-    unsigned int VBO;
+    std::unique_ptr<Camera> cam;
+    
+    std::unique_ptr<GameObject> obj;
+    unsigned int vbo;
 };
 
 } // namespace age

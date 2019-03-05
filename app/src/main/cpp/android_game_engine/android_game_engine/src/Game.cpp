@@ -6,9 +6,47 @@
 
 namespace {
 float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left
-        0.5f, -0.5f, 0.0f, // right
-        0.0f,  0.5f, 0.0f  // top
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 } // namespace
 
@@ -18,21 +56,24 @@ Game::Game() : defaultShader("shaders/default.vert", "shaders/default.frag"){}
 
 void Game::init() {
     glViewport(0, 0, ManagerWindowing::getWindowWidth(),ManagerWindowing::getWindowHeight());
+}
+
+void Game::loadWorld() {
+    this->cam = std::make_unique<Camera>(45.0f,
+            static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
+            0.1f, 1000.0f);
+    this->cam->setPosition({-5.0f, 1.0f, 1.0f})
+          .setLookAtPoint(glm::vec3(0.0f));
     
-    glGenBuffers(1, &VBO);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    this->obj = std::make_unique<GameObject>();
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    
-    this->defaultShader.setVertexAttribPointer("aPos", 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0)
-         .enableVertexAttribArray("aPos");
-    
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Game::onUpdate(std::chrono::duration<float> updateDuration) {
-
+    cam->onUpdate(updateDuration);
 }
 
 void Game::render() {
@@ -40,10 +81,17 @@ void Game::render() {
     glClear(GL_COLOR_BUFFER_BIT);
     
     this->defaultShader.use();
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    this->defaultShader.setVertexAttribPointer("aPos", 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0)
-            .enableVertexAttribArray("aPos");
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    
+    this->defaultShader.setUniform("projection", this->cam->getProjectionMatrix())
+            .setUniform("view", this->cam->getViewMatrix());
+    
+    this->defaultShader.setUniform("model", this->obj->getModelMatrix())
+            .setUniform("normal", this->obj->getNormalMatrix());
+    
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    this->defaultShader.setVertexAttribPointer("aPosition", 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0)
+            .enableVertexAttribArray("aPosition");
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 } // namespace age
