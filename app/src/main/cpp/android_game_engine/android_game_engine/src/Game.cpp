@@ -59,10 +59,10 @@ void Game::init() {
 }
 
 void Game::loadWorld() {
-    this->cam = std::make_unique<Camera>(45.0f,
+    this->cam = std::make_unique<CameraFPV>(45.0f,
             static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
             0.1f, 1000.0f);
-    this->cam->setPosition({-5.0f, 1.0f, 1.0f})
+    this->cam->setPosition({-100.0f, 1.0f, 1.0f})
           .setLookAtPoint(glm::vec3(0.0f));
     
     this->obj = std::make_unique<GameObject>();
@@ -92,6 +92,21 @@ void Game::render() {
     this->defaultShader.setVertexAttribPointer("aPosition", 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0)
             .enableVertexAttribArray("aPosition");
     glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+bool Game::onMotionDown(const age::MotionEvent &event) {
+    this->cam->onMotionDown(event);
+    return true;
+}
+
+bool Game::onMotionMove(const age::MotionEvent &event) {
+    this->cam->onMotionMove(event);
+    return true;
+}
+
+bool Game::onMotionUp(const age::MotionEvent &event) {
+    this->cam->onMotionUp(event);
+    return true;
 }
 
 } // namespace age

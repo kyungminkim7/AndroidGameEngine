@@ -5,6 +5,7 @@
 #include "Log.h"
 #include "ManagerAssets.h"
 #include "ManagerWindowing.h"
+#include "MotionEvent.h"
 
 namespace age {
 namespace GameEngine {
@@ -20,10 +21,13 @@ std::chrono::system_clock::time_point lastUpdateTime;
 template <typename T>
 void appCmdCallback(android_app *app, int32_t cmd);
 
+int32_t inputEventCallback(android_app *app, AInputEvent *event);
+
 template <typename T>
 void run(android_app *app) {
     state = State::PAUSED;
     app->onAppCmd = appCmdCallback<T>;
+    app->onInputEvent = inputEventCallback;
     
     int pollId, events;
     android_poll_source* source;
@@ -117,6 +121,36 @@ void appCmdCallback(android_app *app, int32_t cmd) {
         default:
             break;
     }
+}
+
+int32_t inputEventCallback(android_app *app, AInputEvent *event) {
+    if (state != State::RUNNING) return 0;
+    
+    auto eventType = AInputEvent_getType(event);
+    if (eventType == AINPUT_EVENT_TYPE_MOTION) {
+        MotionEvent motionEvent;
+        auto numPointers = AMotionEvent_getPointerCount(event);
+        for (auto i = 0u; i < numPointers; ++i) {
+            motionEvent[AMotionEvent_getPointerId(event, i)] = {AMotionEvent_getX(event, i),
+                                                                AMotionEvent_getY(event, i)};
+        }
+    
+        switch (AMotionEvent_getAction(event)) {
+            case AMOTION_EVENT_ACTION_DOWN:
+                return game->onMotionDown(motionEvent);
+        
+            case AMOTION_EVENT_ACTION_MOVE:
+                return game->onMotionMove(motionEvent);
+        
+            case AMOTION_EVENT_ACTION_UP:
+                return game->onMotionUp(motionEvent);
+    
+            default:
+                break;
+        }
+    }
+    
+    return 0;
 }
 
 } // namespace GameEngine

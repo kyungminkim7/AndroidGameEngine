@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * Singleton game manager. Users should subclass Game and then call GameEngine::run with the
+ * template instantiation of the derived Game class.
+ */
+
 #include <android_native_app_glue.h>
 
 namespace age {

@@ -8,6 +8,7 @@ target_link_libraries(native_app_glue PUBLIC log)
 
 add_library(${PROJECT_NAME} STATIC
         "src/Camera.cpp"
+        "src/CameraFPV.cpp"
         "src/Game.cpp"
         "src/GameObject.cpp"
         "src/Log.cpp"
