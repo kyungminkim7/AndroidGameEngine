@@ -16,6 +16,7 @@ add_library(${PROJECT_NAME} STATIC
         "src/ManagerWindowing.cpp"
         "src/Model.cpp"
         "src/ShaderProgram.cpp"
+        "src/Texture2D.cpp"
         "src/Utilities.cpp")
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -28,10 +29,11 @@ target_link_libraries(${PROJECT_NAME}
         android
         EGL
         GLESv2
-        native_app_glue
         glm
+        log
+        native_app_glue
     PRIVATE
-        log)
+        stb)
 
 target_compile_features(${PROJECT_NAME}
     PUBLIC

@@ -1,4 +1,7 @@
-attribute vec3 aPosition;
+attribute vec3 aPos;
+attribute vec2 aTexCoord;
+
+varying vec2 vTexCoord;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -6,5 +9,6 @@ uniform mat4 model;
 uniform mat3 normal;
 
 void main() {
-   gl_Position = projection * view * model * vec4(aPosition, 1.0);
+   gl_Position = projection * view * model * vec4(aPos, 1.0);
+   vTexCoord = aTexCoord;
 }

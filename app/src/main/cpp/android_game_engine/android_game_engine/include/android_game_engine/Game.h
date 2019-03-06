@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "MotionEvent.h"
 #include "ShaderProgram.h"
+#include "Texture2D.h"
 
 namespace age {
 
@@ -18,7 +19,7 @@ namespace age {
 class Game {
 public:
     Game();
-    virtual ~Game() = default;
+    virtual ~Game();
     
     virtual void init();
     virtual void loadWorld();
@@ -37,6 +38,7 @@ private:
     
     std::unique_ptr<GameObject> obj;
     unsigned int vbo;
+    std::unique_ptr<Texture2D> texture0, texture1;
 };
 
 } // namespace age
