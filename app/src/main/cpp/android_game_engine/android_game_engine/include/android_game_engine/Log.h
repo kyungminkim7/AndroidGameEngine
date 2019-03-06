@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * Convenience functions for outputing log messages.
+ */
+
 #include <string>
 
 namespace age {

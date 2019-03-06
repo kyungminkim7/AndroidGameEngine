@@ -25,13 +25,6 @@ public:
     ///
     Camera(float fov_deg, float aspectRatioWidthToHeight, float nearPlane, float farPlane);
     
-    ///
-    /// \brief Updates the camera state.
-    ///
-    /// This should be called on every iteration of the game loop.
-    ///
-    /// \param updateDuration Elapsed time since the last frame.
-    ///
     void onUpdate(std::chrono::duration<float> updateDuration) override;
     
     void setFov_deg(float fov_deg);
@@ -40,11 +33,7 @@ public:
     void setAspectRatioWidthToHeight(float aspectRatioWidthToHeight);
     
     glm::mat4 getProjectionMatrix() const;
-    
-    ///
-    /// \brief Sets the speed of the camera's linear movements.
-    /// \param linearSpeed Linear movement speed (m/s).
-    ///
+
     void setLinearSpeed(float linearSpeed);
     float getLinearSpeed() const;
     
@@ -52,8 +41,7 @@ public:
     void moveBackward();
     void moveLeft();
     void moveRight();
-    void stopForwardBackwardMovement();
-    void stopSidewaysMovement();
+    void stopMoving();
     
     void setHorizontalRotationAxis(const glm::vec3& horizontalRotationAxis);
     glm::vec3 getHorizontalRotationAxis() const;
@@ -86,7 +74,6 @@ inline void Camera::moveForward() {this->linearVelocity.x = this->linearSpeed;}
 inline void Camera::moveBackward() {this->linearVelocity.x = -this->linearSpeed;}
 inline void Camera::moveLeft() {this->linearVelocity.y = this->linearSpeed;}
 inline void Camera::moveRight() {this->linearVelocity.y = -this->linearSpeed;}
-inline void Camera::stopForwardBackwardMovement() {this->linearVelocity.x = 0;}
-inline void Camera::stopSidewaysMovement() {this->linearVelocity.y = 0;}
+inline void Camera::stopMoving() {this->linearVelocity = glm::vec3(0.0f);}
 
 } // namespace age

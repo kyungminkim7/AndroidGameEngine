@@ -47,8 +47,6 @@ public:
     virtual void onUpdate(std::chrono::duration<float> updateDuration);
     
     virtual void render(ShaderProgram *shader);
- 
-    
     
 //    void setMesh(std::unique_ptr<Mesh> mesh);
     
