@@ -24,8 +24,8 @@ bool CameraFPV::onMotionMove(const age::MotionEvent &event) {
         auto deltaYaw = static_cast<float>(glm::radians(-offset.x * this->rotationSensitivity));
         auto deltaPitch = static_cast<float>(glm::radians(offset.y * this->rotationSensitivity));
     
-        this->rotate(deltaPitch, this->getOrientationY())
-                .rotate(deltaYaw, this->getHorizontalRotationAxis());
+        this->rotate(deltaPitch, this->getOrientationY());
+        this->rotate(deltaYaw, this->getHorizontalRotationAxis());
         
         this->lastMotionPosition = rotationMotion->second;
     }

@@ -69,13 +69,13 @@ public:
     
     glm::mat4 getViewMatrix() const;
     
-    GameObject& setPosition(const glm::vec3 &position);
+    void setPosition(const glm::vec3 &position);
     glm::vec3 getPosition() const;
     
-    GameObject& setOrientation(const glm::mat3 &orientation);
-    GameObject& setOrientation(const glm::vec3 &orientationX,
-                               const glm::vec3 &orientationY,
-                               const glm::vec3 &orientationZ);
+    void setOrientation(const glm::mat3 &orientation);
+    void setOrientation(const glm::vec3 &orientationX,
+                        const glm::vec3 &orientationY,
+                        const glm::vec3 &orientationZ);
     glm::mat3 getOrientation() const;
     glm::vec3 getOrientationX() const;
     glm::vec3 getOrientationY() const;
@@ -88,8 +88,8 @@ public:
     /// If the new direction is linearly dependent with the game object's original normal,
     /// make sure to call GameObject::setNormal...() afterwards to properly set the new orientation.
     ///@{
-    GameObject& setLookAtPoint(const glm::vec3 &lookAtPoint);
-    GameObject& setLookAtDirection(const glm::vec3 &lookAtDirection);
+    void setLookAtPoint(const glm::vec3 &lookAtPoint);
+    void setLookAtDirection(const glm::vec3 &lookAtDirection);
     ///@}
     
     glm::vec3 getLookAtDirection() const;
@@ -102,7 +102,7 @@ public:
     /// look at direction, make sure to call GameObject::setLookAt...() afterwards to properly
     /// set the new orientation.
     ///@{
-    GameObject& setNormalDirection(const glm::vec3 &normalDirection);
+    void setNormalDirection(const glm::vec3 &normalDirection);
     ///@>
     
     glm::vec3 getNormalDirection() const;
@@ -111,25 +111,22 @@ public:
     /// \brief rotate Rotates the game object about an axis in the world coordinate frame.
     /// \param angle_rad Angle to rotate game object by (rad).
     /// \param axis Axis (in world coordinate frame) to rotate game object about.
-    /// \return The game object to allow chaining of multiple rotation/translation calls.
     ///
-    GameObject& rotate(float angle_rad, const glm::vec3 &axis);
+    void rotate(float angle_rad, const glm::vec3 &axis);
     
     ///
     /// \brief translate Translates the game object in the world coordinate frame.
     /// \param translation Amount to translate the game object by in the world coordinate frame.
-    /// \return The game object to allow chaining of multiple rotation/translation calls.
     ///
-    GameObject& translate(const glm::vec3 &translation);
+    void translate(const glm::vec3 &translation);
     
     ///
     /// \brief translateInLocalFrame Translates the game object in the local coordinate frame.
     /// \param translation Amount to translate the game object by in the local coordinate frame.
-    /// \return The game object to allow chaining of multiple rotation/translation calls.
     ///
-    GameObject& translateInLocalFrame(const glm::vec3 &translation);
+    void translateInLocalFrame(const glm::vec3 &translation);
     
-    GameObject& setScale(const glm::vec3 &scale);
+    void setScale(const glm::vec3 &scale);
     
     void setSpecularExponent(float specularExponent);
 
@@ -145,23 +142,14 @@ inline glm::mat4 GameObject::getModelMatrix() const {return this->model.getModel
 inline glm::mat3 GameObject::getNormalMatrix() const {return this->model.getNormalMatrix();}
 inline glm::mat4 GameObject::getViewMatrix() const {return this->model.getViewMatrix();}
 
-inline GameObject& GameObject::setPosition(const glm::vec3 &position) {
-    this->model.setPosition(position);
-    return *this;
-}
-
+inline void GameObject::setPosition(const glm::vec3 &position) {this->model.setPosition(position);}
 inline glm::vec3 GameObject::getPosition() const {return this->model.getPosition();}
 
-inline GameObject& GameObject::setOrientation(const glm::mat3& orientation) {
-    this->model.setOrientation(orientation);
-    return *this;
-}
-
-inline GameObject& GameObject::setOrientation(const glm::vec3 &orientationX,
-                                              const glm::vec3 &orientationY,
-                                              const glm::vec3 &orientationZ) {
+inline void GameObject::setOrientation(const glm::mat3& orientation) {this->model.setOrientation(orientation);}
+inline void GameObject::setOrientation(const glm::vec3 &orientationX,
+                                       const glm::vec3 &orientationY,
+                                       const glm::vec3 &orientationZ) {
     this->model.setOrientation(orientationX, orientationY, orientationZ);
-    return *this;
 }
 
 inline glm::mat3 GameObject::getOrientation() const {return this->model.getOrientation();}
@@ -169,47 +157,19 @@ inline glm::vec3 GameObject::getOrientationX() const {return this->model.getOrie
 inline glm::vec3 GameObject::getOrientationY() const {return this->model.getOrientationY();}
 inline glm::vec3 GameObject::getOrientationZ() const {return this->model.getOrientationZ();}
 
-inline GameObject& GameObject::setLookAtPoint(const glm::vec3 &lookAtPoint) {
-    this->model.setLookAtPoint(lookAtPoint);
-    return *this;
-}
-
-inline GameObject& GameObject::setLookAtDirection(const glm::vec3 &lookAtDirection) {
-    this->model.setLookAtDirection(lookAtDirection);
-    return *this;
-}
-
+inline void GameObject::setLookAtPoint(const glm::vec3 &lookAtPoint) {this->model.setLookAtPoint(lookAtPoint);}
+inline void GameObject::setLookAtDirection(const glm::vec3 &lookAtDirection) {this->model.setLookAtDirection(lookAtDirection);}
 inline glm::vec3 GameObject::getLookAtDirection() const {return this->model.getLookAtDirection();}
 
-inline GameObject& GameObject::setNormalDirection(const glm::vec3 &normalDirection) {
-    this->model.setNormalDirection(normalDirection);
-    return *this;
-}
-
+inline void GameObject::setNormalDirection(const glm::vec3 &normalDirection) {this->model.setNormalDirection(normalDirection);}
 inline glm::vec3 GameObject::getNormalDirection() const {return this->model.getNormalDirection();}
 
-inline GameObject& GameObject::rotate(float angle_rad, const glm::vec3 &axis) {
-    this->model.rotate(angle_rad, axis);
-    return *this;
-}
+inline void GameObject::rotate(float angle_rad, const glm::vec3 &axis) {this->model.rotate(angle_rad, axis);}
+inline void GameObject::translate(const glm::vec3 &translation) {this->model.translate(translation);}
+inline void GameObject::translateInLocalFrame(const glm::vec3 &translation) {this->model.translateInLocalFrame(translation);}
 
-inline GameObject& GameObject::translate(const glm::vec3 &translation) {
-    this->model.translate(translation);
-    return *this;
-}
+inline void GameObject::setScale(const glm::vec3& scale) {this->model.setScale(scale); }
 
-inline GameObject& GameObject::translateInLocalFrame(const glm::vec3 &translation) {
-    this->model.translateInLocalFrame(translation);
-    return *this;
-}
-
-inline GameObject& GameObject::setScale(const glm::vec3& scale) {
-    this->model.setScale(scale);
-    return *this;
-}
-
-inline void GameObject::setSpecularExponent(float specularExponent) {
-    this->specularExponent = specularExponent;
-}
+inline void GameObject::setSpecularExponent(float specularExponent) {this->specularExponent = specularExponent;}
 
 } // namespace age

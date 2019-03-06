@@ -37,13 +37,13 @@ public:
     
     glm::mat4 getViewMatrix() const;
     
-    Model& setPosition(const glm::vec3 &position);
+    void setPosition(const glm::vec3 &position);
     glm::vec3 getPosition() const;
     
-    Model& setOrientation(const glm::mat3 &orientation);
-    Model& setOrientation(const glm::vec3 &orientationX,
-                          const glm::vec3 &orientationY,
-                          const glm::vec3 &orientationZ);
+    void setOrientation(const glm::mat3 &orientation);
+    void setOrientation(const glm::vec3 &orientationX,
+                        const glm::vec3 &orientationY,
+                        const glm::vec3 &orientationZ);
     glm::mat3 getOrientation() const;
     glm::vec3 getOrientationX() const;
     glm::vec3 getOrientationY() const;
@@ -56,8 +56,8 @@ public:
     /// If the new direction is linearly dependent with the model's original normal,
     /// make sure to call Model::setNormal...() afterwards to properly set the new orientation.
     ///@{
-    Model& setLookAtPoint(const glm::vec3 &lookAtPoint);
-    Model& setLookAtDirection(const glm::vec3 &lookAtDirection);
+    void setLookAtPoint(const glm::vec3 &lookAtPoint);
+    void setLookAtDirection(const glm::vec3 &lookAtDirection);
     ///@}
     
     glm::vec3 getLookAtDirection() const;
@@ -70,7 +70,7 @@ public:
     /// look at direction, make sure to call Model::setLookAt...() afterwards to properly
     /// set the new orientation.
     ///@{
-    Model& setNormalDirection(const glm::vec3 &normalDirection);
+    void setNormalDirection(const glm::vec3 &normalDirection);
     ///@>
     
     glm::vec3 getNormalDirection() const;
@@ -79,25 +79,23 @@ public:
     /// \brief rotate Rotates the model about an axis in the world coordinate frame.
     /// \param angle_rad Angle to rotate model by (rad).
     /// \param axis Axis (in world coordinate frame) to rotate model about.
-    /// \return The model to allow chaining of multiple rotation/translation calls.
     ///
-    Model& rotate(float angle_rad, const glm::vec3 &axis);
+    void rotate(float angle_rad, const glm::vec3 &axis);
     
     ///
     /// \brief translate Translates the model in the world coordinate frame.
     /// \param translation Amount to translate the model by in the world coordinate frame.
-    /// \return The model to allow chaining of multiple rotation/translation calls.
     ///
-    Model& translate(const glm::vec3 &translation);
+    void translate(const glm::vec3 &translation);
     
     ///
     /// \brief translateInBodyFrame Translates the model in the local coordinate frame.
     /// \param translation Amount to translate the model by in the local coordinate frame.
     /// \return The model to allow chaining of multiple rotation/translation calls.
     ///
-    Model& translateInLocalFrame(const glm::vec3 &translation);
+    void translateInLocalFrame(const glm::vec3 &translation);
     
-    Model& setScale(const glm::vec3 &scale);
+    void setScale(const glm::vec3 &scale);
     
     ///
     /// \brief render Sets the uniform model and normal matrices on the shader.

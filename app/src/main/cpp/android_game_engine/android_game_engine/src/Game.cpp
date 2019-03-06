@@ -70,8 +70,8 @@ void Game::loadWorld() {
     this->cam = std::make_unique<CameraFPV>(45.0f,
             static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
             0.1f, 1000.0f);
-    this->cam->setPosition({-10.0f, 1.0f, 1.0f})
-          .setLookAtPoint(glm::vec3(0.0f));
+    this->cam->setPosition({-10.0f, 1.0f, 1.0f});
+    this->cam->setLookAtPoint(glm::vec3(0.0f));
     
     this->obj = std::make_unique<GameObject>();
     glGenBuffers(1, &vbo);
@@ -93,20 +93,21 @@ void Game::render() {
     
     this->defaultShader.use();
     
-    this->defaultShader.setUniform("projection", this->cam->getProjectionMatrix())
-            .setUniform("view", this->cam->getViewMatrix());
+    this->defaultShader.setUniform("projection", this->cam->getProjectionMatrix());
+    this->defaultShader.setUniform("view", this->cam->getViewMatrix());
     
-    this->defaultShader.setUniform("model", this->obj->getModelMatrix())
-            .setUniform("normal", this->obj->getNormalMatrix());
+    this->defaultShader.setUniform("model", this->obj->getModelMatrix());
+    this->defaultShader.setUniform("normal", this->obj->getNormalMatrix());
     
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    this->defaultShader.setVertexAttribPointer("aPos", 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0)
-            .setVertexAttribPointer("aTexCoord", 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)))
-            .enableVertexAttribArray("aPos")
-            .enableVertexAttribArray("aTexCoord");
+    this->defaultShader.setVertexAttribPointer("aPos", 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    this->defaultShader.setVertexAttribPointer("aTexCoord", 2, GL_FLOAT, GL_FALSE,
+            5 * sizeof(float), (void*)(3 * sizeof(float)));
+    this->defaultShader.enableVertexAttribArray("aPos");
+    this->defaultShader.enableVertexAttribArray("aTexCoord");
     
-    this->defaultShader.setUniform("texture0", 0)
-            .setUniform("texture1", 1);
+    this->defaultShader.setUniform("texture0", 0);
+    this->defaultShader.setUniform("texture1", 1);
     
     glActiveTexture(GL_TEXTURE0);
     this->texture0->bind();
