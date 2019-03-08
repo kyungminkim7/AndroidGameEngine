@@ -5,6 +5,7 @@
 #include <glm/gtx/norm.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
+#include <android_game_engine/JoystickHandle.h>
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
 
@@ -22,7 +23,7 @@ std::shared_ptr<Joystick> Joystick::New(Widget *parent) {
 
 Joystick::Joystick(age::Widget *parent) : Widget(parent), handleSize(0.4f) {
     this->setTexture("images/bordered_circle.png");
-    this->handle = JoystickHandle::New(this);
+    this->handle = JoystickHandle::New(this).get();
 }
 
 void Joystick::setDimensions(const glm::vec2 &dimensions) {

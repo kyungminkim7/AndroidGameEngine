@@ -5,9 +5,9 @@
 
 #include "Widget.h"
 
-#include "JoystickHandle.h"
-
 namespace age {
+
+class JoystickHandle;
 
 class Joystick : public Widget {
 public:
@@ -39,7 +39,7 @@ private:
     
     bool inBounds(const glm::vec2 &point) const override;
     
-    std::shared_ptr<JoystickHandle> handle;
+    JoystickHandle *handle;
     float handleSize;
     
     std::forward_list<OnTouchDownCallback> onTouchDownCallbacks;
