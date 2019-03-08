@@ -3,8 +3,7 @@
 #include "Camera.h"
 
 #include <glm/vec2.hpp>
-
-#include "TouchEvent.h"
+#include <glm/vec3.hpp>
 
 namespace age {
 
@@ -15,16 +14,30 @@ namespace age {
 ///
 class CameraFPV : public Camera {
 public:
-    CameraFPV(float maxFov_deg, float aspectRatioWidthToHeight, float nearPlane, float farPlane);
+    CameraFPV(float fov_deg, float aspectRatioWidthToHeight, float nearPlane, float farPlane);
     
-    bool onMotionDown(const TouchEvent &event);
-    bool onMotionMove(const TouchEvent &event);
-    bool onMotionUp(const TouchEvent &event);
+    void onUpdate(std::chrono::duration<float> updateDuration) override;
+    
+    void onMove(const glm::vec2 &input);
+    void onRotate(const glm::vec2 &input);
+    
+    void setHorizontalRotationAxis(const glm::vec3& horizontalRotationAxis);
+    
+    void setLinearSpeed(float speed);
+    void setPitchSpeed(float speed_deg);
+    void setYawSpeed(float speed_deg);
     
 private:
-    int rotationMotionId;
-    glm::vec2 lastMotionPosition;
-    float rotationSensitivity;
+    glm::vec3 horizontalRotationAxis;
+    
+    float linearSpeed; ///< Speed of each linear velocity component (m/s)
+    glm::vec3 linearVelocity {0.0f};
+    
+    float pitchSpeed_rad; ///< rad/s
+    float pitchVelocity_rad = 0.0f;
+    
+    float yawSpeed_rad; ///< rad/s
+    float yawVelocity_rad = 0.0f;
 };
 
 } // namespace age

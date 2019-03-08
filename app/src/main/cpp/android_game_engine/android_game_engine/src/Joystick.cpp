@@ -81,6 +81,9 @@ void Joystick::onTouchMove(const glm::vec2 &position) {
 
 void Joystick::onTouchUp() {
     this->handle->setPosition(this->getCenter() - this->handle->getRadius());
+    for (const auto& callback : this->onTouchUpCallbacks) {
+        callback();
+    }
 }
 
 float Joystick::getRadius() const {return this->getDimensions().x * 0.5f;}

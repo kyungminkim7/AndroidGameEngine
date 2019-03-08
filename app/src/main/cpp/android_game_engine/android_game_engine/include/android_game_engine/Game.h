@@ -3,7 +3,7 @@
 #include <chrono>
 #include <memory>
 
-#include "Camera.h"
+#include "CameraFPV.h"
 #include "GameObject.h"
 #include "TouchEvent.h"
 #include "ShaderProgram.h"
@@ -32,7 +32,7 @@ public:
 
 protected:
     Widget* getGui();
-    Camera* getCam();
+    CameraFPV* getCam();
     
     ShaderProgram* getDefaultShader();
     ShaderProgram* getWidgetShader();
@@ -43,11 +43,11 @@ private:
     
     std::shared_ptr<Widget> gui;
     
-    std::unique_ptr<Camera> cam;
+    std::unique_ptr<CameraFPV> cam;
 };
 
 inline Widget* Game::getGui() {return this->gui.get();}
-inline Camera* Game::getCam() {return this->cam.get();}
+inline CameraFPV* Game::getCam() {return this->cam.get();}
 inline ShaderProgram* Game::getDefaultShader() {return &this->defaultShader;}
 inline ShaderProgram* Game::getWidgetShader() {return &this->widgetShader;}
 

@@ -1,5 +1,7 @@
 #include "TestGame.h"
 
+#include <functional>
+
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
 
@@ -58,9 +60,11 @@ void TestGame::init() {
 }
 
 void TestGame::setupGui() {
+    using namespace std::placeholders;
+    
     // Set up joysticks
-    glm::vec2 positionOffset(50.0f, 450.0f);
-    glm::vec2 dimensions(300.0f, 300.0f);
+    glm::vec2 positionOffset(100.0f, 450.0f);
+    glm::vec2 dimensions(250.0f, 250.0f);
     glm::vec4 joystickColor(0.0f, 0.6f, 0.7f, 0.8f);
     glm::vec4 joystickHandleColor(0.0f, 0.7f, 0.9f, 0.8f);
     
@@ -69,16 +73,11 @@ void TestGame::setupGui() {
     this->moveJoystick->setColor(joystickColor);
     this->moveJoystick->setHandleColor(joystickHandleColor);
     
-    this->moveJoystick->registerOnTouchDownCallback([](const auto& output){
-        Log::info("Joy1 down: " + std::to_string(output.x) + ", " + std::to_string(output.y));
-    });
-    this->moveJoystick->registerOnTouchMoveCallback([](const auto& output){
-        Log::info("Joy1 move: " + std::to_string(output.x) + ", " + std::to_string(output.y));
-    });
-    this->moveJoystick->registerOnTouchUpCallback([](){
-        Log::info("Joy1 up");
-    });
-    
+    auto moveCam = std::bind(&CameraFPV::onMove, this->getCam(), _1);
+    this->moveJoystick->registerOnTouchDownCallback(moveCam);
+    this->moveJoystick->registerOnTouchMoveCallback(moveCam);
+    this->moveJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onMove, this->getCam(),
+                                                            glm::vec2(0.0f)));
     
     this->rotateJoystick = Joystick::New(this->getGui());
     this->rotateJoystick->setGeometry({ManagerWindowing::getWindowWidth() - positionOffset.x - dimensions.x,
@@ -87,15 +86,11 @@ void TestGame::setupGui() {
     this->rotateJoystick->setColor(joystickColor);
     this->rotateJoystick->setHandleColor(joystickHandleColor);
     
-    this->rotateJoystick->registerOnTouchDownCallback([](const auto& output){
-        Log::info("Joy2 down: " + std::to_string(output.x) + ", " + std::to_string(output.y));
-    });
-    this->rotateJoystick->registerOnTouchMoveCallback([](const auto& output){
-        Log::info("Joy2 move: " + std::to_string(output.x) + ", " + std::to_string(output.y));
-    });
-    this->rotateJoystick->registerOnTouchUpCallback([](){
-        Log::info("Joy2 up");
-    });
+    auto rotateCam = std::bind(&CameraFPV::onRotate, this->getCam(), _1);
+    this->rotateJoystick->registerOnTouchDownCallback(rotateCam);
+    this->rotateJoystick->registerOnTouchMoveCallback(rotateCam);
+    this->rotateJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onRotate, this->getCam(),
+                                                              glm::vec2(0.0f)));
 }
 
 void TestGame::loadWorld() {
@@ -113,7 +108,7 @@ void TestGame::loadWorld() {
 }
 
 void TestGame::onUpdate(std::chrono::duration<float> updateDuration) {
-
+    Game::onUpdate(updateDuration);
 }
 
 void TestGame::render() {

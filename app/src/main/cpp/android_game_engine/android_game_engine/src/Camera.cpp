@@ -8,15 +8,8 @@ namespace age {
 Camera::Camera(float fov_deg, float aspectRatioWidthToHeight, float nearPlane, float farPlane)
         : GameObject(),
           fov_rad(glm::radians(fov_deg)), aspectRatioWidthToHeight(aspectRatioWidthToHeight),
-          nearPlane(nearPlane), farPlane(farPlane), linearSpeed(10.0f),
-          horizontalRotationAxis(0.0f, 0.0f, 1.0f) {
+          nearPlane(nearPlane), farPlane(farPlane) {
     this->updateProjectionMatrix();
-}
-
-void Camera::onUpdate(std::chrono::duration<float> updateDuration) {
-    if (glm::length2(this->linearVelocity) > 0.0f) {
-        this->translateInLocalFrame(this->linearVelocity * updateDuration.count());
-    }
 }
 
 void Camera::setFov_deg(float fov_deg) {
@@ -37,14 +30,6 @@ void Camera::updateProjectionMatrix() {
     this->projectionMatrix = glm::perspective(this->fov_rad,
                                               this->aspectRatioWidthToHeight,
                                               this->nearPlane, this->farPlane);
-}
-
-void Camera::setHorizontalRotationAxis(const glm::vec3 &horizontalRotationAxis) {
-    this->horizontalRotationAxis = horizontalRotationAxis;
-}
-
-glm::vec3 Camera::getHorizontalRotationAxis() const {
-    return this->horizontalRotationAxis;
 }
 
 } // namespace age

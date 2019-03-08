@@ -2,47 +2,49 @@
 
 #include <android_game_engine/CameraFPV.h>
 
+#include <glm/gtx/norm.hpp>
 #include <glm/trigonometric.hpp>
 
 namespace age {
 
-CameraFPV::CameraFPV(float maxFov_deg, float aspectRatioWidthToHeight, float nearPlane, float farPlane)
-        : Camera(maxFov_deg, aspectRatioWidthToHeight, nearPlane, farPlane),
-        rotationSensitivity(0.2f){}
+CameraFPV::CameraFPV(float fov_deg, float aspectRatioWidthToHeight, float nearPlane, float farPlane)
+        : Camera(fov_deg, aspectRatioWidthToHeight, nearPlane, farPlane),
+        horizontalRotationAxis(0.0f, 0.0f, 1.0f), linearSpeed(10.0f),
+        pitchSpeed_rad(glm::radians(50.0f)), yawSpeed_rad(glm::radians(50.0f)) {}
 
-bool CameraFPV::onMotionDown(const age::TouchEvent &event) {
-    auto motion = event.begin();
-    this->rotationMotionId = motion->first;
-    this->lastMotionPosition = motion->second;
-    return true;
-}
-
-bool CameraFPV::onMotionMove(const age::TouchEvent &event) {
-    auto rotationMotion = event.find(this->rotationMotionId);
-    if (rotationMotion != event.end()) {
-        auto offset = rotationMotion->second - this->lastMotionPosition;
-        auto deltaYaw = static_cast<float>(glm::radians(-offset.x * this->rotationSensitivity));
-        auto deltaPitch = static_cast<float>(glm::radians(offset.y * this->rotationSensitivity));
+void CameraFPV::onUpdate(std::chrono::duration<float> updateDuration) {
+    // Rotation
+    if (glm::length2(glm::vec2(this->pitchVelocity_rad, this->yawVelocity_rad)) > 0.0f) {
+        auto deltaYaw = -this->yawVelocity_rad * updateDuration.count();
+        auto deltaPitch = this->pitchVelocity_rad * updateDuration.count();
     
         this->rotate(deltaPitch, this->getOrientationY());
-        this->rotate(deltaYaw, this->getHorizontalRotationAxis());
-        
-        this->lastMotionPosition = rotationMotion->second;
+        this->rotate(deltaYaw, this->horizontalRotationAxis);
     }
     
-    if ((rotationMotion != event.end() && event.size() > 1) ||
-        (rotationMotion == event.end() && !event.empty())) {
-        this->moveForward();
-    } else {
-        this->stopMoving();
+    // Translation
+    if (glm::length2(this->linearVelocity) > 0.0f) {
+        this->translateInLocalFrame(this->linearVelocity * updateDuration.count());
     }
-    
-    return true;
 }
 
-bool CameraFPV::onMotionUp(const age::TouchEvent &event) {
-    this->stopMoving();
-    return true;
+void CameraFPV::onMove(const glm::vec2 &input) {
+    this->linearVelocity = {input[1] * this->linearSpeed,
+                            -input[0] * this->linearSpeed,
+                            0.0f};
 }
+
+void CameraFPV::onRotate(const glm::vec2 &input) {
+    this->pitchVelocity_rad = -input[1] * this->pitchSpeed_rad;
+    this->yawVelocity_rad = input[0] * this->yawSpeed_rad;
+}
+
+void CameraFPV::setHorizontalRotationAxis(const glm::vec3 &horizontalRotationAxis) {
+    this->horizontalRotationAxis = horizontalRotationAxis;
+}
+
+void CameraFPV::setLinearSpeed(float speed) {this->linearSpeed = speed;}
+void CameraFPV::setPitchSpeed(float speed_deg) {this->pitchSpeed_rad = glm::radians(speed_deg);}
+void CameraFPV::setYawSpeed(float speed_deg) {this->yawSpeed_rad = glm::radians(speed_deg);}
 
 } // namespace age

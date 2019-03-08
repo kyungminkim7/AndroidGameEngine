@@ -27,9 +27,9 @@ void Game::init() {
                            {ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight()});
 
     // Setup cam
-    this->cam = std::make_unique<Camera>(45.0f,
-                                         static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
-                                         0.1f, 1000.0f);
+    this->cam = std::make_unique<CameraFPV>(45.0f,
+                                            static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
+                                            0.1f, 1000.0f);
 }
 
 void Game::loadWorld() {}
