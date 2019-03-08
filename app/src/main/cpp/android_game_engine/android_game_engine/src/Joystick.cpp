@@ -40,8 +40,26 @@ void Joystick::setHandleSize(float handleSize) {
 
 void Joystick::setHandleColor(const glm::vec4 &color) {this->handle->setColor(color);}
 
+void Joystick::registerOnTouchDownCallback(OnTouchDownCallback callback) {
+    this->onTouchDownCallbacks.push_front(callback);
+}
+
+void Joystick::registerOnTouchMoveCallback(OnTouchMoveCallback callback) {
+    this->onTouchMoveCallbacks.push_front(callback);
+}
+
+void Joystick::registerOnTouchUpCallback(OnTouchUpCallback callback) {
+    this->onTouchUpCallbacks.push_front(callback);
+}
+
 void Joystick::onTouchDown(const glm::vec2 &position) {
     this->handle->setPosition(position - this->handle->getRadius());
+    
+    auto output = (position - this->getCenter()) / this->getRadius();
+    output.y *= -1.0f;
+    for (const auto& callback : this->onTouchDownCallbacks) {
+        callback(output);
+    }
 }
 
 void Joystick::onTouchMove(const glm::vec2 &position) {
@@ -51,9 +69,14 @@ void Joystick::onTouchMove(const glm::vec2 &position) {
     auto touchRadius = std::min(glm::distance(center, position),
             this->getRadius());
     
-    this->handle->setPosition(center +
-                              glm::rotate(glm::vec2{touchRadius, 0.0f}, angle) -
-                              this->handle->getRadius());
+    auto relativeHandleCenter = glm::rotate(glm::vec2{touchRadius, 0.0f}, angle);
+    this->handle->setPosition(center + relativeHandleCenter - this->handle->getRadius());
+    
+    auto output = relativeHandleCenter / this->getRadius();
+    output.y *= -1.0f;
+    for (const auto& callback : this->onTouchMoveCallbacks) {
+        callback(output);
+    }
 }
 
 void Joystick::onTouchUp() {

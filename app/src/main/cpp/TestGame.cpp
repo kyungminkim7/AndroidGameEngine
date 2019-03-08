@@ -1,5 +1,6 @@
 #include "TestGame.h"
 
+#include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
 
 namespace {
@@ -68,12 +69,33 @@ void TestGame::setupGui() {
     this->moveJoystick->setColor(joystickColor);
     this->moveJoystick->setHandleColor(joystickHandleColor);
     
+    this->moveJoystick->registerOnTouchDownCallback([](const auto& output){
+        Log::info("Joy1 down: " + std::to_string(output.x) + ", " + std::to_string(output.y));
+    });
+    this->moveJoystick->registerOnTouchMoveCallback([](const auto& output){
+        Log::info("Joy1 move: " + std::to_string(output.x) + ", " + std::to_string(output.y));
+    });
+    this->moveJoystick->registerOnTouchUpCallback([](){
+        Log::info("Joy1 up");
+    });
+    
+    
     this->rotateJoystick = Joystick::New(this->getGui());
     this->rotateJoystick->setGeometry({ManagerWindowing::getWindowWidth() - positionOffset.x - dimensions.x,
                                        positionOffset.y},
                                       dimensions);
     this->rotateJoystick->setColor(joystickColor);
     this->rotateJoystick->setHandleColor(joystickHandleColor);
+    
+    this->rotateJoystick->registerOnTouchDownCallback([](const auto& output){
+        Log::info("Joy2 down: " + std::to_string(output.x) + ", " + std::to_string(output.y));
+    });
+    this->rotateJoystick->registerOnTouchMoveCallback([](const auto& output){
+        Log::info("Joy2 move: " + std::to_string(output.x) + ", " + std::to_string(output.y));
+    });
+    this->rotateJoystick->registerOnTouchUpCallback([](){
+        Log::info("Joy2 up");
+    });
 }
 
 void TestGame::loadWorld() {
