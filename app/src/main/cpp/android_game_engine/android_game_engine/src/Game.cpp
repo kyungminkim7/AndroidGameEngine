@@ -1,135 +1,94 @@
 #include <android_game_engine/Game.h>
 
 #include <GLES2/gl2.h>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include <android_game_engine/Log.h>
-#include <android_game_engine/ManagerAssets.h>
 #include <android_game_engine/ManagerWindowing.h>
-
-namespace {
-std::vector<float> vertices = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-        
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-} // namespace
 
 namespace age {
 
-Game::Game() : defaultShader("shaders/default.vert", "shaders/default.frag"){}
-
-Game::~Game() {
-    glDeleteBuffers(1, &this->vbo);
-}
+Game::Game() : defaultShader("shaders/default.vert", "shaders/default.frag"),
+                widgetShader("shaders/widget.vert", "shaders/widget.frag") {}
 
 void Game::init() {
-    glEnable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-    glViewport(0, 0, ManagerWindowing::getWindowWidth(),ManagerWindowing::getWindowHeight());
+    glViewport(0, 0, ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight());
+    
+    // Setup gui
+    auto widgetProjection = glm::ortho(0.0f, static_cast<float>(ManagerWindowing::getWindowWidth()),
+                                       0.0f, static_cast<float>(ManagerWindowing::getWindowHeight()));
+    
+    this->widgetShader.use();
+    this->widgetShader.setUniform("projection", widgetProjection);
+    
+    this->gui = Widget::New();
+    this->gui->setGeometry({0.0f, 0.0f},
+                           {ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight()});
+
+    // Setup cam
+    this->cam = std::make_unique<Camera>(45.0f,
+                                         static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
+                                         0.1f, 1000.0f);
 }
 
-void Game::loadWorld() {
-    this->cam = std::make_unique<CameraFPV>(45.0f,
-            static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
-            0.1f, 1000.0f);
-    this->cam->setPosition({-10.0f, 1.0f, 1.0f});
-    this->cam->setLookAtPoint(glm::vec3(0.0f));
-    
-    this->obj = std::make_unique<GameObject>();
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
-    this->texture0 = std::make_unique<Texture2D>("images/container.jpg");
-    this->texture1 = std::make_unique<Texture2D>("images/awesomeface.png");
-}
+void Game::loadWorld() {}
 
 void Game::onUpdate(std::chrono::duration<float> updateDuration) {
     cam->onUpdate(updateDuration);
 }
 
 void Game::render() {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    this->defaultShader.use();
-    
-    this->defaultShader.setUniform("projection", this->cam->getProjectionMatrix());
-    this->defaultShader.setUniform("view", this->cam->getViewMatrix());
-    
-    this->defaultShader.setUniform("model", this->obj->getModelMatrix());
-    this->defaultShader.setUniform("normal", this->obj->getNormalMatrix());
-    
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    this->defaultShader.setVertexAttribPointer("aPos", 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    this->defaultShader.setVertexAttribPointer("aTexCoord", 2, GL_FLOAT, GL_FALSE,
-            5 * sizeof(float), (void*)(3 * sizeof(float)));
-    this->defaultShader.enableVertexAttribArray("aPos");
-    this->defaultShader.enableVertexAttribArray("aTexCoord");
-    
-    this->defaultShader.setUniform("texture0", 0);
-    this->defaultShader.setUniform("texture1", 1);
-    
-    glActiveTexture(GL_TEXTURE0);
-    this->texture0->bind();
-    
-    glActiveTexture(GL_TEXTURE1);
-    this->texture1->bind();
-    
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+//    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//
+//    // Render game objects
+//    glEnable(GL_DEPTH_TEST);
+//    glDisable(GL_BLEND);
+//    this->defaultShader.use();
+//
+//    this->defaultShader.setUniform("projection", this->cam->getProjectionMatrix());
+//    this->defaultShader.setUniform("view", this->cam->getViewMatrix());
+//
+//    this->obj->render(&this->defaultShader);
+//
+//    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+//    this->defaultShader.setVertexAttribPointer("aPos", 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+//    this->defaultShader.setVertexAttribPointer("aTexCoord", 2, GL_FLOAT, GL_FALSE,
+//            5 * sizeof(float), (void*)(3 * sizeof(float)));
+//    this->defaultShader.enableVertexAttribArray("aPos");
+//    this->defaultShader.enableVertexAttribArray("aTexCoord");
+//
+//    this->defaultShader.setUniform("texture0", 0);
+//    this->defaultShader.setUniform("texture1", 1);
+//
+//    glActiveTexture(GL_TEXTURE0);
+//    this->texture0->bind();
+//
+//    glActiveTexture(GL_TEXTURE1);
+//    this->texture1->bind();
+//
+//    glDrawArrays(GL_TRIANGLES, 0, 36);
+//
+//    // Render GUI widgets
+//    glDisable(GL_DEPTH_TEST);
+//    glEnable(GL_BLEND);
+//    this->widgetShader.use();
+//    this->gui->render(&this->widgetShader);
 }
 
-bool Game::onMotionDown(const age::MotionEvent &event) {
-    this->cam->onMotionDown(event);
+bool Game::onTouchDownEvent(const age::TouchEvent &event) {
+    this->gui->onTouchDownEvent(event);
     return true;
 }
 
-bool Game::onMotionMove(const age::MotionEvent &event) {
-    this->cam->onMotionMove(event);
+bool Game::onTouchMoveEvent(const age::TouchEvent &event) {
+    this->gui->onTouchMoveEvent(event);
     return true;
 }
 
-bool Game::onMotionUp(const age::MotionEvent &event) {
-    this->cam->onMotionUp(event);
+bool Game::onTouchUpEvent(const age::TouchEvent &event) {
+    this->gui->onTouchUpEvent(event);
     return true;
 }
 

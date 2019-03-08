@@ -96,8 +96,8 @@ namespace age {
 void GameObject::onUpdate(std::chrono::duration<float> updateDuration) {}
 
 void GameObject::render(ShaderProgram *shader) {
-//    this->model.render(shader);
-//
+    this->model.render(shader);
+
 //    shader->setUniform("material.specularExponent", this->specularExponent);
 //
 //    for (const auto& mesh : *this->meshes) {

@@ -37,27 +37,26 @@ public:
     ///
     /// This is a helper function that calls glUseProgram() on this shader program.
     ///
-    ShaderProgram& use();
+    void use();
     
-    ShaderProgram& setVertexAttribPointer(const std::string &attribName, GLint size, GLenum type,
+    void setVertexAttribPointer(const std::string &attribName, GLint size, GLenum type,
                                           GLboolean normalized, GLsizei stride, const GLvoid *ptr);
-    ShaderProgram& enableVertexAttribArray(const std::string &attribName);
-    ShaderProgram& disableVertexAttribArray(const std::string &attribName);
+    void enableVertexAttribArray(const std::string &attribName);
+    void disableVertexAttribArray(const std::string &attribName);
     
     /// \name Uniforms
     /// Sets uniform value on this shader program. User must call ShaderProgram::use() before
     /// the 1st call to a ShaderProgram::setUniform() function to ensure that they are
     /// setting the uniform on the right active shader program.
     ///@{
-    ShaderProgram& setUniform(const std::string &name, bool value);
-    ShaderProgram& setUniform(const std::string &name, int value);
-    ShaderProgram& setUniform(const std::string &name, float value);
-    ShaderProgram& setUniform(const std::string &name, float x, float y, float z);
-    ShaderProgram& setUniform(const std::string &name, float x, float y, float z, float w);
-    ShaderProgram& setUniform(const std::string &name, const glm::vec2 &v);
-    ShaderProgram& setUniform(const std::string &name, const glm::vec3 &v);
-    ShaderProgram& setUniform(const std::string &name, const glm::mat3 &m);
-    ShaderProgram& setUniform(const std::string &name, const glm::mat4 &m);
+    void setUniform(const std::string &name, bool value);
+    void setUniform(const std::string &name, int value);
+    void setUniform(const std::string &name, float value);
+    void setUniform(const std::string &name, const glm::vec2 &v);
+    void setUniform(const std::string &name, const glm::vec3 &v);
+    void setUniform(const std::string &name, const glm::vec4 &v);
+    void setUniform(const std::string &name, const glm::mat3 &m);
+    void setUniform(const std::string &name, const glm::mat4 &m);
     ///@}
     
 private:

@@ -4,7 +4,7 @@
 
 #include <glm/vec2.hpp>
 
-#include "MotionEvent.h"
+#include "TouchEvent.h"
 
 namespace age {
 
@@ -17,9 +17,9 @@ class CameraFPV : public Camera {
 public:
     CameraFPV(float maxFov_deg, float aspectRatioWidthToHeight, float nearPlane, float farPlane);
     
-    bool onMotionDown(const MotionEvent &event);
-    bool onMotionMove(const MotionEvent &event);
-    bool onMotionUp(const MotionEvent &event);
+    bool onMotionDown(const TouchEvent &event);
+    bool onMotionMove(const TouchEvent &event);
+    bool onMotionUp(const TouchEvent &event);
     
 private:
     int rotationMotionId;

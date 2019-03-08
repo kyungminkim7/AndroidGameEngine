@@ -3,23 +3,22 @@
 #include <chrono>
 #include <memory>
 
-#include "CameraFPV.h"
+#include "Camera.h"
 #include "GameObject.h"
-#include "MotionEvent.h"
+#include "TouchEvent.h"
 #include "ShaderProgram.h"
-#include "Texture2D.h"
+#include "Widget.h"
 
 namespace age {
 
 /**
- * Game template class.
  * Users should subclass Game and then run it using GameEngine::run with the derived
  * Game class.
  */
 class Game {
 public:
     Game();
-    virtual ~Game();
+    virtual ~Game() = default;
     
     virtual void init();
     virtual void loadWorld();
@@ -27,18 +26,29 @@ public:
     virtual void onUpdate(std::chrono::duration<float> updateDuration);
     virtual void render();
     
-    virtual bool onMotionDown(const MotionEvent &event);
-    virtual bool onMotionMove(const MotionEvent &event);
-    virtual bool onMotionUp(const MotionEvent &event);
+    virtual bool onTouchDownEvent(const TouchEvent &event);
+    virtual bool onTouchMoveEvent(const TouchEvent &event);
+    virtual bool onTouchUpEvent(const TouchEvent &event);
+
+protected:
+    Widget* getGui();
+    Camera* getCam();
+    
+    ShaderProgram* getDefaultShader();
+    ShaderProgram* getWidgetShader();
 
 private:
     ShaderProgram defaultShader;
+    ShaderProgram widgetShader;
     
-    std::unique_ptr<CameraFPV> cam;
+    std::shared_ptr<Widget> gui;
     
-    std::unique_ptr<GameObject> obj;
-    unsigned int vbo;
-    std::unique_ptr<Texture2D> texture0, texture1;
+    std::unique_ptr<Camera> cam;
 };
+
+inline Widget* Game::getGui() {return this->gui.get();}
+inline Camera* Game::getCam() {return this->cam.get();}
+inline ShaderProgram* Game::getDefaultShader() {return &this->defaultShader;}
+inline ShaderProgram* Game::getWidgetShader() {return &this->widgetShader;}
 
 } // namespace age

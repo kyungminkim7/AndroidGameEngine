@@ -10,14 +10,14 @@ CameraFPV::CameraFPV(float maxFov_deg, float aspectRatioWidthToHeight, float nea
         : Camera(maxFov_deg, aspectRatioWidthToHeight, nearPlane, farPlane),
         rotationSensitivity(0.2f){}
 
-bool CameraFPV::onMotionDown(const age::MotionEvent &event) {
+bool CameraFPV::onMotionDown(const age::TouchEvent &event) {
     auto motion = event.begin();
     this->rotationMotionId = motion->first;
     this->lastMotionPosition = motion->second;
     return true;
 }
 
-bool CameraFPV::onMotionMove(const age::MotionEvent &event) {
+bool CameraFPV::onMotionMove(const age::TouchEvent &event) {
     auto rotationMotion = event.find(this->rotationMotionId);
     if (rotationMotion != event.end()) {
         auto offset = rotationMotion->second - this->lastMotionPosition;
@@ -40,7 +40,7 @@ bool CameraFPV::onMotionMove(const age::MotionEvent &event) {
     return true;
 }
 
-bool CameraFPV::onMotionUp(const age::MotionEvent &event) {
+bool CameraFPV::onMotionUp(const age::TouchEvent &event) {
     this->stopMoving();
     return true;
 }

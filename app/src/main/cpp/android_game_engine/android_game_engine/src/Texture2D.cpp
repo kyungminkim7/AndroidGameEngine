@@ -39,6 +39,10 @@ std::shared_ptr<unsigned int> loadTexture(const std::string &imageFilepath) {
     
     GLenum format;
     switch (numChannels) {
+        case 1:
+            format = GL_ALPHA;
+            break;
+        
         case 3:
             format = GL_RGB;
             break;

@@ -5,7 +5,7 @@
 #include "Log.h"
 #include "ManagerAssets.h"
 #include "ManagerWindowing.h"
-#include "MotionEvent.h"
+#include "TouchEvent.h"
 
 namespace age {
 namespace GameEngine {
@@ -128,22 +128,22 @@ int32_t inputEventCallback(android_app *app, AInputEvent *event) {
     
     auto eventType = AInputEvent_getType(event);
     if (eventType == AINPUT_EVENT_TYPE_MOTION) {
-        MotionEvent motionEvent;
+        TouchEvent touchEvent;
         auto numPointers = AMotionEvent_getPointerCount(event);
         for (auto i = 0u; i < numPointers; ++i) {
-            motionEvent[AMotionEvent_getPointerId(event, i)] = {AMotionEvent_getX(event, i),
-                                                                AMotionEvent_getY(event, i)};
+            touchEvent[AMotionEvent_getPointerId(event, i)] = {AMotionEvent_getX(event, i),
+                                                               AMotionEvent_getY(event, i)};
         }
     
         switch (AMotionEvent_getAction(event)) {
             case AMOTION_EVENT_ACTION_DOWN:
-                return game->onMotionDown(motionEvent);
+                return game->onTouchDownEvent(touchEvent);
         
             case AMOTION_EVENT_ACTION_MOVE:
-                return game->onMotionMove(motionEvent);
+                return game->onTouchMoveEvent(touchEvent);
         
             case AMOTION_EVENT_ACTION_UP:
-                return game->onMotionUp(motionEvent);
+                return game->onTouchUpEvent(touchEvent);
     
             default:
                 break;

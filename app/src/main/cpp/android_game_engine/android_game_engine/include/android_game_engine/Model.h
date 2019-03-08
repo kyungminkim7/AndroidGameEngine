@@ -96,6 +96,7 @@ public:
     void translateInLocalFrame(const glm::vec3 &translation);
     
     void setScale(const glm::vec3 &scale);
+    glm::vec3 getScale() const;
     
     ///
     /// \brief render Sets the uniform model and normal matrices on the shader.
@@ -120,5 +121,6 @@ inline glm::vec3 Model::getOrientationY() const {return this->orientation[1];}
 inline glm::vec3 Model::getOrientationZ() const {return this->orientation[2];}
 inline glm::vec3 Model::getLookAtDirection() const {return this->orientation[0];}
 inline glm::vec3 Model::getNormalDirection() const {return this->orientation[2];}
+inline glm::vec3 Model::getScale() const {return this->scale;}
 
 } // namespace age

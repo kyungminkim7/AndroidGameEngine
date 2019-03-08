@@ -6,6 +6,6 @@
 
 namespace age {
 
-using MotionEvent = std::unordered_map<int, glm::vec2>;
+using TouchEvent = std::unordered_map<int, glm::vec2>;
 
 } // namespace age

@@ -11,6 +11,8 @@ add_library(${PROJECT_NAME} STATIC
         "src/CameraFPV.cpp"
         "src/Game.cpp"
         "src/GameObject.cpp"
+        "src/Joystick.cpp"
+        "src/JoystickHandle.cpp"
         "src/Log.cpp"
         "src/ManagerAssets.cpp"
         "src/ManagerWindowing.cpp"

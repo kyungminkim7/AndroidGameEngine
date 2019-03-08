@@ -10,7 +10,16 @@ add_subdirectory(android_game_engine)
 set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
 
-add_library(game SHARED main.cpp)
+set(CMAKE_CXX_STANDARD 14)
+
+add_library(game SHARED
+        main.cpp
+        TestGame.cpp
+        TestGame.h)
+
+target_include_directories(game INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
 target_link_libraries(game PUBLIC
         android_game_engine)

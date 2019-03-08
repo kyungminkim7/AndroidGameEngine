@@ -13,7 +13,6 @@
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerAssets.h>
-#include <android_game_engine/Utilities.h>
 
 namespace {
 ///
@@ -143,71 +142,54 @@ ShaderProgram::~ShaderProgram() {
     glDeleteProgram(this->id);
 }
 
-ShaderProgram& ShaderProgram::use() {
+void ShaderProgram::use() {
     glUseProgram(this->id);
-    return *this;
 }
 
-ShaderProgram& ShaderProgram::setVertexAttribPointer(const std::string &attribName, GLint size,
+void ShaderProgram::setVertexAttribPointer(const std::string &attribName, GLint size,
                                                      GLenum type, GLboolean normalized,
                                                      GLsizei stride, const GLvoid *ptr) {
     glVertexAttribPointer(static_cast<GLuint>(glGetAttribLocation(this->id, attribName.c_str())),
             size, type, normalized, stride, ptr);
-    return *this;
 }
 
-ShaderProgram& ShaderProgram::enableVertexAttribArray(const std::string &attribName) {
+void ShaderProgram::enableVertexAttribArray(const std::string &attribName) {
     glEnableVertexAttribArray(static_cast<GLuint>(glGetAttribLocation(this->id, attribName.c_str())));
-    return *this;
 }
 
-ShaderProgram& ShaderProgram::disableVertexAttribArray(const std::string &attribName) {
+void ShaderProgram::disableVertexAttribArray(const std::string &attribName) {
     glDisableVertexAttribArray(static_cast<GLuint>(glGetAttribLocation(this->id, attribName.c_str())));
-    return *this;
 }
 
-ShaderProgram& ShaderProgram::setUniform(const std::string &name, bool value) {
+void ShaderProgram::setUniform(const std::string &name, bool value) {
     glUniform1i(glGetUniformLocation(this->id, name.c_str()), value);
-    return *this;
 }
 
-ShaderProgram& ShaderProgram::setUniform(const std::string &name, int value) {
+void ShaderProgram::setUniform(const std::string &name, int value) {
     glUniform1i(glGetUniformLocation(this->id, name.c_str()), value);
-    return *this;
 }
 
-ShaderProgram& ShaderProgram::setUniform(const std::string &name, float value) {
+void ShaderProgram::setUniform(const std::string &name, float value) {
     glUniform1f(glGetUniformLocation(this->id, name.c_str()), value);
-    return *this;
 }
 
-ShaderProgram& ShaderProgram::setUniform(const std::string &name, float x, float y, float z) {
-    glUniform3f(glGetUniformLocation(this->id, name.c_str()), x, y, z);
-    return *this;
-}
-
-ShaderProgram& ShaderProgram::setUniform(const std::string &name, float x, float y, float z, float w) {
-    glUniform4f(glGetUniformLocation(this->id, name.c_str()), x, y, z, w);
-    return *this;
-}
-
-ShaderProgram& ShaderProgram::setUniform(const std::string &name, const glm::vec2 &v) {
+void ShaderProgram::setUniform(const std::string &name, const glm::vec2 &v) {
     glUniform2f(glGetUniformLocation(this->id, name.c_str()), v.x, v.y);
-    return *this;
 }
 
-ShaderProgram& ShaderProgram::setUniform(const std::string &name, const glm::vec3 &v) {
+void ShaderProgram::setUniform(const std::string &name, const glm::vec3 &v) {
     glUniform3f(glGetUniformLocation(this->id, name.c_str()), v.x, v.y, v.z);
-    return *this;
 }
 
-ShaderProgram& ShaderProgram::setUniform(const std::string &name, const glm::mat3 &m) {
+void ShaderProgram::setUniform(const std::string &name, const glm::vec4 &v) {
+    glUniform4f(glGetUniformLocation(this->id, name.c_str()), v.x, v.y, v.z, v.w);
+}
+
+void ShaderProgram::setUniform(const std::string &name, const glm::mat3 &m) {
     glUniformMatrix3fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, glm::value_ptr(m));
-    return *this;
 }
 
-ShaderProgram& ShaderProgram::setUniform(const std::string &name, const glm::mat4 &m) {
+void ShaderProgram::setUniform(const std::string &name, const glm::mat4 &m) {
     glUniformMatrix4fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, glm::value_ptr(m));
-    return *this;
 }
 } // namespace age
