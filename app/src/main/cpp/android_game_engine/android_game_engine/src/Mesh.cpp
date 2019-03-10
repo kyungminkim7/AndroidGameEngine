@@ -26,11 +26,11 @@ namespace {
 namespace age {
 
 Mesh::Mesh(std::shared_ptr<age::VertexBufferObject> vbo,
-           std::shared_ptr<age::ElementBufferObject> ebo, const std::string &textureFilepath)
+           std::shared_ptr<age::ElementBufferObject> ebo,
+           const std::vector<std::string> &textureFilepaths)
            : vbo(std::move(vbo)), ebo(std::move(ebo)){
-    if (!textureFilepath.empty()) {
-        Texture2D texture(textureFilepath);
-        this->diffuseTextures.push_back(texture);
+    for (const auto& file : textureFilepaths) {
+        this->diffuseTextures.emplace_back(file);
     }
 }
 
