@@ -13,7 +13,7 @@ uniform mat3 normal;
 
 void main() {
    gl_Position = projection * view * model * vec4(aPos, 1.0);
-   vPosition = aPos;
-   vNormal = normalize(vec3(projection * vec4(normal * aNormal, 0.0)));
+   vPosition = vec3(model * vec4(aPos, 1.0));
+   vNormal = vec3(normal * aNormal);
    vTexCoord = aTexCoord;
 }

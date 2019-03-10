@@ -107,4 +107,12 @@ void GameObject::setMesh(std::shared_ptr<Meshes> mesh) {
     this->meshes = std::move(mesh);
 }
 
+void GameObject::setScale(const glm::vec3& scale) {
+    this->model.setScale(scale);
+}
+
+void GameObject::setSpecularExponent(float specularExponent) {
+    this->specularExponent = specularExponent;
+}
+
 } // namespace age

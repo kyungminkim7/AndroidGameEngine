@@ -13,8 +13,8 @@ namespace age {
 ///
 class Box : public GameObject {
 public:
-    explicit Box(const std::vector<std::string> &textureFilepaths={},
-                 const glm::vec3 &dimensions=glm::vec3(1.0f));
+    explicit Box(const std::vector<std::string> &diffuseTextureFilepaths={},
+                 const std::vector<std::string> &specularTextureFilepaths={});
 };
 
 } // namespace age

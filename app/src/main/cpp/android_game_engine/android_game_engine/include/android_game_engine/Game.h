@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "CameraFPV.h"
+#include "DirectionalLight.h"
 #include "GameObject.h"
 #include "TouchEvent.h"
 #include "ShaderProgram.h"
@@ -45,6 +46,7 @@ private:
     std::shared_ptr<Widget> gui;
     
     std::unique_ptr<CameraFPV> cam;
+    std::unique_ptr<DirectionalLight> directionalLight;
     std::vector<std::unique_ptr<GameObject>> worldList;
 };
 

@@ -169,8 +169,4 @@ inline void GameObject::rotate(float angle_rad, const glm::vec3 &axis) {this->mo
 inline void GameObject::translate(const glm::vec3 &translation) {this->model.translate(translation);}
 inline void GameObject::translateInLocalFrame(const glm::vec3 &translation) {this->model.translateInLocalFrame(translation);}
 
-inline void GameObject::setScale(const glm::vec3& scale) {this->model.setScale(scale); }
-
-inline void GameObject::setSpecularExponent(float specularExponent) {this->specularExponent = specularExponent;}
-
 } // namespace age

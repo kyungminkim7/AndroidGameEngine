@@ -31,6 +31,11 @@ void Game::init() {
     this->cam = std::make_unique<CameraFPV>(45.0f,
                                             static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
                                             0.1f, 1000.0f);
+    
+    // Setup light
+    this->directionalLight = std::make_unique<DirectionalLight>(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f),
+            -10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 500.0f);
+    this->directionalLight->setLookAtDirection({1.0f, 1.0f, -1.0f});
 }
 
 void Game::loadWorld() {}
@@ -47,13 +52,16 @@ void Game::render() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Render game objects
+    // Render world
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
     
     this->defaultShader.use();
     this->defaultShader.setUniform("projection", this->cam->getProjectionMatrix());
     this->defaultShader.setUniform("view", this->cam->getViewMatrix());
+    this->defaultShader.setUniform("viewPosition", this->cam->getPosition());
+    
+    this->directionalLight->render(&this->defaultShader);
 
     for (auto& gameObject : this->worldList) {
         gameObject->render(&this->defaultShader);

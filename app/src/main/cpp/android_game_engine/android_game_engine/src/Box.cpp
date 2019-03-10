@@ -135,7 +135,8 @@ std::weak_ptr<age::ElementBufferObject> eboCache;
 
 namespace age {
 
-Box::Box(const std::vector<std::string> &textureFilepaths, const glm::vec3 &dimensions) {
+Box::Box(const std::vector<std::string> &diffuseTextureFilepaths,
+         const std::vector<std::string> &specularTextureFilepaths) {
     auto vbo = vboCache.lock();
     if (!vbo) {
         vbo = std::make_shared<VertexBufferObject>(positions, normals, textureCoords);
@@ -147,10 +148,9 @@ Box::Box(const std::vector<std::string> &textureFilepaths, const glm::vec3 &dime
     }
     
     std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::move(vbo), std::move(ebo),
-                                                   textureFilepaths)});
+                                                   diffuseTextureFilepaths,
+                                                   specularTextureFilepaths)});
     this->setMesh(std::move(meshes));
-    
-    this->setScale(dimensions);
 }
 
 } // namespace age

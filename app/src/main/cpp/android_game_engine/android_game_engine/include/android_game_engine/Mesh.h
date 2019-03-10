@@ -21,7 +21,8 @@ class VertexBufferObject;
 class Mesh {
 public:
     Mesh(std::shared_ptr<VertexBufferObject> vbo, std::shared_ptr<ElementBufferObject> ebo,
-         const std::vector<std::string> &textureFilepaths);
+         const std::vector<std::string> &diffuseTextureFilepaths,
+         const std::vector<std::string> &specularTextureFilepaths);
     
     void render(ShaderProgram *shader);
 
