@@ -33,11 +33,10 @@ public:
     virtual bool onTouchUpEvent(const TouchEvent &event);
 
 protected:
+    void addToWorldList(std::unique_ptr<GameObject> gameObject);
+    
     Widget* getGui();
     CameraFPV* getCam();
-    
-    ShaderProgram* getDefaultShader();
-    ShaderProgram* getWidgetShader();
 
 private:
     ShaderProgram defaultShader;
@@ -51,7 +50,5 @@ private:
 
 inline Widget* Game::getGui() {return this->gui.get();}
 inline CameraFPV* Game::getCam() {return this->cam.get();}
-inline ShaderProgram* Game::getDefaultShader() {return &this->defaultShader;}
-inline ShaderProgram* Game::getWidgetShader() {return &this->widgetShader;}
 
 } // namespace age

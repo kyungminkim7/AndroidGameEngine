@@ -44,42 +44,27 @@ void Game::onUpdate(std::chrono::duration<float> updateDuration) {
 }
 
 void Game::render() {
-//    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//
-//    // Render game objects
-//    glEnable(GL_DEPTH_TEST);
-//    glDisable(GL_BLEND);
-//    this->defaultShader.use();
-//
-//    this->defaultShader.setUniform("projection", this->cam->getProjectionMatrix());
-//    this->defaultShader.setUniform("view", this->cam->getViewMatrix());
-//
-//    this->obj->render(&this->defaultShader);
-//
-//    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-//    this->defaultShader.setVertexAttribPointer("aPos", 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-//    this->defaultShader.setVertexAttribPointer("aTexCoord", 2, GL_FLOAT, GL_FALSE,
-//            5 * sizeof(float), (void*)(3 * sizeof(float)));
-//    this->defaultShader.enableVertexAttribArray("aPos");
-//    this->defaultShader.enableVertexAttribArray("aTexCoord");
-//
-//    this->defaultShader.setUniform("texture0", 0);
-//    this->defaultShader.setUniform("texture1", 1);
-//
-//    glActiveTexture(GL_TEXTURE0);
-//    this->texture0->bind();
-//
-//    glActiveTexture(GL_TEXTURE1);
-//    this->texture1->bind();
-//
-//    glDrawArrays(GL_TRIANGLES, 0, 36);
-//
-//    // Render GUI widgets
-//    glDisable(GL_DEPTH_TEST);
-//    glEnable(GL_BLEND);
-//    this->widgetShader.use();
-//    this->gui->render(&this->widgetShader);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Render game objects
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    
+    this->defaultShader.use();
+    this->defaultShader.setUniform("projection", this->cam->getProjectionMatrix());
+    this->defaultShader.setUniform("view", this->cam->getViewMatrix());
+
+    for (auto& gameObject : this->worldList) {
+        gameObject->render(&this->defaultShader);
+    }
+
+    // Render GUI widgets
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    
+    this->widgetShader.use();
+    this->gui->render(&this->widgetShader);
 }
 
 bool Game::onTouchDownEvent(const age::TouchEvent &event) {
@@ -95,6 +80,10 @@ bool Game::onTouchMoveEvent(const age::TouchEvent &event) {
 bool Game::onTouchUpEvent(const age::TouchEvent &event) {
     this->gui->onTouchUpEvent(event);
     return true;
+}
+
+void Game::addToWorldList(std::unique_ptr<age::GameObject> gameObject) {
+    this->worldList.push_back(std::move(gameObject));
 }
 
 } // namespace age
