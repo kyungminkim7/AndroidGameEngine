@@ -6,13 +6,13 @@
 //#include <assimp/material.h>
 //#include <assimp/mesh.h>
 
-#include <android_game_engine/ElementBufferObject.h>
-#include <android_game_engine/VertexBufferObject.h>
+#include "Texture2D.h"
 
 namespace age {
 
+class ElementBufferObject;
 class ShaderProgram;
-class Texture2D;
+class VertexBufferObject;
 
 ///
 /// \brief Aggregates vertex and index data to load onto the GPU
@@ -20,19 +20,17 @@ class Texture2D;
 ///
 class Mesh {
 public:
-    Mesh(const std::vector<float> &vertices, const std::vector<float> &normals,
-         const std::vector<float> &textureCoords, const std::vector<unsigned int> &indices,
-         const std::string &textureFilepath=std::string());
+    Mesh(std::shared_ptr<VertexBufferObject> vbo, std::shared_ptr<ElementBufferObject> ebo,
+            const std::string &textureFilepath=std::string());
     
     void render(ShaderProgram *shader);
 
 private:
     void bindTextures(ShaderProgram *shader);
     
-    VertexBufferObject vbo;
-    ElementBufferObject ebo;
+    std::shared_ptr<VertexBufferObject> vbo;
+    std::shared_ptr<ElementBufferObject> ebo;
     
-    std::vector<Texture2D> ambientTextures;
     std::vector<Texture2D> diffuseTextures;
     std::vector<Texture2D> specularTextures;
 };

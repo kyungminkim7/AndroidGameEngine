@@ -10,26 +10,24 @@
 #include <glm/mat4x4.hpp>
 
 #include <android_game_engine/Exception.h>
-//#include <android_game_engine/Mesh.h>
+#include <android_game_engine/Mesh.h>
 #include <android_game_engine/ShaderProgram.h>
 
-//namespace {
-//
-//using Meshes = std::vector<std::unique_ptr<age::Mesh>>;
-//
-//std::unordered_map<std::string, std::weak_ptr<Meshes>> cachedMeshes;
-//
-/////
-///// \brief loadMeshes Loads and caches mesh data from model file.
-/////
-///// Mesh caches will automatically be cleaned up as the last
-///// reference to the returned shared_ptr<Meshes> is destroyed.
-/////
-///// \param modelFilepath Absolute filepath to the model data.
-///// \return Shared pointer to the model data (meshes).
-///// \exception ge::LoadError Failed to load mesh data from model file.
-///// \exception ge::LoadError Failed to load texture image from file.
-/////
+namespace {
+
+std::unordered_map<std::string, std::weak_ptr<age::GameObject::Meshes>> cachedMeshes;
+
+///
+/// \brief loadMeshes Loads and caches mesh data from model file.
+///
+/// Mesh caches will automatically be cleaned up as the last
+/// reference to the returned shared_ptr<Meshes> is destroyed.
+///
+/// \param modelFilepath Absolute filepath to the model data.
+/// \return Shared pointer to the model data (meshes).
+/// \exception ge::LoadError Failed to load mesh data from model file.
+/// \exception ge::LoadError Failed to load texture image from file.
+///
 //std::shared_ptr<Meshes> loadMeshes(const std::string &modelFilepath);
 //void processNode(Meshes *meshes, const aiNode &node, const aiScene &scene, const std::string &modelDirectory);
 //
@@ -78,12 +76,12 @@
 //        processNode(meshes, *node.mChildren[i], scene, modelDirectory);
 //    }
 //}
-//
-//} // namespace
+
+} // namespace
 
 namespace age {
 
-//GameObject::GameObject() : meshes(std::make_shared<Meshes>()) {}
+GameObject::GameObject() : meshes(std::make_shared<Meshes>()) {}
 //GameObject::GameObject(const std::string &modelFilepath) : meshes(loadMeshes(modelFilepath)) {}
 //GameObject::GameObject(const std::vector<float> &positions,
 //                       const std::vector<float> &normals,
@@ -98,16 +96,15 @@ void GameObject::onUpdate(std::chrono::duration<float> updateDuration) {}
 void GameObject::render(ShaderProgram *shader) {
     this->model.render(shader);
 
-//    shader->setUniform("material.specularExponent", this->specularExponent);
-//
-//    for (const auto& mesh : *this->meshes) {
-//        mesh->render(shader);
-//    }
+    shader->setUniform("material.specularExponent", this->specularExponent);
+
+    for (auto& mesh : *this->meshes) {
+        mesh.render(shader);
+    }
 }
 
-//void GameObject::setMesh(std::unique_ptr<Mesh> mesh) {
-//    this->meshes->clear();
-//    this->meshes->push_back(std::move(mesh));
-//}
+void GameObject::setMesh(std::shared_ptr<Meshes> mesh) {
+    this->meshes = std::move(mesh);
+}
 
 } // namespace age

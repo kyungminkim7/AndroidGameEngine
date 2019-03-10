@@ -2,8 +2,9 @@
 
 #include <GLES2/gl2.h>
 
+#include <android_game_engine/ElementBufferObject.h>
 #include <android_game_engine/ShaderProgram.h>
-#include <android_game_engine/Texture2D.h>
+#include <android_game_engine/VertexBufferObject.h>
 
 namespace {
 
@@ -24,33 +25,25 @@ namespace {
 
 namespace age {
 
-Mesh::Mesh(const std::vector<float> &vertices, const std::vector<float> &normals,
-           const std::vector<float> &textureCoords, const std::vector<unsigned int> &indices,
-           const std::string &textureFilepath)
-           : vbo(vertices, normals, textureCoords), ebo(indices) {
+Mesh::Mesh(std::shared_ptr<age::VertexBufferObject> vbo,
+           std::shared_ptr<age::ElementBufferObject> ebo, const std::string &textureFilepath)
+           : vbo(std::move(vbo)), ebo(std::move(ebo)){
     if (!textureFilepath.empty()) {
         Texture2D texture(textureFilepath);
-        this->ambientTextures.push_back(texture);
         this->diffuseTextures.push_back(texture);
     }
 }
 
 void Mesh::render(ShaderProgram *shader) {
-    this->vbo.bind(shader);
-    this->ebo.bind();
+    this->vbo->bind(shader);
+    this->ebo->bind();
     this->bindTextures(shader);
-    glDrawElements(GL_TRIANGLES, this->ebo.getNumIndices(),
+    glDrawElements(GL_TRIANGLES, this->ebo->getNumIndices(),
                    GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0));
 }
 
 void Mesh::bindTextures(ShaderProgram *shader) {
     int textureUnit = 0;
-    
-    for (size_t i = 0; i < this->ambientTextures.size(); ++i, ++textureUnit) {
-        glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(textureUnit));
-        shader->setUniform("material.ambientTexture" + std::to_string(i), textureUnit);
-        this->ambientTextures[i].bind();
-    }
     
     for (size_t i = 0; i < this->diffuseTextures.size(); ++i, ++textureUnit) {
         glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(textureUnit));

@@ -17,7 +17,9 @@ class ShaderProgram;
 ///
 class GameObject {
 public:
-//    GameObject();
+    using Meshes = std::vector<Mesh>;
+    
+    GameObject();
     
     ///
     /// \brief GameObject Loads vertex and texture data and creates a model
@@ -48,7 +50,7 @@ public:
     
     virtual void render(ShaderProgram *shader);
     
-//    void setMesh(std::unique_ptr<Mesh> mesh);
+    void setMesh(std::shared_ptr<Meshes> mesh);
     
     glm::mat4 getModelMatrix() const;
     
@@ -131,10 +133,9 @@ public:
     void setSpecularExponent(float specularExponent);
 
 private:
-//    using Meshes = std::vector<std::unique_ptr<Mesh>>;
     Model model;
     
-//    std::shared_ptr<Meshes> meshes;
+    std::shared_ptr<Meshes> meshes;
     float specularExponent = 64.0f;
 };
 
