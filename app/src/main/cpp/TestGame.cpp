@@ -55,13 +55,13 @@ void TestGame::loadWorld() {
     this->getCam()->setPosition({-10.0f, 1.0f, 1.0f});
     this->getCam()->setLookAtPoint(glm::vec3(0.0f));
 
-    std::unique_ptr<Box> box1(new Box({"images/container.jpg"}, {"images/blank.png"}));
-    std::unique_ptr<Box> box2(new Box({"images/awesomeface.png"}, {"images/blank.png"}));
+    std::unique_ptr<Box> box1(new Box({"images/awesomeface.png"}, {"images/blank.png"}));
+    std::unique_ptr<Box> box2(new Box({"images/container.jpg"}, {"images/blank.png"}));
     
-    box1->setScale({2.0f, 3.0f, 5.0f});
-    box1->setPosition({2.0f, -1.0f, 4.0f});
-    box1->rotate(glm::radians(45.0f), {1.0f, 1.0f, 1.0f});
     this->box = box1.get();
+    this->box->setPosition({0.0f, 5.0f, 0.0f});
+    this->getDirectionalLight()->setPosition(this->box->getPosition());
+    this->getDirectionalLight()->setLookAtPoint(glm::vec3(0.0f));
     
     this->addToWorldList(std::move(box1));
     this->addToWorldList(std::move(box2));
@@ -70,7 +70,15 @@ void TestGame::loadWorld() {
 void TestGame::onUpdate(std::chrono::duration<float> updateDuration) {
     Game::onUpdate(updateDuration);
     
-    box->rotate(glm::radians(20.0f) * updateDuration.count(), {1.0f, 2.0f, 3.0f});
+    static auto beginning = std::chrono::system_clock::now();
+    std::chrono::duration<float> elapsedTime = std::chrono::system_clock::now() - beginning;
+    
+    auto r = 3.0f;
+    this->box->setPosition({r * std::sin(elapsedTime.count()),
+                            r * std::cos(elapsedTime.count()),
+                            r * std::cos(elapsedTime.count())});
+    this->getDirectionalLight()->setPosition(this->box->getPosition());
+    this->getDirectionalLight()->setLookAtPoint(glm::vec3(0.0f));
 }
 
 } // namespace age

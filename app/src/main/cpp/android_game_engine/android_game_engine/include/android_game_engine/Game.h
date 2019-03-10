@@ -38,6 +38,7 @@ protected:
     
     Widget* getGui();
     CameraFPV* getCam();
+    DirectionalLight* getDirectionalLight();
 
 private:
     ShaderProgram defaultShader;
@@ -52,5 +53,6 @@ private:
 
 inline Widget* Game::getGui() {return this->gui.get();}
 inline CameraFPV* Game::getCam() {return this->cam.get();}
+inline DirectionalLight* Game::getDirectionalLight() {return this->directionalLight.get();}
 
 } // namespace age
