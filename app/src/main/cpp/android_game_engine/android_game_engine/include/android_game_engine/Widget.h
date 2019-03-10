@@ -16,6 +16,14 @@ namespace age {
 
 class ShaderProgram;
 
+///
+/// \brief Base class for building GUI Widgets. All GUI widgets are described in the following
+///        screen coordinate system:
+///             - Upper left: (0, 0)
+///             - Upper right: (dimensions.x, 0)
+///             - Lower left: (0, dimensions.y)
+///             - Lower right: (dimensions.x, dimensions.y)
+///
 class Widget {
 public:
     static std::shared_ptr<Widget> New(Widget *parent=nullptr);
@@ -26,11 +34,19 @@ public:
     void setTexture(const std::string &imageFilepath);
     void setColor(const glm::vec4 &color);
     
+    ///
+    /// Sets the upper left position and dimensions of this widget relative to its parent
+    /// in screen coordinates.
+    /// \param upperLeftPosition
+    /// \param dimensions
     void setGeometry(const glm::vec2 &upperLeftPosition, const glm::vec2 &dimensions);
+    
     void setRelativePosition(const glm::vec2 &upperLeftPosition);
     glm::vec2 getRelativePosition() const;
+    
     void setPosition(const glm::vec2 &upperLeftPosition);
     glm::vec2 getPosition() const;
+    
     virtual void setDimensions(const glm::vec2 &dimensions);
     glm::vec2 getDimensions() const;
     

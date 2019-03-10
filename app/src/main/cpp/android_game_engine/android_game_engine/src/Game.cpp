@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <android_game_engine/ManagerWindowing.h>
+#include <android_game_engine/Widget.h>
 
 namespace age {
 
@@ -36,6 +37,10 @@ void Game::loadWorld() {}
 
 void Game::onUpdate(std::chrono::duration<float> updateDuration) {
     cam->onUpdate(updateDuration);
+    
+    for (auto& gameObject : this->worldList) {
+        gameObject->onUpdate(updateDuration);
+    }
 }
 
 void Game::render() {

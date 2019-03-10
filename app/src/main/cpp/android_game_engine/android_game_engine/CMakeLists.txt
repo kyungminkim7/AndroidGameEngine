@@ -9,6 +9,7 @@ target_link_libraries(native_app_glue PUBLIC log)
 add_library(${PROJECT_NAME} STATIC
         "src/Camera.cpp"
         "src/CameraFPV.cpp"
+        "src/ElementBufferObject.cpp"
         "src/Game.cpp"
         "src/GameObject.cpp"
         "src/Joystick.cpp"
@@ -16,10 +17,12 @@ add_library(${PROJECT_NAME} STATIC
         "src/Log.cpp"
         "src/ManagerAssets.cpp"
         "src/ManagerWindowing.cpp"
+        "src/Mesh.cpp"
         "src/Model.cpp"
         "src/ShaderProgram.cpp"
         "src/Texture2D.cpp"
         "src/Utilities.cpp"
+        "src/VertexBufferObject.cpp"
         "src/Widget.cpp")
 
 target_include_directories(${PROJECT_NAME} PUBLIC

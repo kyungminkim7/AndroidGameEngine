@@ -6,6 +6,9 @@ namespace age {
 
 class Joystick;
 
+///
+/// \brief Widget for joystick handle meant to be used by a Joystick Widget.
+///
 class JoystickHandle : public Widget {
 public:
     static std::shared_ptr<JoystickHandle> New(Joystick *parent);

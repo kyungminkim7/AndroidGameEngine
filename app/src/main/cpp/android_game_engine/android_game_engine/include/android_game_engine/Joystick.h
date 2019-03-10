@@ -9,6 +9,15 @@ namespace age {
 
 class JoystickHandle;
 
+///
+/// \brief Widget implementing a joystick. The joystick provides the following outputs for each
+///        position. Intermediate positions are interpolated to the limits:
+///             - Center: (0.0f, 0.0f)
+///             - Left: (-1.0f, 0.0f)
+///             - Right: (1.0f, 0.0f)
+///             - Up: (0.0f, 1.0f)
+///             - Down: (0.0f, -1.0f
+///
 class Joystick : public Widget {
 public:
     using OnTouchDownCallback = std::function<void(const glm::vec2&)>;

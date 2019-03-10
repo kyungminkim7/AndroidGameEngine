@@ -21,18 +21,17 @@ void shutdown();
 
 void swapBuffers();
 
-/**
- * Use this function before init or calls to GameEngine::run to specify EGL
- * attributes different from the default.
- * @param attribs
- */
+///
+/// Use this function before init or calls to GameEngine::run to specify EGL
+/// attributes different from the default.
+/// \param attribs
+///
 void setEglAttribs(const std::vector<EGLint> &attribs);
 
-/**
- * Use this function before init or calls to GameEngine::run to specify
- * OpenGL context attributes different from the default.
- * @param attribs
- */
+/// Use this function before init or calls to GameEngine::run to specify
+/// OpenGL context attributes different from the default.
+/// \param attribs
+///
 void setContextAttribs(const std::vector<EGLint> &attribs);
 
 int getWindowWidth();

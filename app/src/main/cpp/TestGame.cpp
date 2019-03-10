@@ -4,6 +4,7 @@
 
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
+#include <android_game_engine/Widget.h>
 
 namespace {
 std::vector<float> vertices = {

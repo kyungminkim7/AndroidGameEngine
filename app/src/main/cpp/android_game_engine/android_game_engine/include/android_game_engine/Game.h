@@ -2,14 +2,16 @@
 
 #include <chrono>
 #include <memory>
+#include <vector>
 
 #include "CameraFPV.h"
 #include "GameObject.h"
 #include "TouchEvent.h"
 #include "ShaderProgram.h"
-#include "Widget.h"
 
 namespace age {
+
+class Widget;
 
 /**
  * Users should subclass Game and then run it using GameEngine::run with the derived
@@ -44,6 +46,7 @@ private:
     std::shared_ptr<Widget> gui;
     
     std::unique_ptr<CameraFPV> cam;
+    std::vector<std::unique_ptr<GameObject>> worldList;
 };
 
 inline Widget* Game::getGui() {return this->gui.get();}
