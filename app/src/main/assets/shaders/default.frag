@@ -60,8 +60,7 @@ Lighting calculateBaseLight(vec3 lightDirection, Lighting lighting) {
 }
 
 vec3 calculateDirectionalLight() {
-    vec3 lightDirection = normalize(directionalLight.direction);
-    Lighting result = calculateBaseLight(lightDirection,
+    Lighting result = calculateBaseLight(directionalLight.direction,
                                          directionalLight.lighting);
     return result.ambient + result.diffuse + result.specular;
 }
