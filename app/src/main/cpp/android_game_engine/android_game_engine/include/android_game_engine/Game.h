@@ -9,6 +9,7 @@
 #include "GameObject.h"
 #include "TouchEvent.h"
 #include "ShaderProgram.h"
+#include "Skybox.h"
 
 namespace age {
 
@@ -34,6 +35,7 @@ public:
     virtual bool onTouchUpEvent(const TouchEvent &event);
 
 protected:
+    void setSkybox(std::unique_ptr<Skybox> skybox);
     void addToWorldList(std::unique_ptr<GameObject> gameObject);
     
     Widget* getGui();
@@ -42,12 +44,14 @@ protected:
 
 private:
     ShaderProgram defaultShader;
+    ShaderProgram skyboxShader;
     ShaderProgram widgetShader;
     
-    std::shared_ptr<Widget> gui;
+    std::shared_ptr<Widget> gui = nullptr;
     
-    std::unique_ptr<CameraFPV> cam;
-    std::unique_ptr<DirectionalLight> directionalLight;
+    std::unique_ptr<Skybox> skybox = nullptr;
+    std::unique_ptr<CameraFPV> cam = nullptr;
+    std::unique_ptr<DirectionalLight> directionalLight = nullptr;
     std::vector<std::unique_ptr<GameObject>> worldList;
 };
 

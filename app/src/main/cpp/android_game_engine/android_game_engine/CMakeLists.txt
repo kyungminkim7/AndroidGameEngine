@@ -24,6 +24,7 @@ add_library(${PROJECT_NAME} STATIC
         "src/Model.cpp"
         "src/Quad.cpp"
         "src/ShaderProgram.cpp"
+        "src/Skybox.cpp"
         "src/Texture2D.cpp"
         "src/Utilities.cpp"
         "src/VertexBufferObject.cpp"

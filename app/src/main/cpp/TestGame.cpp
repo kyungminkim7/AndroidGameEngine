@@ -1,5 +1,6 @@
 #include "TestGame.h"
 
+#include <array>
 #include <functional>
 
 #include <glm/trigonometric.hpp>
@@ -53,12 +54,23 @@ void TestGame::setupGui() {
 }
 
 void TestGame::loadWorld() {
+//    const std::string skyboxDir = "skyboxes/early_morning/";
+//    std::array<std::string, 6> skyboxImages {
+//        skyboxDir + "front.jpg",
+//        skyboxDir + "back.jpg",
+//        skyboxDir + "right.jpg",
+//        skyboxDir + "left.jpg",
+//        skyboxDir + "top.jpg",
+//        skyboxDir + "bottom.jpg"
+//    };
+//    this->setSkybox(std::make_unique<Skybox>(skyboxImages));
+    
     this->getCam()->setPosition({-10.0f, 1.0f, 1.0f});
     this->getCam()->setLookAtPoint(glm::vec3(0.0f));
 
     std::unique_ptr<Box> box1(new Box({"images/container.jpg"}, {"images/white.png"}));
     std::unique_ptr<Box> box2(new Box({"images/awesomeface.png"}, {"images/white.png"}));
-    std::unique_ptr<Quad> quad(new Quad({"images/wood.png"}, {"images/white.png"}, glm::vec3(5.0f)));
+    std::unique_ptr<Quad> quad(new Quad({"images/wood.png"}, {"images/white.png"}, glm::vec2(5.0f)));
     
     this->box = box1.get();
     this->box->setScale({2.0f, 3.0f, 5.0f});

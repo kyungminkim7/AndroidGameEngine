@@ -9,7 +9,8 @@
 namespace age {
 
 Game::Game() : defaultShader("shaders/default.vert", "shaders/default.frag"),
-                widgetShader("shaders/widget.vert", "shaders/widget.frag") {}
+               skyboxShader("shaders/skybox.vert", "shaders/skybox.frag"),
+               widgetShader("shaders/widget.vert", "shaders/widget.frag") {}
 
 void Game::init() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -30,11 +31,11 @@ void Game::init() {
     // Setup cam
     this->cam = std::make_unique<CameraFPV>(45.0f,
                                             static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
-                                            0.1f, 1000.0f);
+                                            0.1f, 500.0f);
     
     // Setup light
     this->directionalLight = std::make_unique<DirectionalLight>(glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f),
-            -10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 500.0f);
+            -10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 250.0f);
     this->directionalLight->setLookAtDirection({1.0f, 1.0f, -1.0f});
 }
 
@@ -56,15 +57,27 @@ void Game::render() {
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
     
+    auto projection = this->cam->getProjectionMatrix();
+    auto view = this->cam->getViewMatrix();
+    
     this->defaultShader.use();
-    this->defaultShader.setUniform("projection", this->cam->getProjectionMatrix());
-    this->defaultShader.setUniform("view", this->cam->getViewMatrix());
+    this->defaultShader.setUniform("projection_view", projection * view);
     this->defaultShader.setUniform("viewPosition", this->cam->getPosition());
     
     this->directionalLight->render(&this->defaultShader);
 
     for (auto& gameObject : this->worldList) {
         gameObject->render(&this->defaultShader);
+    }
+    
+    // Render skybox
+    if (this->skybox != nullptr) {
+        glDepthFunc(GL_LEQUAL);
+        view[3] = glm::vec4(0.0f);
+        this->skyboxShader.use();
+        this->skyboxShader.setUniform("projection_view", projection * view);
+        this->skybox->render(&this->defaultShader);
+        glDepthFunc(GL_LESS);
     }
 
     // Render GUI widgets
@@ -88,6 +101,10 @@ bool Game::onTouchMoveEvent(const age::TouchEvent &event) {
 bool Game::onTouchUpEvent(const age::TouchEvent &event) {
     this->gui->onTouchUpEvent(event);
     return true;
+}
+
+void Game::setSkybox(std::unique_ptr<age::Skybox> skybox) {
+    this->skybox = std::move(skybox);
 }
 
 void Game::addToWorldList(std::unique_ptr<age::GameObject> gameObject) {
