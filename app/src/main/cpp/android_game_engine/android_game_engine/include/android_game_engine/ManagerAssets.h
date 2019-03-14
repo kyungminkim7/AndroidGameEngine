@@ -12,24 +12,16 @@
 
 #include <android/asset_manager.h>
 
-namespace age {
+#include <android_game_engine/Asset.h>
 
-/**
- * Data read from an asset. This data structure was chosen to avoid the
- * extra cost of initialization after data allocation in std structures
- * such as std::vector.
- */
-struct Asset {
-    std::unique_ptr<uint8_t[]> data;
-    int size;
-};
+namespace age {
 
 namespace ManagerAssets {
 
 void init(AAssetManager *manager);
 void shutdown();
 
-Asset readAsset(const std::string &filepath);
+Asset openAsset(const std::string &filepath);
 
 } // namespace ManagerAssets
 } // namespace age

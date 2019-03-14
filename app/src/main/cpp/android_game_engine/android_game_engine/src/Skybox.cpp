@@ -65,8 +65,12 @@ unsigned int loadCubemapTexture(const std::array<std::string, 6> &imageFilepaths
     
     int width, height, numChannels;
     for (auto i = 0u; i < imageFilepaths.size(); ++i) {
-        auto asset = age::ManagerAssets::readAsset(imageFilepaths[i]);
-        auto img = stbi_load_from_memory(asset.data.get(), asset.size, &width, &height, &numChannels, 0);
+        auto asset = age::ManagerAssets::openAsset(imageFilepaths[i]);
+        auto length = asset.getLength();
+        std::unique_ptr<stbi_uc[]> buffer(new stbi_uc[length]);
+        asset.read(buffer.get(), length);
+        
+        auto img = stbi_load_from_memory(buffer.get(), length, &width, &height, &numChannels, 0);
     
         GLenum format;
         switch (numChannels) {

@@ -29,8 +29,11 @@ std::shared_ptr<unsigned int> loadTexture(const std::string &imageFilepath) {
     
     // Load image from file
     int width, height, numChannels;
-    auto asset = age::ManagerAssets::readAsset(imageFilepath);
-    auto img = stbi_load_from_memory(asset.data.get(), asset.size, &width, &height, &numChannels, 0);
+    auto asset = age::ManagerAssets::openAsset(imageFilepath);
+    auto length = asset.getLength();
+    std::unique_ptr<stbi_uc[]> buffer(new stbi_uc[length]);
+    asset.read(buffer.get(), length);
+    auto img = stbi_load_from_memory(buffer.get(), length, &width, &height, &numChannels, 0);
     
     if (!img) {
         stbi_image_free(img);

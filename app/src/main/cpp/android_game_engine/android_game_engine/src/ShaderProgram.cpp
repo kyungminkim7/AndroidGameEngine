@@ -39,9 +39,14 @@ unsigned int linkShaderProgram(unsigned int vertexShader,
                                unsigned int fragmentShader);
 
 unsigned int compileShader(unsigned int shaderType, const std::string &shaderPath) {
-    auto shaderCode = age::ManagerAssets::readAsset(shaderPath);
-    auto shaderCodeStr = reinterpret_cast<GLchar*>(shaderCode.data.get());
-    std::array<GLint, 1> shaderCodeSize{shaderCode.size};
+    auto asset = age::ManagerAssets::openAsset(shaderPath);
+    auto length = asset.getLength();
+    std::unique_ptr<GLchar[]> buffer(new GLchar[length]);
+    if (asset.read(buffer.get(), length) < 0) {
+        throw age::LoadError("Failed to read shader code from file: " + shaderPath);
+    }
+    
+    std::array<GLint, 1> shaderCodeSize{static_cast<GLint>(length)};
     
     // Compile shader
     auto shader = glCreateShader(shaderType);
@@ -49,7 +54,8 @@ unsigned int compileShader(unsigned int shaderType, const std::string &shaderPat
         throw age::BuildError("Failed to create shader for: " + shaderPath);
     }
     
-    glShaderSource(shader, 1, &shaderCodeStr, shaderCodeSize.data());
+    auto shaderCode = buffer.get();
+    glShaderSource(shader, 1, &shaderCode, shaderCodeSize.data());
     glCompileShader(shader);
     
     // Check for compilation errors

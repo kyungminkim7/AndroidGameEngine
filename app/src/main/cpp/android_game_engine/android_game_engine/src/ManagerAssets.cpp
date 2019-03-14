@@ -17,22 +17,12 @@ void shutdown() {
     assetManager = nullptr;
 }
 
-Asset readAsset(const std::string &filepath) {
+Asset openAsset(const std::string &filepath) {
     if (assetManager == nullptr) {
-        throw LoadError("Asset manager is uninitialized.");
+        throw LoadError("AssetProxy manager is uninitialized.");
     }
     
-    auto asset = AAssetManager_open(assetManager, filepath.c_str(), AASSET_MODE_UNKNOWN);
-    auto size = AAsset_getLength(asset);
-    Asset result{std::unique_ptr<uint8_t[]>(new uint8_t[size]), static_cast<int>(size)};
-    auto numBytesRead = AAsset_read(asset, result.data.get(), static_cast<int>(size));
-    AAsset_close(asset);
-    
-    if (numBytesRead < 0) {
-        throw LoadError("Failed to read asset data from file: " + filepath);
-    } else {
-        return result;
-    }
+    return Asset(AAssetManager_open(assetManager, filepath.c_str(), AASSET_MODE_UNKNOWN));
 }
 
 } // namespace ManagerAssets
