@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <glm/fwd.hpp>
+
 namespace age {
 
 ///
@@ -9,7 +11,7 @@ namespace age {
 ///
 class ElementBufferObject {
 public:
-    ElementBufferObject(const std::vector<unsigned int> &indices);
+    explicit ElementBufferObject(const std::vector<glm::uvec3> &indices);
     ~ElementBufferObject();
     
     void bind();

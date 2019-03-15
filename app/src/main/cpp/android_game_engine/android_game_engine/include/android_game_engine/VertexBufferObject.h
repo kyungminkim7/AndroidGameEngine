@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <glm/fwd.hpp>
+
 namespace age {
 
 class ShaderProgram;
@@ -11,9 +13,10 @@ class ShaderProgram;
 ///
 class VertexBufferObject {
 public:
-    VertexBufferObject(const std::vector<float> &positions,
-                       const std::vector<float> &normals,
-                       const std::vector<float> &textureCoords);
+    VertexBufferObject(const std::vector<glm::vec3> &positions,
+                       const std::vector<glm::vec3> &normals,
+                       const std::vector<glm::vec2> &textureCoords);
+    
     ~VertexBufferObject();
     
     void bind(ShaderProgram *shader);

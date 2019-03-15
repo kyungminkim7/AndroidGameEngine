@@ -1,6 +1,8 @@
 #include <android_game_engine/VertexBufferObject.h>
 
 #include <GLES2/gl2.h>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
 #include <android_game_engine/ShaderProgram.h>
 
@@ -14,12 +16,12 @@ constexpr auto textureCoordStride = 2 * sizeof(float);
 
 namespace age {
 
-VertexBufferObject::VertexBufferObject(const std::vector<float> &positions,
-                                       const std::vector<float> &normals,
-                                       const std::vector<float> &textureCoords) {
-    const auto positionsSize_bytes = positions.size() * sizeof(float);
-    const auto normalsSize_bytes = normals.size() * sizeof(float);
-    const auto textureCoordsSize_bytes = textureCoords.size() * sizeof(float);
+VertexBufferObject::VertexBufferObject(const std::vector<glm::vec3> &positions,
+                                       const std::vector<glm::vec3> &normals,
+                                       const std::vector<glm::vec2> &textureCoords) {
+    const auto positionsSize_bytes = positions.size() * sizeof(glm::vec3);
+    const auto normalsSize_bytes = normals.size() * sizeof(glm::vec3);
+    const auto textureCoordsSize_bytes = textureCoords.size() * sizeof(glm::vec2);
     
     this->normalsOffset = positionsSize_bytes;
     this->textureCoordsOffset = positionsSize_bytes + normalsSize_bytes;
