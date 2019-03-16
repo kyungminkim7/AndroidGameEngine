@@ -33,6 +33,8 @@ std::shared_ptr<unsigned int> loadTexture(const std::string &imageFilepath) {
     auto length = asset.getLength();
     std::unique_ptr<stbi_uc[]> buffer(new stbi_uc[length]);
     asset.read(buffer.get(), length);
+    
+    stbi_set_flip_vertically_on_load(true);
     auto img = stbi_load_from_memory(buffer.get(), length, &width, &height, &numChannels, 0);
     
     if (!img) {

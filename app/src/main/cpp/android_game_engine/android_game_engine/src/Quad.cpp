@@ -44,8 +44,8 @@ std::weak_ptr<age::ElementBufferObject> eboCache;
 
 namespace age {
 
-Quad::Quad(const std::vector<std::string> &diffuseTextureFilepaths,
-           const std::vector<std::string> &specularTextureFilepaths,
+Quad::Quad(const std::set<std::string> &diffuseTextureFilepaths,
+           const std::set<std::string> &specularTextureFilepaths,
            const glm::vec2 &numTextureRepeat)
         : GameObject() {
     std::vector<glm::vec2> repeatTextureCoords(textureCoords);

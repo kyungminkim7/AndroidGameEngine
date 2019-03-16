@@ -27,8 +27,8 @@ namespace age {
 
 Mesh::Mesh(std::shared_ptr<age::VertexBufferObject> vbo,
            std::shared_ptr<age::ElementBufferObject> ebo,
-           const std::vector<std::string> &diffuseTextureFilepaths,
-           const std::vector<std::string> &specularTextureFilepaths)
+           const std::set<std::string> &diffuseTextureFilepaths,
+           const std::set<std::string> &specularTextureFilepaths)
            : vbo(std::move(vbo)), ebo(std::move(ebo)){
     for (const auto& file : diffuseTextureFilepaths) {
         this->diffuseTextures.emplace_back(file);

@@ -138,8 +138,8 @@ std::weak_ptr<age::ElementBufferObject> eboCache;
 
 namespace age {
 
-Box::Box(const std::vector<std::string> &diffuseTextureFilepaths,
-         const std::vector<std::string> &specularTextureFilepaths) {
+Box::Box(const std::set<std::string> &diffuseTextureFilepaths,
+         const std::set<std::string> &specularTextureFilepaths) {
     auto vbo = vboCache.lock();
     if (!vbo) {
         vbo = std::make_shared<VertexBufferObject>(positions, normals, textureCoords);

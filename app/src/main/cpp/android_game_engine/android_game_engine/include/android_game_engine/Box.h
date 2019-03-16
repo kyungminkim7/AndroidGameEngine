@@ -2,7 +2,7 @@
 
 #include "GameObject.h"
 
-#include <vector>
+#include <set>
 
 #include <glm/vec3.hpp>
 
@@ -13,8 +13,8 @@ namespace age {
 ///
 class Box : public GameObject {
 public:
-    explicit Box(const std::vector<std::string> &diffuseTextureFilepaths={},
-                 const std::vector<std::string> &specularTextureFilepaths={});
+    explicit Box(const std::set<std::string> &diffuseTextureFilepaths={},
+                 const std::set<std::string> &specularTextureFilepaths={});
 };
 
 } // namespace age
