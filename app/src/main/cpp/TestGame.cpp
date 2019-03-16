@@ -68,21 +68,30 @@ void TestGame::loadWorld() {
     this->getCam()->setPosition({-10.0f, 1.0f, 1.0f});
     this->getCam()->setLookAtPoint(glm::vec3(0.0f));
 
-    std::unique_ptr<Box> box1(new Box({"images/container.jpg"}, {"images/white.png"}));
-    std::unique_ptr<Box> box2(new Box({"images/awesomeface.png"}, {"images/white.png"}));
+//    std::unique_ptr<Box> box1(new Box({"images/container.jpg"}, {"images/white.png"}));
+//    std::unique_ptr<Box> box2(new Box({"images/awesomeface.png"}, {"images/white.png"}));
     std::unique_ptr<Quad> quad(new Quad({"images/wood.png"}, {"images/white.png"}, glm::vec2(5.0f)));
-    
-    this->box = box1.get();
-    this->box->setScale({2.0f, 3.0f, 5.0f});
-    this->box->setPosition({5.0f, -5.0f, 5.0f});
-    
+//
+//    this->box = box1.get();
+//    this->box->setScale({2.0f, 3.0f, 5.0f});
+//    this->box->setPosition({5.0f, -5.0f, 5.0f});
+//
     quad->setScale(glm::vec3{5.0f});
     quad->setPosition({0.0f, 0.0f, -0.5f});
-//    quad->setSpecularExponent(32.0f);
-    
-    this->addToWorldList(std::move(box1));
-    this->addToWorldList(std::move(box2));
+    quad->setSpecularExponent(32.0f);
+
+//    this->addToWorldList(std::move(box1));
+//    this->addToWorldList(std::move(box2));
     this->addToWorldList(std::move(quad));
+
+    auto uav = std::make_unique<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
+    uav->setScale(glm::vec3(10.0f));
+    uav->setPosition({0.0f, 0.0f, 1.0f});
+    
+//    auto uav = std::make_unique<GameObject>("models/C-17A_3DS/C-17A_MAX.3DS");
+
+ box = uav.get();
+    this->addToWorldList(std::move(uav));
 }
 
 void TestGame::onUpdate(std::chrono::duration<float> updateDuration) {

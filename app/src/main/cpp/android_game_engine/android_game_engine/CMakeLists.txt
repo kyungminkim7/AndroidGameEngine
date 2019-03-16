@@ -23,6 +23,7 @@ add_library(${PROJECT_NAME} STATIC
         "src/ManagerWindowing.cpp"
         "src/Mesh.cpp"
         "src/Model.cpp"
+        "src/ModelLoader3ds.cpp"
         "src/Quad.cpp"
         "src/ShaderProgram.cpp"
         "src/Skybox.cpp"
