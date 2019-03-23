@@ -22,7 +22,12 @@ Asset openAsset(const std::string &filepath) {
         throw LoadError("AssetProxy manager is uninitialized.");
     }
     
-    return Asset(AAssetManager_open(assetManager, filepath.c_str(), AASSET_MODE_UNKNOWN));
+    auto asset = AAssetManager_open(assetManager, filepath.c_str(), AASSET_MODE_UNKNOWN);
+    if (asset == nullptr) {
+        throw LoadError("Failed to open asset: " + filepath);
+    }
+    
+    return Asset(asset);
 }
 
 } // namespace ManagerAssets

@@ -85,10 +85,11 @@ void TestGame::loadWorld() {
     this->addToWorldList(std::move(quad));
 
     auto uav = std::make_unique<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
+////    auto uav = std::make_unique<GameObject>("models/C-17A_3DS/C-17A_MAX.3DS");
+//    auto uav = std::make_unique<GameObject>("models/CV-22/v22usaf.3ds");
+
     uav->setScale(glm::vec3(10.0f));
-    uav->setPosition({0.0f, 0.0f, 1.0f});
-    
-//    auto uav = std::make_unique<GameObject>("models/C-17A_3DS/C-17A_MAX.3DS");
+//    uav->setPosition({0.0f, 0.0f, 1.0f});
 
  box = uav.get();
     this->addToWorldList(std::move(uav));
