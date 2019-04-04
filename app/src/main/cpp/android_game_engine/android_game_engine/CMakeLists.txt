@@ -7,30 +7,31 @@ add_library(native_app_glue STATIC
 target_link_libraries(native_app_glue PUBLIC log)
 
 add_library(${PROJECT_NAME} STATIC
-        "src/Asset.cpp"
-        "src/Box.cpp"
-        "src/Camera.cpp"
-        "src/CameraFPV.cpp"
-        "src/DirectionalLight.cpp"
-        "src/ElementBufferObject.cpp"
-        "src/Game.cpp"
-        "src/GameObject.cpp"
-        "src/Joystick.cpp"
-        "src/JoystickHandle.cpp"
-        "src/Light.cpp"
-        "src/Log.cpp"
-        "src/ManagerAssets.cpp"
-        "src/ManagerWindowing.cpp"
-        "src/Mesh.cpp"
-        "src/Model.cpp"
-        "src/ModelLoader3ds.cpp"
-        "src/Quad.cpp"
-        "src/ShaderProgram.cpp"
-        "src/Skybox.cpp"
-        "src/Texture2D.cpp"
-        "src/Utilities.cpp"
-        "src/VertexBufferObject.cpp"
-        "src/Widget.cpp")
+        src/Asset.cpp
+        src/Box.cpp
+        src/Camera.cpp
+        src/CameraFPV.cpp
+        src/DirectionalLight.cpp
+        src/ElementBufferObject.cpp
+        src/Game.cpp
+        src/GameObject.cpp
+        src/Joystick.cpp
+        src/JoystickHandle.cpp
+        src/Light.cpp
+        src/Log.cpp
+        src/ManagerAssets.cpp
+        src/ManagerWindowing.cpp
+        src/Mesh.cpp
+        src/Model.cpp
+        src/ModelLoader.cpp
+        src/ModelLoader3ds.cpp
+        src/Quad.cpp
+        src/ShaderProgram.cpp
+        src/Skybox.cpp
+        src/Texture2D.cpp
+        src/Utilities.cpp
+        src/VertexBufferObject.cpp
+        src/Widget.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -46,7 +47,8 @@ target_link_libraries(${PROJECT_NAME}
         log
         native_app_glue
     PRIVATE
-        stb)
+        stb
+        lib3ds)
 
 target_compile_features(${PROJECT_NAME}
     PUBLIC

@@ -5,11 +5,11 @@
 
 #include <glm/fwd.hpp>
 
+#include "Mesh.h"
 #include "Model.h"
 
 namespace age {
 
-class Mesh;
 class ShaderProgram;
 
 ///
@@ -28,7 +28,7 @@ public:
     /// \exception ge::LoadError Failed to load mesh data from model file.
     /// \exception ge::LoadError Failed to load texture image from file.
     ///
-    GameObject(const std::string& modelFilepath);
+    explicit GameObject(const std::string& modelFilepath);
     
 //    GameObject(const std::vector<float> &positions,
 //               const std::vector<float> &normals,

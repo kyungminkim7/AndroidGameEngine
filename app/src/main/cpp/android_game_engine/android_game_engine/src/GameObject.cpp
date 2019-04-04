@@ -1,6 +1,5 @@
 #include <android_game_engine/GameObject.h>
 
-#include <android_game_engine/Mesh.h>
 #include <android_game_engine/ModelLoader3ds.h>
 #include <android_game_engine/ShaderProgram.h>
 
@@ -8,8 +7,10 @@ namespace age {
 
 GameObject::GameObject() : meshes(std::make_shared<Meshes>()) {}
 
-GameObject::GameObject(const std::string &modelFilepath)
-    : meshes(std::move(ModelLoader3ds::loadModel(modelFilepath))) {}
+GameObject::GameObject(const std::string &modelFilepath){
+    ModelLoader3ds modelLoader(modelFilepath);
+    this->meshes = std::move(modelLoader.loadMeshes());
+}
 
 void GameObject::onUpdate(std::chrono::duration<float> updateDuration) {}
 

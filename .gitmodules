@@ -4,3 +4,6 @@
 [submodule "app/src/main/cpp/android_game_engine/stb"]
 	path = app/src/main/cpp/android_game_engine/stb
 	url = https://github.com/nothings/stb.git
+[submodule "app/src/main/cpp/android_game_engine/lib3ds"]
+	path = app/src/main/cpp/android_game_engine/lib3ds
+	url = https://github.com/hoopoe/lib3ds.git
