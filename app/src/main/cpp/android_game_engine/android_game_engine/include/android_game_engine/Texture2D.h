@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 
+#include <glm/fwd.hpp>
+
 namespace age {
 
 ///
@@ -18,10 +20,16 @@ public:
     /// destruction. Do NOT call glDeleteTextures on this texture's id.
     ///
     /// \param imageFilepath Filepath to the image.
-    /// \return OpenGL's texture ID for the loaded texture.
     /// \exception age::LoadError Failed to load image data from file.
     ///
     explicit Texture2D(const std::string &imageFilepath);
+    
+    ///
+    /// \brief Creates a 2D texture of a solid color.
+    ///
+    /// \param color RGB values between 0.0 and 1.0
+    ///
+    explicit Texture2D(const glm::vec3 &color);
     
     ///
     /// \brief bind Binds this texture to the GPU for rendering.

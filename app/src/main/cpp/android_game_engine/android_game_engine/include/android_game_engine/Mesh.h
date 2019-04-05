@@ -4,9 +4,6 @@
 #include <string>
 #include <vector>
 
-//#include <assimp/material.h>
-//#include <assimp/mesh.h>
-
 #include "Texture2D.h"
 
 namespace age {
@@ -25,9 +22,14 @@ public:
          const std::set<std::string> &diffuseTextureFilepaths,
          const std::set<std::string> &specularTextureFilepaths);
     
+    Mesh(std::shared_ptr<VertexBufferObject> vbo, std::shared_ptr<ElementBufferObject> ebo,
+         const std::vector<Texture2D> &diffuseTextures,
+         const std::vector<Texture2D> &specularTextures);
+    
     void render(ShaderProgram *shader);
 
 private:
+    void init();
     void bindTextures(ShaderProgram *shader);
     
     std::shared_ptr<VertexBufferObject> vbo;

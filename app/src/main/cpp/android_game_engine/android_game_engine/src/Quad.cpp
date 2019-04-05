@@ -48,6 +48,28 @@ Quad::Quad(const std::set<std::string> &diffuseTextureFilepaths,
            const std::set<std::string> &specularTextureFilepaths,
            const glm::vec2 &numTextureRepeat)
         : GameObject() {
+    std::vector<Texture2D> diffuseTextures, specularTextures;
+    
+    for (const auto& filepath : diffuseTextureFilepaths) {
+        diffuseTextures.emplace_back(filepath);
+    }
+    
+    for (const auto& filepath : specularTextureFilepaths) {
+        specularTextures.emplace_back(filepath);
+    }
+    
+    this->init(diffuseTextures, specularTextures, numTextureRepeat);
+}
+
+Quad::Quad(const std::vector<age::Texture2D> &diffuseTextures,
+           const std::vector<age::Texture2D> &specularTextures,
+           const glm::vec2 &numTextureRepeat){
+    this->init(diffuseTextures, specularTextures, numTextureRepeat);
+}
+           
+void Quad::init(const std::vector<age::Texture2D> &diffuseTextures,
+                const std::vector<age::Texture2D> &specularTextures,
+                const glm::vec2 &numTextureRepeat) {
     std::vector<glm::vec2> repeatTextureCoords(textureCoords);
     std::transform(repeatTextureCoords.begin(), repeatTextureCoords.end(),
                    repeatTextureCoords.begin(),
@@ -62,8 +84,8 @@ Quad::Quad(const std::set<std::string> &diffuseTextureFilepaths,
     }
     
     std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::move(vbo), std::move(ebo),
-                                                   diffuseTextureFilepaths,
-                                                   specularTextureFilepaths)});
+                                                   diffuseTextures,
+                                                   specularTextures)});
     this->setMesh(std::move(meshes));
 }
 

@@ -167,8 +167,7 @@ std::shared_ptr<ModelLoader3ds::Meshes> ModelLoader3ds::loadMeshes() {
                                                                   normals,
                                                                   textureCoords),
                              std::make_shared<ElementBufferObject>(indices),
-                             diffuseTextures.empty() ? std::set<std::string>{"images/white.png"} : diffuseTextures,
-                             specularTextures.empty() ? std::set<std::string>{"images/white.png"} : specularTextures);
+                             diffuseTextures, specularTextures);
     }
     
     return meshes;

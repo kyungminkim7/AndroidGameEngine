@@ -1,6 +1,7 @@
 #include <android_game_engine/Mesh.h>
 
 #include <GLES2/gl2.h>
+#include <glm/vec3.hpp>
 
 #include <android_game_engine/ElementBufferObject.h>
 #include <android_game_engine/ShaderProgram.h>
@@ -29,13 +30,33 @@ Mesh::Mesh(std::shared_ptr<age::VertexBufferObject> vbo,
            std::shared_ptr<age::ElementBufferObject> ebo,
            const std::set<std::string> &diffuseTextureFilepaths,
            const std::set<std::string> &specularTextureFilepaths)
-           : vbo(std::move(vbo)), ebo(std::move(ebo)){
+           : vbo(std::move(vbo)), ebo(std::move(ebo)) {
     for (const auto& file : diffuseTextureFilepaths) {
         this->diffuseTextures.emplace_back(file);
     }
     
     for (const auto& file : specularTextureFilepaths) {
         this->specularTextures.emplace_back(file);
+    }
+    
+    this->init();
+}
+
+Mesh::Mesh(std::shared_ptr<VertexBufferObject> vbo, std::shared_ptr<ElementBufferObject> ebo,
+           const std::vector<Texture2D> &diffuseTextures,
+           const std::vector<Texture2D> &specularTextures)
+           : vbo(std::move(vbo)), ebo(std::move(ebo)),
+             diffuseTextures(diffuseTextures), specularTextures(specularTextures) {
+    this->init();
+}
+
+void Mesh::init() {
+    if (this->diffuseTextures.empty()) {
+        this->diffuseTextures.emplace_back(glm::vec3(1.0f));
+    }
+    
+    if (this->specularTextures.empty()) {
+        this->specularTextures.emplace_back(glm::vec3(1.0f));
     }
 }
 

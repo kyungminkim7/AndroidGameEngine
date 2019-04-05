@@ -70,7 +70,9 @@ void TestGame::loadWorld() {
 
 //    std::unique_ptr<Box> box1(new Box({"images/container.jpg"}, {"images/white.png"}));
 //    std::unique_ptr<Box> box2(new Box({"images/awesomeface.png"}, {"images/white.png"}));
-    std::unique_ptr<Quad> quad(new Quad({"images/wood.png"}, {"images/white.png"}, glm::vec2(5.0f)));
+    std::unique_ptr<Quad> quad(new Quad({Texture2D("images/wood.png")},
+                                        {Texture2D(glm::vec3(1.0f))},
+                                        glm::vec2(5.0f)));
 //
 //    this->box = box1.get();
 //    this->box->setScale({2.0f, 3.0f, 5.0f});
@@ -88,8 +90,8 @@ void TestGame::loadWorld() {
     auto uav = std::make_unique<GameObject>("models/C-17A_3DS/C-17A_DE.3ds");
 //    auto uav = std::make_unique<GameObject>("models/CV-22/v22usaf.3ds");
 
-//    uav->setScale(glm::vec3(10.0f));
-//    uav->setPosition({0.0f, 0.0f, 1.0f});
+    uav->setScale(glm::vec3(0.1f));
+    uav->setPosition({0.0f, 0.0f, 1.0f});
 
  box = uav.get();
     this->addToWorldList(std::move(uav));

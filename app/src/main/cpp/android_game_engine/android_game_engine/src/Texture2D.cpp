@@ -1,8 +1,11 @@
 #include <android_game_engine/Texture2D.h>
 
+#include <array>
+#include <cstdint>
 #include <unordered_map>
 
 #include <GLES2/gl2.h>
+#include <glm/vec3.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -15,12 +18,12 @@ namespace {
 std::unordered_map<std::string, std::weak_ptr<unsigned int>> cachedTextureIds;
 
 ///
-/// \brief loadTexture Loads and caches texture data from image file.
+/// \brief loadImageTexture Loads and caches texture data from image file.
 /// \param imageFilepath Filepath to the image.
 /// \return OpenGL's texture ID for the loaded texture.
 /// \exception age::LoadError Failed to load image data from file.
 ///
-std::shared_ptr<unsigned int> loadTexture(const std::string &imageFilepath) {
+std::shared_ptr<unsigned int> loadImageTexture(const std::string &imageFilepath) {
     const auto imageFilename = imageFilepath.substr(imageFilepath.find_last_of('/') + 1);
     
     // Check cache to avoid reloading
@@ -96,7 +99,35 @@ std::shared_ptr<unsigned int> loadTexture(const std::string &imageFilepath) {
 namespace age {
 
 Texture2D::Texture2D(const std::string &imageFilepath)
-        : id(loadTexture(imageFilepath)) {}
+        : id(loadImageTexture(imageFilepath)) {}
+        
+Texture2D::Texture2D(const glm::vec3 &color) {
+    std::array<uint8_t, 3> rgb{static_cast<uint8_t>(color.r * 255),
+                               static_cast<uint8_t>(color.g * 255),
+                               static_cast<uint8_t>(color.b * 255)};
+    
+    auto textureIdDeleter = [](auto textureId) {
+        glDeleteTextures(1, textureId);
+        delete textureId;
+    };
+    this->id = std::shared_ptr<unsigned int>(new unsigned int, textureIdDeleter);
+    
+    // Load texture img onto GPU
+    glGenTextures(1, this->id.get());
+    glBindTexture(GL_TEXTURE_2D, *this->id);
+    
+    glTexImage2D(GL_TEXTURE_2D,
+                 0, GL_RGB, 1, 1, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, rgb.data());
+    glGenerateMipmap(GL_TEXTURE_2D);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
 
 void Texture2D::bind() {
     glBindTexture(GL_TEXTURE_2D, *this->id);
