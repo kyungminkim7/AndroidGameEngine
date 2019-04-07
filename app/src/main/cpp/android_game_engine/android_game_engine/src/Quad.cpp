@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <memory>
 
+#include <BulletCollision/CollisionShapes/btBox2dShape.h>
+#include <LinearMath/btVector3.h>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
@@ -70,6 +72,7 @@ Quad::Quad(const std::vector<age::Texture2D> &diffuseTextures,
 void Quad::init(const std::vector<age::Texture2D> &diffuseTextures,
                 const std::vector<age::Texture2D> &specularTextures,
                 const glm::vec2 &numTextureRepeat) {
+    // Create mesh
     std::vector<glm::vec2> repeatTextureCoords(textureCoords);
     std::transform(repeatTextureCoords.begin(), repeatTextureCoords.end(),
                    repeatTextureCoords.begin(),
@@ -87,6 +90,9 @@ void Quad::init(const std::vector<age::Texture2D> &diffuseTextures,
                                                    diffuseTextures,
                                                    specularTextures)});
     this->setMesh(std::move(meshes));
+    
+    // Create collision shape
+    this->setCollisionShape(std::make_shared<btBox2dShape>(btVector3(0.5f, 0.5f, 0.5f)));
 }
 
 } // namespace age

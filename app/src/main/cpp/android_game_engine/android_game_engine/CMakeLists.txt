@@ -25,6 +25,10 @@ add_library(${PROJECT_NAME} STATIC
         src/Model.cpp
         src/ModelLoader.cpp
         src/ModelLoader3ds.cpp
+        src/PhysicsEngine.cpp
+        src/PhysicsEngineBullet.cpp
+        src/PhysicsMotionState.cpp
+        src/PhysicsRigidBody.cpp
         src/Quad.cpp
         src/ShaderProgram.cpp
         src/Skybox.cpp
@@ -40,15 +44,18 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-        android
         EGL
+        BulletDynamics
+        BulletCollision
         GLESv2
+        LinearMath
+        android
         glm
+        lib3ds
         log
         native_app_glue
     PRIVATE
-        stb
-        lib3ds)
+        stb)
 
 target_compile_features(${PROJECT_NAME}
     PUBLIC

@@ -4,13 +4,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <android_game_engine/ManagerWindowing.h>
+#include <android_game_engine/PhysicsEngineBullet.h>
 #include <android_game_engine/Widget.h>
 
 namespace age {
 
 Game::Game() : defaultShader("shaders/default.vert", "shaders/default.frag"),
                skyboxShader("shaders/skybox.vert", "shaders/skybox.frag"),
-               widgetShader("shaders/widget.vert", "shaders/widget.frag") {}
+               widgetShader("shaders/widget.vert", "shaders/widget.frag"),
+               physics(new PhysicsEngineBullet) {}
 
 void Game::init() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -42,10 +44,15 @@ void Game::init() {
 void Game::loadWorld() {}
 
 void Game::onUpdate(std::chrono::duration<float> updateDuration) {
-    cam->onUpdate(updateDuration);
+    this->cam->onUpdate(updateDuration);
     
     for (auto& gameObject : this->worldList) {
         gameObject->onUpdate(updateDuration);
+    }
+
+    this->physics->onUpdate(updateDuration);
+    for (auto& gameObject : this->worldList) {
+        gameObject->updateFromPhysics();
     }
 }
 
@@ -108,6 +115,10 @@ void Game::setSkybox(std::unique_ptr<age::Skybox> skybox) {
 }
 
 void Game::addToWorldList(std::unique_ptr<age::GameObject> gameObject) {
+    if (gameObject->getPhysicsBody()) {
+        this->physics->addRigidBody(gameObject->getPhysicsBody());
+    }
+    
     this->worldList.push_back(std::move(gameObject));
 }
 

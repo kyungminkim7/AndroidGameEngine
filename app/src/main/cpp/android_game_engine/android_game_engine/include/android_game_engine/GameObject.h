@@ -3,10 +3,12 @@
 #include <chrono>
 #include <vector>
 
+#include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <glm/fwd.hpp>
 
 #include "Mesh.h"
 #include "Model.h"
+#include "PhysicsRigidBody.h"
 
 namespace age {
 
@@ -28,13 +30,7 @@ public:
     /// \exception ge::LoadError Failed to load mesh data from model file.
     /// \exception ge::LoadError Failed to load texture image from file.
     ///
-    explicit GameObject(const std::string& modelFilepath);
-    
-//    GameObject(const std::vector<float> &positions,
-//               const std::vector<float> &normals,
-//               const std::vector<float> &textureCoords,
-//               const std::vector<unsigned int> &indices,
-//               const std::string &textureFilepath="");
+    explicit GameObject(const std::string &modelFilepath);
     
     virtual ~GameObject() = default;
     
@@ -47,6 +43,8 @@ public:
     /// \param updateDuration Elapsed time since the last frame.
     ///
     virtual void onUpdate(std::chrono::duration<float> updateDuration);
+    
+    virtual void updateFromPhysics();
     
     virtual void render(ShaderProgram *shader);
     
@@ -131,42 +129,32 @@ public:
     void setScale(const glm::vec3 &scale);
     
     void setSpecularExponent(float specularExponent);
+    
+    PhysicsRigidBody* getPhysicsBody();
+    
+    void setMass(float mass);
+
+protected:
+    void setCollisionShape(std::shared_ptr<btCollisionShape> collisionShape);
 
 private:
     Model model;
     
     std::shared_ptr<Meshes> meshes;
     float specularExponent = 64.0f;
+    
+    std::unique_ptr<PhysicsRigidBody> physicsBody = nullptr;
 };
 
 inline glm::mat4 GameObject::getModelMatrix() const {return this->model.getModelMatrix();}
 inline glm::mat3 GameObject::getNormalMatrix() const {return this->model.getNormalMatrix();}
 inline glm::mat4 GameObject::getViewMatrix() const {return this->model.getViewMatrix();}
-
-inline void GameObject::setPosition(const glm::vec3 &position) {this->model.setPosition(position);}
 inline glm::vec3 GameObject::getPosition() const {return this->model.getPosition();}
-
-inline void GameObject::setOrientation(const glm::mat3& orientation) {this->model.setOrientation(orientation);}
-inline void GameObject::setOrientation(const glm::vec3 &orientationX,
-                                       const glm::vec3 &orientationY,
-                                       const glm::vec3 &orientationZ) {
-    this->model.setOrientation(orientationX, orientationY, orientationZ);
-}
-
 inline glm::mat3 GameObject::getOrientation() const {return this->model.getOrientation();}
 inline glm::vec3 GameObject::getOrientationX() const {return this->model.getOrientationX();}
 inline glm::vec3 GameObject::getOrientationY() const {return this->model.getOrientationY();}
 inline glm::vec3 GameObject::getOrientationZ() const {return this->model.getOrientationZ();}
-
-inline void GameObject::setLookAtPoint(const glm::vec3 &lookAtPoint) {this->model.setLookAtPoint(lookAtPoint);}
-inline void GameObject::setLookAtDirection(const glm::vec3 &lookAtDirection) {this->model.setLookAtDirection(lookAtDirection);}
 inline glm::vec3 GameObject::getLookAtDirection() const {return this->model.getLookAtDirection();}
-
-inline void GameObject::setNormalDirection(const glm::vec3 &normalDirection) {this->model.setNormalDirection(normalDirection);}
 inline glm::vec3 GameObject::getNormalDirection() const {return this->model.getNormalDirection();}
-
-inline void GameObject::rotate(float angle_rad, const glm::vec3 &axis) {this->model.rotate(angle_rad, axis);}
-inline void GameObject::translate(const glm::vec3 &translation) {this->model.translate(translation);}
-inline void GameObject::translateInLocalFrame(const glm::vec3 &translation) {this->model.translateInLocalFrame(translation);}
 
 } // namespace age

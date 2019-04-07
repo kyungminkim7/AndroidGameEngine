@@ -20,7 +20,7 @@ private:
     std::shared_ptr<Joystick> moveJoystick;
     std::shared_ptr<Joystick> rotateJoystick;
     
-    GameObject *box;
+    GameObject *uav;
 };
 
 } // namespace age

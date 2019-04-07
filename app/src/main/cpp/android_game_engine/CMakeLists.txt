@@ -1,9 +1,47 @@
 cmake_minimum_required(VERSION 3.0)
 
+# android_game_engine library
 add_subdirectory(android_game_engine)
+
+# bullet library for physics and collision detection
+add_subdirectory(bullet3)
+
+target_include_directories(Bullet2FileLoader INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/bullet3/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/bullet3/src>)
+
+target_include_directories(Bullet3Collision INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/bullet3/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/bullet3/src>)
+
+target_include_directories(Bullet3Common INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/bullet3/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/bullet3/src>)
+
+target_include_directories(BulletCollision INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/bullet3/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/bullet3/src>)
+
+target_include_directories(BulletDynamics INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/bullet3/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/bullet3/src>)
+
+target_include_directories(BulletInverseDynamics INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/bullet3/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/bullet3/src>)
+
+target_include_directories(BulletSoftBody INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/bullet3/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/bullet3/src>)
+
+target_include_directories(LinearMath INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/bullet3/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/bullet3/src>)
+
+# glm library for linear algebra
 add_subdirectory(glm)
 
-# lib3ds library
+# lib3ds library for loading 3DS model files
 add_library(lib3ds STATIC
         lib3ds/src/lib3ds.h
         lib3ds/src/lib3ds_impl.h
@@ -32,7 +70,7 @@ target_include_directories(lib3ds PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib3ds/src>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/lib3ds/src>)
 
-# STB library
+# STB library for loading image files
 add_library(stb INTERFACE)
 
 target_include_directories(stb INTERFACE

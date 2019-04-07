@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 
+#include <BulletCollision/CollisionShapes/btCollisionShape.h>
+
 #include "Mesh.h"
 
 namespace age {
@@ -23,10 +25,16 @@ public:
     virtual ~ModelLoader() = default;
     
     ///
-    /// Extract mesh data from the 3D model file.
+    /// Extract mesh data from the 3D model file. The mesh data is internally cached.
     /// \return mesh data
     ///
     virtual std::shared_ptr<Meshes> loadMeshes() = 0;
+    
+    ///
+    /// Extract collision shape from the 3D model file. The collision shape is internally cached.
+    /// \return collision data
+    ///
+    virtual std::shared_ptr<btCollisionShape> loadCollisionShape() = 0;
 
 protected:
     std::string getFilepath() const;

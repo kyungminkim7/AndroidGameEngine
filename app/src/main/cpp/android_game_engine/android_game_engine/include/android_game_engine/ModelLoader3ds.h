@@ -15,6 +15,7 @@ public:
     ~ModelLoader3ds();
     
     std::shared_ptr<Meshes> loadMeshes() override;
+    std::shared_ptr<btCollisionShape> loadCollisionShape() override;
 
 private:
     Lib3dsFile *lib3dsFile;

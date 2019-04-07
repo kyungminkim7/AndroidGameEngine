@@ -7,3 +7,6 @@
 [submodule "app/src/main/cpp/android_game_engine/lib3ds"]
 	path = app/src/main/cpp/android_game_engine/lib3ds
 	url = https://github.com/hoopoe/lib3ds.git
+[submodule "app/src/main/cpp/android_game_engine/bullet3"]
+	path = app/src/main/cpp/android_game_engine/bullet3
+	url = https://github.com/bulletphysics/bullet3.git

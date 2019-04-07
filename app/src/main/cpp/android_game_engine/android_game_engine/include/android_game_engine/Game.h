@@ -7,6 +7,7 @@
 #include "CameraFPV.h"
 #include "DirectionalLight.h"
 #include "GameObject.h"
+#include "PhysicsEngine.h"
 #include "TouchEvent.h"
 #include "ShaderProgram.h"
 #include "Skybox.h"
@@ -53,6 +54,8 @@ private:
     std::unique_ptr<CameraFPV> cam = nullptr;
     std::unique_ptr<DirectionalLight> directionalLight = nullptr;
     std::vector<std::unique_ptr<GameObject>> worldList;
+
+    std::unique_ptr<PhysicsEngine> physics;
 };
 
 inline Widget* Game::getGui() {return this->gui.get();}

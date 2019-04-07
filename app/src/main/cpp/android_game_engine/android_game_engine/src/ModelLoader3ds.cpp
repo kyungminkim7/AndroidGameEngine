@@ -3,6 +3,8 @@
 #include <set>
 #include <unordered_map>
 
+#include <BulletCollision/CollisionShapes/btConvexHullShape.h>
+#include <BulletCollision/CollisionShapes/btShapeHull.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <android_game_engine/ElementBufferObject.h>
@@ -17,7 +19,8 @@ struct Material {
     std::string specularTextureFilename;
 };
 
-std::unordered_map<std::string, std::weak_ptr<age::ModelLoader3ds::Meshes>> cachedMeshes;
+std::unordered_map<std::string, std::weak_ptr<age::ModelLoader3ds::Meshes>> meshesCache;
+std::unordered_map<std::string, std::weak_ptr<btCollisionShape>> collisionShapeCache;
 
 long assetio_seek_func(void *self, long offset, Lib3dsIoSeek origin) {
     auto asset = reinterpret_cast<age::Asset*>(self);
@@ -90,13 +93,13 @@ ModelLoader3ds::~ModelLoader3ds() {
 
 std::shared_ptr<ModelLoader3ds::Meshes> ModelLoader3ds::loadMeshes() {
     // Check cached meshes to avoid reloading
-    auto meshes = cachedMeshes[this->getFilename()].lock();
+    auto meshes = meshesCache[this->getFilename()].lock();
     if (meshes) return meshes;
     
     auto filename = this->getFilename();
     auto meshesDeleter = [filename](auto meshes){
         // Clear cache
-        cachedMeshes.erase(filename);
+        meshesCache.erase(filename);
         delete meshes;
     };
     meshes = std::shared_ptr<Meshes>(new Meshes, meshesDeleter);
@@ -171,6 +174,49 @@ std::shared_ptr<ModelLoader3ds::Meshes> ModelLoader3ds::loadMeshes() {
     }
     
     return meshes;
+}
+
+std::shared_ptr<btCollisionShape> ModelLoader3ds::loadCollisionShape() {
+    auto shape = collisionShapeCache[this->getFilename()].lock();
+    if (shape) return shape;
+    
+    auto filename = this->getFilename();
+    auto shapeDeleter = [filename](auto shape){
+        // Clear cache
+        collisionShapeCache.erase(filename);
+        delete shape;
+    };
+    shape = std::shared_ptr<btCollisionShape>(new btConvexHullShape, shapeDeleter);
+    auto hull = static_cast<btConvexHullShape*>(shape.get());
+    
+    // Extract vertex data from lib3ds file
+    for (auto i = 0; i < this->lib3dsFile->nmeshes; ++i) {
+        auto mesh = this->lib3dsFile->meshes[i];
+        for (auto j = 0; j < mesh->nvertices; ++j) {
+            hull->addPoint({mesh->vertices[j][0],
+                            mesh->vertices[j][1],
+                            mesh->vertices[j][2]},
+                           false);
+        }
+    }
+    hull->recalcLocalAabb();
+    
+    // Simplify hull
+    if (hull->getNumPoints() >= 100) {
+        btShapeHull hullSimplifier(hull);
+        hullSimplifier.buildHull(hull->getMargin());
+        
+        shape.reset(new btConvexHullShape, shapeDeleter);
+        hull = static_cast<btConvexHullShape*>(shape.get());
+        
+        // Copy simplified hull data
+        for (auto i = 0; i < hullSimplifier.numVertices(); ++i) {
+            hull->addPoint(hullSimplifier.getVertexPointer()[i], false);
+        }
+        hull->recalcLocalAabb();
+    }
+    
+    return shape;
 }
 
 } // namespace age
