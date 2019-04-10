@@ -14,9 +14,9 @@ void PhysicsRigidBody::setOrientation(const glm::mat3 &orientation) {
     btTransform transform;
     this->motionState->getWorldTransform(transform);
     
-    transform.setBasis({orientation[0][0], orientation[0][1], orientation[0][2],
-                        orientation[1][0], orientation[1][1], orientation[1][2],
-                        orientation[2][0], orientation[2][1], orientation[2][2]});
+    transform.setBasis({orientation[0][0], orientation[1][0], orientation[2][0],
+                        orientation[0][1], orientation[1][1], orientation[2][1],
+                        orientation[0][2], orientation[1][2], orientation[2][2]});
     
     this->motionState->setWorldTransform(transform);
     this->body->setWorldTransform(transform);
@@ -64,9 +64,9 @@ std::pair<glm::mat3, glm::vec3> PhysicsRigidBody::getTransform() const {
     const auto& basis = transform.getBasis();
     const auto& origin = transform.getOrigin();
     
-    return std::make_pair(glm::mat3(basis[0][0], basis[0][1], basis[0][2],
-                                    basis[1][0], basis[1][1], basis[1][2],
-                                    basis[2][0], basis[2][1], basis[2][2]),
+    return std::make_pair(glm::mat3(basis[0][0], basis[1][0], basis[2][0],
+                                    basis[0][1], basis[1][1], basis[2][1],
+                                    basis[0][2], basis[1][2], basis[2][2]),
                           glm::vec3(origin.getX(), origin.getY(), origin.getZ()));
 }
 

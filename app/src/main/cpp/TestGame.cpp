@@ -15,6 +15,7 @@ namespace age {
 
 void TestGame::init() {
     Game::init();
+    this->enablePhysicsDebugDrawer(true);
     
     this->setupGui();
 }
@@ -72,13 +73,13 @@ void TestGame::loadWorld() {
 //    std::unique_ptr<Box> box2(new Box({"images/awesomeface.png"}, {"images/white.png"}));
     std::unique_ptr<Quad> quad(new Quad({Texture2D("images/wood.png")},
                                         {Texture2D(glm::vec3(1.0f))},
-                                        glm::vec2(10.0f)));
+                                        glm::vec2(1.0f)));
 //
 //    this->box = box1.get();
 //    this->box->setScale({2.0f, 3.0f, 5.0f});
 //    this->box->setPosition({5.0f, -5.0f, 5.0f});
 //
-    quad->setScale(glm::vec3{10.0f});
+    quad->setScale(glm::vec3{1.0f});
     quad->setPosition({0.0f, 0.0f, -0.5f});
     quad->setSpecularExponent(32.0f);
 

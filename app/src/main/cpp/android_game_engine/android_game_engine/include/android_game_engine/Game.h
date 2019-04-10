@@ -34,6 +34,8 @@ public:
     virtual bool onTouchDownEvent(const TouchEvent &event);
     virtual bool onTouchMoveEvent(const TouchEvent &event);
     virtual bool onTouchUpEvent(const TouchEvent &event);
+    
+    void enablePhysicsDebugDrawer(bool enable);
 
 protected:
     void setSkybox(std::unique_ptr<Skybox> skybox);
@@ -47,6 +49,7 @@ private:
     ShaderProgram defaultShader;
     ShaderProgram skyboxShader;
     ShaderProgram widgetShader;
+    ShaderProgram physicsDebugShader;
     
     std::shared_ptr<Widget> gui = nullptr;
     
@@ -54,8 +57,9 @@ private:
     std::unique_ptr<CameraFPV> cam = nullptr;
     std::unique_ptr<DirectionalLight> directionalLight = nullptr;
     std::vector<std::unique_ptr<GameObject>> worldList;
-
+    
     std::unique_ptr<PhysicsEngine> physics;
+    bool drawDebugPhysics;
 };
 
 inline Widget* Game::getGui() {return this->gui.get();}

@@ -4,15 +4,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <android_game_engine/ManagerWindowing.h>
-#include <android_game_engine/PhysicsEngineBullet.h>
 #include <android_game_engine/Widget.h>
 
 namespace age {
 
-Game::Game() : defaultShader("shaders/default.vert", "shaders/default.frag"),
-               skyboxShader("shaders/skybox.vert", "shaders/skybox.frag"),
-               widgetShader("shaders/widget.vert", "shaders/widget.frag"),
-               physics(new PhysicsEngineBullet) {}
+Game::Game() : defaultShader("shaders/Default.vert", "shaders/Default.frag"),
+               skyboxShader("shaders/Skybox.vert", "shaders/Skybox.frag"),
+               widgetShader("shaders/Widget.vert", "shaders/Widget.frag"),
+               physicsDebugShader("shaders/PhysicsDebug.vert", "shaders/PhysicsDebug.frag"),
+               physics(new PhysicsEngine(&this->physicsDebugShader)),
+               drawDebugPhysics(false) {}
 
 void Game::init() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -46,12 +47,12 @@ void Game::loadWorld() {}
 void Game::onUpdate(std::chrono::duration<float> updateDuration) {
     this->cam->onUpdate(updateDuration);
     
-    for (auto& gameObject : this->worldList) {
+    for (auto &gameObject : this->worldList) {
         gameObject->onUpdate(updateDuration);
     }
 
     this->physics->onUpdate(updateDuration);
-    for (auto& gameObject : this->worldList) {
+    for (auto &gameObject : this->worldList) {
         gameObject->updateFromPhysics();
     }
 }
@@ -66,17 +67,24 @@ void Game::render() {
     
     auto projection = this->cam->getProjectionMatrix();
     auto view = this->cam->getViewMatrix();
+    auto projectionView = projection * view;
     
     this->defaultShader.use();
-    this->defaultShader.setUniform("projection_view", projection * view);
+    this->defaultShader.setUniform("projection_view", projectionView);
     this->defaultShader.setUniform("viewPosition", this->cam->getPosition());
     
     this->directionalLight->render(&this->defaultShader);
 
-    for (auto& gameObject : this->worldList) {
+    for (auto &gameObject : this->worldList) {
         gameObject->render(&this->defaultShader);
     }
     
+    if (this->drawDebugPhysics) {
+        this->physicsDebugShader.use();
+        this->physicsDebugShader.setUniform("projection_view", projectionView);
+        this->physics->renderDebug();
+    }
+
     // Render skybox
     if (this->skybox != nullptr) {
         glDepthFunc(GL_LEQUAL);
@@ -108,6 +116,10 @@ bool Game::onTouchMoveEvent(const age::TouchEvent &event) {
 bool Game::onTouchUpEvent(const age::TouchEvent &event) {
     this->gui->onTouchUpEvent(event);
     return true;
+}
+
+void Game::enablePhysicsDebugDrawer(bool enable) {
+    this->drawDebugPhysics = enable;
 }
 
 void Game::setSkybox(std::unique_ptr<age::Skybox> skybox) {

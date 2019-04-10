@@ -7,23 +7,6 @@
 #include <android_game_engine/ShaderProgram.h>
 #include <android_game_engine/VertexBufferObject.h>
 
-namespace {
-
-//std::vector<ge::Texture2D> loadTexturesFromMaterial(const aiMaterial &material, aiTextureType type, const std::string &modelDirectory) {
-//    std::vector<ge::Texture2D> textures;
-//    textures.reserve(material.GetTextureCount(type));
-//
-//    for (unsigned int i = 0; i < material.GetTextureCount(type); ++i) {
-//        aiString imageFilename;
-//        material.GetTexture(type, i, &imageFilename);
-//        textures.emplace_back(modelDirectory + "/" + imageFilename.C_Str());
-//    }
-//
-//    return textures;
-//}
-
-} // namespace
-
 namespace age {
 
 Mesh::Mesh(std::shared_ptr<age::VertexBufferObject> vbo,
