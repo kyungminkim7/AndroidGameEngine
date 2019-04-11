@@ -20,7 +20,6 @@ struct Material {
 };
 
 std::unordered_map<std::string, std::weak_ptr<age::ModelLoader3ds::Meshes>> meshesCache;
-std::unordered_map<std::string, std::weak_ptr<btCollisionShape>> collisionShapeCache;
 
 long assetio_seek_func(void *self, long offset, Lib3dsIoSeek origin) {
     auto asset = reinterpret_cast<age::Asset*>(self);
@@ -55,7 +54,7 @@ size_t assetio_read_func(void *self, void *buffer, size_t size) {
     return asset->read(buffer, size);
 }
 
-Lib3dsFile* lib3ds_asset_open(const std::string &filepath) {
+std::shared_ptr<Lib3dsFile> lib3ds_asset_open(const std::string &filepath) {
     auto asset = age::ManagerAssets::openAsset(filepath);
     
     auto lib3dsFile = lib3ds_file_new();
@@ -77,7 +76,7 @@ Lib3dsFile* lib3ds_asset_open(const std::string &filepath) {
         throw age::LoadError("Failed to read 3DS model file for: " + filepath);
     }
     
-    return lib3dsFile;
+    return std::shared_ptr<Lib3dsFile>(lib3dsFile, [](auto file){lib3ds_file_free(file);});
 }
 
 } // namespace
@@ -86,10 +85,6 @@ namespace age {
 
 ModelLoader3ds::ModelLoader3ds(const std::string &filepath)
     : ModelLoader(filepath), lib3dsFile(lib3ds_asset_open(filepath)) {}
-
-ModelLoader3ds::~ModelLoader3ds() {
-    lib3ds_file_free(this->lib3dsFile);
-}
 
 std::shared_ptr<ModelLoader3ds::Meshes> ModelLoader3ds::loadMeshes() {
     // Check cached meshes to avoid reloading
@@ -173,47 +168,40 @@ std::shared_ptr<ModelLoader3ds::Meshes> ModelLoader3ds::loadMeshes() {
                              diffuseTextures, specularTextures);
     }
     
+    meshesCache[this->getFilename()] = meshes;
     return meshes;
 }
 
 std::shared_ptr<btCollisionShape> ModelLoader3ds::loadCollisionShape() {
-    auto shape = collisionShapeCache[this->getFilename()].lock();
-    if (shape) return shape;
-    
-    auto filename = this->getFilename();
-    auto shapeDeleter = [filename](auto shape){
-        // Clear cache
-        collisionShapeCache.erase(filename);
-        delete shape;
-    };
-    shape = std::shared_ptr<btCollisionShape>(new btConvexHullShape, shapeDeleter);
-    auto hull = static_cast<btConvexHullShape*>(shape.get());
+    return this->loadConvexHull();
+}
+
+std::shared_ptr<btCollisionShape> ModelLoader3ds::loadConvexHull() {
+    auto shape = std::make_shared<btConvexHullShape>();
     
     // Extract vertex data from lib3ds file
     for (auto i = 0; i < this->lib3dsFile->nmeshes; ++i) {
         auto mesh = this->lib3dsFile->meshes[i];
         for (auto j = 0; j < mesh->nvertices; ++j) {
-            hull->addPoint({mesh->vertices[j][0],
-                            mesh->vertices[j][1],
-                            mesh->vertices[j][2]},
-                           false);
+            shape->addPoint({mesh->vertices[j][0],
+                             mesh->vertices[j][1],
+                             mesh->vertices[j][2]},
+                            false);
         }
     }
-    hull->recalcLocalAabb();
+    shape->recalcLocalAabb();
     
     // Simplify hull
-    if (hull->getNumPoints() >= 100) {
-        btShapeHull hullSimplifier(hull);
-        hullSimplifier.buildHull(hull->getMargin());
-        
-        shape.reset(new btConvexHullShape, shapeDeleter);
-        hull = static_cast<btConvexHullShape*>(shape.get());
+    if (shape->getNumPoints() >= 100) {
+        btShapeHull hull(shape.get());
+        hull.buildHull(shape->getMargin());
         
         // Copy simplified hull data
-        for (auto i = 0; i < hullSimplifier.numVertices(); ++i) {
-            hull->addPoint(hullSimplifier.getVertexPointer()[i], false);
+        shape.reset(new btConvexHullShape);
+        for (auto i = 0; i < hull.numVertices(); ++i) {
+            shape->addPoint(hull.getVertexPointer()[i], false);
         }
-        hull->recalcLocalAabb();
+        shape->recalcLocalAabb();
     }
     
     return shape;

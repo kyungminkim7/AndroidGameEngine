@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <BulletCollision/CollisionShapes/btBoxShape.h>
+#include <LinearMath/btVector3.h>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
@@ -140,20 +142,46 @@ namespace age {
 
 Box::Box(const std::set<std::string> &diffuseTextureFilepaths,
          const std::set<std::string> &specularTextureFilepaths) {
+    std::vector<Texture2D> diffuseTextures, specularTextures;
+    
+    for (const auto& filepath : diffuseTextureFilepaths) {
+        diffuseTextures.emplace_back(filepath);
+    }
+    
+    for (const auto& filepath : specularTextureFilepaths) {
+        specularTextures.emplace_back(filepath);
+    }
+    
+    this->init(diffuseTextures, specularTextures);
+}
+
+Box::Box(const std::vector<age::Texture2D> &diffuseTextures,
+         const std::vector<age::Texture2D> &specularTextures) {
+    this->init(diffuseTextures, specularTextures);
+}
+
+void Box::init(const std::vector<age::Texture2D> &diffuseTextures,
+               const std::vector<age::Texture2D> &specularTextures) {
+    // Create mesh
     auto vbo = vboCache.lock();
     if (!vbo) {
         vbo = std::make_shared<VertexBufferObject>(positions, normals, textureCoords);
+        vboCache = vbo;
     }
     
     auto ebo = eboCache.lock();
     if (!ebo) {
         ebo = std::make_shared<ElementBufferObject>(indices);
+        eboCache = ebo;
     }
     
     std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::move(vbo), std::move(ebo),
-                                                   diffuseTextureFilepaths,
-                                                   specularTextureFilepaths)});
+                                                   diffuseTextures,
+                                                   specularTextures)});
     this->setMesh(std::move(meshes));
+    
+    // Create collision shape
+    this->setCollisionShape(std::make_shared<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
 }
 
 } // namespace age

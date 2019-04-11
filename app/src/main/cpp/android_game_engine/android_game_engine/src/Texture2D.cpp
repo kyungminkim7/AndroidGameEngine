@@ -15,7 +15,7 @@
 
 namespace {
 
-std::unordered_map<std::string, std::weak_ptr<unsigned int>> cachedTextureIds;
+std::unordered_map<std::string, std::weak_ptr<unsigned int>> textureIdCache;
 
 ///
 /// \brief loadImageTexture Loads and caches texture data from image file.
@@ -27,7 +27,7 @@ std::shared_ptr<unsigned int> loadImageTexture(const std::string &imageFilepath)
     const auto imageFilename = imageFilepath.substr(imageFilepath.find_last_of('/') + 1);
     
     // Check cache to avoid reloading
-    auto textureId = cachedTextureIds[imageFilename].lock();
+    auto textureId = textureIdCache[imageFilename].lock();
     if (textureId) return textureId;
     
     // Load image from file
@@ -68,7 +68,7 @@ std::shared_ptr<unsigned int> loadImageTexture(const std::string &imageFilepath)
     auto textureIdDeleter = [imageFilename](auto textureId) {
         glDeleteTextures(1, textureId);
         
-        cachedTextureIds.erase(imageFilename);
+        textureIdCache.erase(imageFilename);
         delete textureId;
     };
     textureId = std::shared_ptr<unsigned int>(new unsigned int, textureIdDeleter);
@@ -87,7 +87,7 @@ std::shared_ptr<unsigned int> loadImageTexture(const std::string &imageFilepath)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
-    cachedTextureIds[imageFilename] = textureId;
+    textureIdCache[imageFilename] = textureId;
     
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_image_free(img);

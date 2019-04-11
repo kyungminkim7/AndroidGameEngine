@@ -84,6 +84,7 @@ void Quad::init(const std::vector<age::Texture2D> &diffuseTextures,
     auto ebo = eboCache.lock();
     if (!ebo) {
         ebo = std::make_shared<ElementBufferObject>(indices);
+        eboCache = ebo;
     }
     
     std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::move(vbo), std::move(ebo),
@@ -92,7 +93,7 @@ void Quad::init(const std::vector<age::Texture2D> &diffuseTextures,
     this->setMesh(std::move(meshes));
     
     // Create collision shape
-    this->setCollisionShape(std::make_shared<btBox2dShape>(btVector3(0.5f, 0.5f, 0.5f)));
+    this->setCollisionShape(std::make_shared<btBox2dShape>(btVector3(0.5f, 0.5f, 0.0f)));
 }
 
 } // namespace age
