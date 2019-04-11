@@ -6,11 +6,13 @@
 
 namespace age {
 Camera::Camera(float fov_deg, float aspectRatioWidthToHeight, float nearPlane, float farPlane)
-        : GameObject(),
-          fov_rad(glm::radians(fov_deg)), aspectRatioWidthToHeight(aspectRatioWidthToHeight),
+        : fov_rad(glm::radians(fov_deg)), aspectRatioWidthToHeight(aspectRatioWidthToHeight),
           nearPlane(nearPlane), farPlane(farPlane) {
     this->updateProjectionMatrix();
 }
+
+void Camera::onUpdate(std::chrono::duration<float> updateDuration) {}
+
 
 void Camera::setFov_deg(float fov_deg) {
     this->fov_rad = glm::radians(fov_deg);
