@@ -34,7 +34,7 @@ public:
     /// Extract collision shape from the 3D model file. The collision shape is internally cached.
     /// \return collision data
     ///
-    virtual std::shared_ptr<btCollisionShape> loadCollisionShape() = 0;
+    virtual std::unique_ptr<btCollisionShape> loadCollisionShape() = 0;
 
 protected:
     std::string getFilepath() const;

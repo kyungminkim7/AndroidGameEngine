@@ -14,10 +14,10 @@ public:
     explicit ModelLoader3ds(const std::string &filepath);
     
     std::shared_ptr<Meshes> loadMeshes() override;
-    std::shared_ptr<btCollisionShape> loadCollisionShape() override;
+    std::unique_ptr<btCollisionShape> loadCollisionShape() override;
 
 private:
-    std::shared_ptr<btCollisionShape> loadConvexHull();
+    std::unique_ptr<btCollisionShape> loadConvexHull();
     
     std::shared_ptr<Lib3dsFile> lib3dsFile;
 };

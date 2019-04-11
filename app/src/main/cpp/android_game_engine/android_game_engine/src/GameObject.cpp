@@ -138,7 +138,7 @@ void GameObject::setMass(float mass) {
     }
 }
 
-void GameObject::setCollisionShape(std::shared_ptr<btCollisionShape> collisionShape) {
+void GameObject::setCollisionShape(std::unique_ptr<btCollisionShape> collisionShape) {
     this->physicsBody = std::make_unique<PhysicsRigidBody>(std::move(collisionShape));
 }
 

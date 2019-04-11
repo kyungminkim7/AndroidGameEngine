@@ -135,7 +135,7 @@ public:
     void setMass(float mass);
 
 protected:
-    void setCollisionShape(std::shared_ptr<btCollisionShape> collisionShape);
+    void setCollisionShape(std::unique_ptr<btCollisionShape> collisionShape);
 
 private:
     Model model;

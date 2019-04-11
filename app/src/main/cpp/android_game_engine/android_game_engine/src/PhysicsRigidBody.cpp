@@ -2,7 +2,7 @@
 
 namespace age {
 
-PhysicsRigidBody::PhysicsRigidBody(std::shared_ptr<btCollisionShape> collisionShape)
+PhysicsRigidBody::PhysicsRigidBody(std::unique_ptr<btCollisionShape> collisionShape)
     : motionState(new PhysicsMotionState),
       collisionShape(std::move(collisionShape)),
       body(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(0.0f, this->motionState.get(),

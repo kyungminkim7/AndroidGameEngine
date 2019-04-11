@@ -172,12 +172,12 @@ std::shared_ptr<ModelLoader3ds::Meshes> ModelLoader3ds::loadMeshes() {
     return meshes;
 }
 
-std::shared_ptr<btCollisionShape> ModelLoader3ds::loadCollisionShape() {
+std::unique_ptr<btCollisionShape> ModelLoader3ds::loadCollisionShape() {
     return this->loadConvexHull();
 }
 
-std::shared_ptr<btCollisionShape> ModelLoader3ds::loadConvexHull() {
-    auto shape = std::make_shared<btConvexHullShape>();
+std::unique_ptr<btCollisionShape> ModelLoader3ds::loadConvexHull() {
+    auto shape = std::make_unique<btConvexHullShape>();
     
     // Extract vertex data from lib3ds file
     for (auto i = 0; i < this->lib3dsFile->nmeshes; ++i) {

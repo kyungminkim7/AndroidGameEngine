@@ -14,7 +14,7 @@ namespace age {
 
 class PhysicsRigidBody {
 public:
-    explicit PhysicsRigidBody(std::shared_ptr<btCollisionShape> collisionShape);
+    explicit PhysicsRigidBody(std::unique_ptr<btCollisionShape> collisionShape);
     
     void* getNativeBody();
     
@@ -35,7 +35,7 @@ public:
     
 private:
     std::unique_ptr<PhysicsMotionState> motionState;
-    std::shared_ptr<btCollisionShape> collisionShape;
+    std::unique_ptr<btCollisionShape> collisionShape;
     std::unique_ptr<btRigidBody> body;
 };
 
