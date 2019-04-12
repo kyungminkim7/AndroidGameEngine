@@ -12,6 +12,9 @@
 
 namespace age {
 
+///
+/// \brief Wrapper class for a rigid physics body.
+///
 class PhysicsRigidBody {
 public:
     explicit PhysicsRigidBody(std::unique_ptr<btCollisionShape> collisionShape);

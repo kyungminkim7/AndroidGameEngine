@@ -18,6 +18,7 @@ public:
 
 private:
     std::unique_ptr<btCollisionShape> loadConvexHull();
+    std::unique_ptr<btCollisionShape> loadCompoundShape();
     
     std::shared_ptr<Lib3dsFile> lib3dsFile;
 };

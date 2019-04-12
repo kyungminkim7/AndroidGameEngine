@@ -6,6 +6,9 @@ namespace age {
 
 class ShaderProgram;
 
+///
+/// \brief Draws debugging objects for the Physics Engine
+///
 class PhysicsDebugDrawer : public btIDebugDraw {
 public:
     explicit PhysicsDebugDrawer(ShaderProgram *shader);

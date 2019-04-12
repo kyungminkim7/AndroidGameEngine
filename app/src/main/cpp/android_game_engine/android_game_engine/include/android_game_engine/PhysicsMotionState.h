@@ -4,6 +4,9 @@
 
 namespace age {
 
+///
+/// \brief Wrapper class implementing the motion state for a physics body.
+///
 class PhysicsMotionState : public btMotionState {
 public:
     explicit PhysicsMotionState(const btTransform& transform = btTransform::getIdentity(),

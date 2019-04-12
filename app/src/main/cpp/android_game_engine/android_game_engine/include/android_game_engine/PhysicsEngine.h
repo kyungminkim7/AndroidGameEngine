@@ -16,14 +16,29 @@ namespace age {
 class PhysicsRigidBody;
 class ShaderProgram;
 
+///
+/// \brief Encapsulates physics and collision detection behavior.
+///
 class PhysicsEngine{
 public:
+    ///
+    /// Construct PhysicsEngine.
+    /// \param debugShader Shader for drawing debug objects such as collision
+    ///                    objects and bounding boxes.
+    ///
     explicit PhysicsEngine(ShaderProgram *debugShader);
     
     void onUpdate(std::chrono::duration<float> updateDuration);
     
+    ///
+    /// Add a rigid body for physics simulation and collision detection
+    /// \param body
+    ///
     void addRigidBody(PhysicsRigidBody *body);
     
+    ///
+    /// Draw registered physics body collision objects and bounding boxes.
+    ///
     void renderDebug();
 
 private:

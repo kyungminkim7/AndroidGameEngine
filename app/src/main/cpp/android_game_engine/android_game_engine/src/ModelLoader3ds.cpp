@@ -4,9 +4,11 @@
 #include <unordered_map>
 
 #include <BulletCollision/CollisionShapes/btConvexHullShape.h>
+#include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <android_game_engine/PhysicsCompoundShape.h>
 #include <android_game_engine/ElementBufferObject.h>
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/ManagerAssets.h>
@@ -205,6 +207,57 @@ std::unique_ptr<btCollisionShape> ModelLoader3ds::loadConvexHull() {
     }
     
     return shape;
+}
+
+std::unique_ptr<btCollisionShape> ModelLoader3ds::loadCompoundShape() {
+    auto compoundShape = std::make_unique<PhysicsCompoundShape>(this->lib3dsFile->nmeshes);
+    
+//    for (auto i = 0; i < this->lib3dsFile->nmeshes; ++i) {
+//        // Build collision shape from mesh vertex data
+//        auto mesh = this->lib3dsFile->meshes[i];
+//        auto shape = std::make_unique<btConvexHullShape>();
+//        for (auto j = 0; j < mesh->nvertices; ++j) {
+//            shape->addPoint({mesh->vertices[j][0],
+//                             mesh->vertices[j][1],
+//                             mesh->vertices[j][2]},
+//                            false);
+//        }
+//        shape->recalcLocalAabb();
+//
+//        // Simplify collision shape
+//        if (shape->getNumPoints() >= 100) {
+//            btShapeHull hull(shape.get());
+//            hull.buildHull(shape->getMargin());
+//
+//            // Copy simplified hull data
+//            shape.reset(new btConvexHullShape);
+//            for (auto i = 0; i < hull.numVertices(); ++i) {
+//                shape->addPoint(hull.getVertexPointer()[i], false);
+//            }
+//            shape->recalcLocalAabb();
+//        }
+//
+//        compoundShape->addChild(std::move(shape));
+//    }
+
+    for (int i = 0; i < this->lib3dsFile->nmeshes; ++i) {
+        auto mesh = this->lib3dsFile->meshes[i];
+        float minBound[3];
+        float maxBound[3];
+        btVector3 halfExtents;
+        btVector3 localOrigin;
+        
+        lib3ds_mesh_bounding_box(mesh, minBound, maxBound);
+        for (auto j = 0; j < 3; ++j) {
+            halfExtents[j] = std::abs(maxBound[j] - minBound[j]) / 2.0f;
+            localOrigin[j] = (minBound[j] + maxBound[j]) / 2.0f;
+        }
+        
+        compoundShape->addChild(std::make_unique<btBoxShape>(halfExtents),
+                                btTransform(btMatrix3x3::getIdentity(), localOrigin));
+    }
+    
+    return compoundShape;
 }
 
 } // namespace age
