@@ -4,6 +4,7 @@
 #include <string>
 
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
+#include <glm/fwd.hpp>
 
 #include "Mesh.h"
 
@@ -36,6 +37,8 @@ public:
     ///
     virtual std::unique_ptr<btCollisionShape> loadCollisionShape() = 0;
 
+    virtual glm::vec3 loadDimensions() = 0;
+    
 protected:
     std::string getFilepath() const;
     std::string getDirectory() const;

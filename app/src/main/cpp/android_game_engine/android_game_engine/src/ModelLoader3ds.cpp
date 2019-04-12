@@ -260,4 +260,13 @@ std::unique_ptr<btCollisionShape> ModelLoader3ds::loadCompoundShape() {
     return compoundShape;
 }
 
+glm::vec3 ModelLoader3ds::loadDimensions() {
+    float minBound[3];
+    float maxBound[3];
+    lib3ds_file_bounding_box_of_objects(this->lib3dsFile.get(), 1, 0, 0, minBound, maxBound);
+    return {std::abs(maxBound[0] - minBound[0]),
+            std::abs(maxBound[1] - minBound[1]),
+            std::abs(maxBound[2] - minBound[2])};
+}
+
 } // namespace age

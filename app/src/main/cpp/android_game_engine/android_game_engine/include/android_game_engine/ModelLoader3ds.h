@@ -15,6 +15,7 @@ public:
     
     std::shared_ptr<Meshes> loadMeshes() override;
     std::unique_ptr<btCollisionShape> loadCollisionShape() override;
+    glm::vec3 loadDimensions() override;
 
 private:
     std::unique_ptr<btCollisionShape> loadConvexHull();

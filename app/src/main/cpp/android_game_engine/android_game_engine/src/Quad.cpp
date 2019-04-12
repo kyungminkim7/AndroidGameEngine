@@ -94,6 +94,7 @@ void Quad::init(const std::vector<age::Texture2D> &diffuseTextures,
     
     // Create collision shape
     this->setCollisionShape(std::make_unique<btBox2dShape>(btVector3(0.5f, 0.5f, 0.0f)));
+    this->setUnscaledDimensions({1.0f, 1.0f, 0.0f});
 }
 
 } // namespace age

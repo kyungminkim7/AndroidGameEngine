@@ -128,6 +128,8 @@ public:
     
     void setScale(const glm::vec3 &scale);
     
+    glm::vec3 getScaledDimensions() const;
+    
     void setSpecularExponent(float specularExponent);
     
     PhysicsRigidBody* getPhysicsBody();
@@ -141,9 +143,11 @@ public:
 
 protected:
     void setCollisionShape(std::unique_ptr<btCollisionShape> collisionShape);
-
+    void setUnscaledDimensions(const glm::vec3 &dimensions);
+    
 private:
     Model model;
+    glm::vec3 unscaledDimensions;
     
     std::shared_ptr<Meshes> meshes;
     float specularExponent = 64.0f;
@@ -161,6 +165,7 @@ inline glm::vec3 GameObject::getOrientationY() const {return this->model.getOrie
 inline glm::vec3 GameObject::getOrientationZ() const {return this->model.getOrientationZ();}
 inline glm::vec3 GameObject::getLookAtDirection() const {return this->model.getLookAtDirection();}
 inline glm::vec3 GameObject::getNormalDirection() const {return this->model.getNormalDirection();}
+inline glm::vec3 GameObject::getScaledDimensions() const {return this->unscaledDimensions * this->model.getScale();}
 inline void GameObject::applyCentralForce(const glm::vec3 &force) {this->physicsBody->applyCentralForce(force);}
 inline void GameObject::applyTorque(const glm::vec3 &torque) {this->physicsBody->applyTorque(torque);}
 inline void GameObject::applyForce(const glm::vec3 &force, const glm::vec3 &relPos) {this->physicsBody->applyForce(force, relPos);}

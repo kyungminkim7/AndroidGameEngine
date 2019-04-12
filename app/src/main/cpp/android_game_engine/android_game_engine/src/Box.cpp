@@ -182,6 +182,7 @@ void Box::init(const std::vector<age::Texture2D> &diffuseTextures,
     
     // Create collision shape
     this->setCollisionShape(std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
+    this->setUnscaledDimensions(glm::vec3(1.0f));
 }
 
 } // namespace age
