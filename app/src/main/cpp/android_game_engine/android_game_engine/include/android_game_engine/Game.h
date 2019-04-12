@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "CameraChase.h"
-#include "DirectionalLight.h"
 #include "GameObject.h"
+#include "LightDirectional.h"
 #include "PhysicsEngine.h"
 #include "TouchEvent.h"
 #include "ShaderProgram.h"
@@ -45,7 +45,7 @@ protected:
     
     Widget* getGui();
     CameraType* getCam();
-    DirectionalLight* getDirectionalLight();
+    LightDirectional* getDirectionalLight();
 
 private:
     ShaderProgram defaultShader;
@@ -57,7 +57,7 @@ private:
     
     std::unique_ptr<Skybox> skybox = nullptr;
     std::unique_ptr<CameraType> cam = nullptr;
-    std::unique_ptr<DirectionalLight> directionalLight = nullptr;
+    std::unique_ptr<LightDirectional> directionalLight = nullptr;
     std::vector<std::unique_ptr<GameObject>> worldList;
     
     std::unique_ptr<PhysicsEngine> physics;
@@ -66,6 +66,6 @@ private:
 
 inline Widget* Game::getGui() {return this->gui.get();}
 inline CameraType* Game::getCam() {return this->cam.get();}
-inline DirectionalLight* Game::getDirectionalLight() {return this->directionalLight.get();}
+inline LightDirectional* Game::getDirectionalLight() {return this->directionalLight.get();}
 
 } // namespace age

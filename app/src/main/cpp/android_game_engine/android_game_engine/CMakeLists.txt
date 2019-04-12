@@ -12,13 +12,13 @@ add_library(${PROJECT_NAME} STATIC
         src/Camera.cpp
         src/CameraChase.cpp
         src/CameraFPV.cpp
-        src/DirectionalLight.cpp
         src/ElementBufferObject.cpp
         src/Game.cpp
         src/GameObject.cpp
         src/Joystick.cpp
         src/JoystickHandle.cpp
         src/Light.cpp
+        src/LightDirectional.cpp
         src/Log.cpp
         src/ManagerAssets.cpp
         src/ManagerWindowing.cpp

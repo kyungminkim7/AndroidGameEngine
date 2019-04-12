@@ -7,12 +7,12 @@
 namespace age {
 
 ///
-/// \brief The DirectionalLight class represents a directional light with uniform
+/// \brief The LightDirectional class represents a directional light with uniform
 /// orthonormal projection.
 ///
-class DirectionalLight : public Light {
+class LightDirectional : public Light {
 public:
-    DirectionalLight(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
+    LightDirectional(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
                      float left, float right, float bottom, float top, float nearPlane, float farPlane);
     
     ///

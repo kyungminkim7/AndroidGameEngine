@@ -37,7 +37,7 @@ void Game::init() {
                                              0.1f, 500.0f);
     
     // Setup light
-    this->directionalLight = std::make_unique<DirectionalLight>(glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f),
+    this->directionalLight = std::make_unique<LightDirectional>(glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f),
             -10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 250.0f);
     this->directionalLight->setLookAtDirection({1.0f, 1.0f, -1.0f});
 }
