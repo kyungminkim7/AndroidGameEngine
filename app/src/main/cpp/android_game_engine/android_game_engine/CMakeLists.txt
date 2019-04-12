@@ -10,6 +10,7 @@ add_library(${PROJECT_NAME} STATIC
         src/Asset.cpp
         src/Box.cpp
         src/Camera.cpp
+        src/CameraChase.cpp
         src/CameraFPV.cpp
         src/DirectionalLight.cpp
         src/ElementBufferObject.cpp
