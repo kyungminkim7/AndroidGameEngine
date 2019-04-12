@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "CameraFPV.h"
+#include "CameraChase.h"
 #include "DirectionalLight.h"
 #include "GameObject.h"
 #include "PhysicsEngine.h"
@@ -15,6 +15,8 @@
 namespace age {
 
 class Widget;
+
+using CameraType = CameraChase;
 
 /**
  * Users should subclass Game and then run it using GameEngine::run with the derived
@@ -42,7 +44,7 @@ protected:
     void addToWorldList(std::unique_ptr<GameObject> gameObject);
     
     Widget* getGui();
-    CameraFPV* getCam();
+    CameraType* getCam();
     DirectionalLight* getDirectionalLight();
 
 private:
@@ -54,7 +56,7 @@ private:
     std::shared_ptr<Widget> gui = nullptr;
     
     std::unique_ptr<Skybox> skybox = nullptr;
-    std::unique_ptr<CameraFPV> cam = nullptr;
+    std::unique_ptr<CameraType> cam = nullptr;
     std::unique_ptr<DirectionalLight> directionalLight = nullptr;
     std::vector<std::unique_ptr<GameObject>> worldList;
     
@@ -63,7 +65,7 @@ private:
 };
 
 inline Widget* Game::getGui() {return this->gui.get();}
-inline CameraFPV* Game::getCam() {return this->cam.get();}
+inline CameraType* Game::getCam() {return this->cam.get();}
 inline DirectionalLight* Game::getDirectionalLight() {return this->directionalLight.get();}
 
 } // namespace age

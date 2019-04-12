@@ -32,9 +32,9 @@ void Game::init() {
                            {ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight()});
 
     // Setup cam
-    this->cam = std::make_unique<CameraFPV>(45.0f,
-                                            static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
-                                            0.1f, 500.0f);
+    this->cam = std::make_unique<CameraType>(45.0f,
+                                             static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
+                                             0.1f, 500.0f);
     
     // Setup light
     this->directionalLight = std::make_unique<DirectionalLight>(glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f),

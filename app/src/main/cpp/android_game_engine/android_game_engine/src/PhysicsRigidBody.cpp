@@ -49,14 +49,6 @@ void PhysicsRigidBody::setScale(const glm::vec3 &scale) {
     this->collisionShape->setLocalScaling({scale.x, scale.y, scale.z});
 }
 
-void PhysicsRigidBody::setLinearVelocity(const glm::vec3 &velocity) {
-    this->body->setLinearVelocity({velocity.x, velocity.y, velocity.z});
-}
-
-void PhysicsRigidBody::setAngularVelocity(const glm::vec3 &velocity) {
-    this->body->setAngularVelocity({velocity.x, velocity.y, velocity.z});
-}
-
 std::pair<glm::mat3, glm::vec3> PhysicsRigidBody::getTransform() const {
     btTransform transform;
     this->motionState->getWorldTransform(transform);

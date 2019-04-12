@@ -34,12 +34,6 @@ void TestGame::setupGui() {
     this->moveJoystick->setColor(joystickColor);
     this->moveJoystick->setHandleColor(joystickHandleColor);
     
-    auto moveCam = std::bind(&CameraFPV::onMove, this->getCam(), _1);
-    this->moveJoystick->registerOnTouchDownCallback(moveCam);
-    this->moveJoystick->registerOnTouchMoveCallback(moveCam);
-    this->moveJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onMove, this->getCam(),
-                                                            glm::vec2(0.0f)));
-    
     this->rotateJoystick = Joystick::New(this->getGui());
     this->rotateJoystick->setGeometry({ManagerWindowing::getWindowWidth() - positionOffset.x - dimensions.x,
                                        positionOffset.y},
@@ -47,11 +41,17 @@ void TestGame::setupGui() {
     this->rotateJoystick->setColor(joystickColor);
     this->rotateJoystick->setHandleColor(joystickHandleColor);
     
-    auto rotateCam = std::bind(&CameraFPV::onRotate, this->getCam(), _1);
-    this->rotateJoystick->registerOnTouchDownCallback(rotateCam);
-    this->rotateJoystick->registerOnTouchMoveCallback(rotateCam);
-    this->rotateJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onRotate, this->getCam(),
-                                                              glm::vec2(0.0f)));
+//    auto moveCam = std::bind(&CameraFPV::onMove, this->getCam(), _1);
+//    this->moveJoystick->registerOnTouchDownCallback(moveCam);
+//    this->moveJoystick->registerOnTouchMoveCallback(moveCam);
+//    this->moveJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onMove, this->getCam(),
+//                                                            glm::vec2(0.0f)));
+//
+//    auto rotateCam = std::bind(&CameraFPV::onRotate, this->getCam(), _1);
+//    this->rotateJoystick->registerOnTouchDownCallback(rotateCam);
+//    this->rotateJoystick->registerOnTouchMoveCallback(rotateCam);
+//    this->rotateJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onRotate, this->getCam(),
+//                                                              glm::vec2(0.0f)));
 }
 
 void TestGame::loadWorld() {
@@ -66,8 +66,8 @@ void TestGame::loadWorld() {
 //    };
 //    this->setSkybox(std::make_unique<Skybox>(skyboxImages));
     
-    this->getCam()->setPosition({-10.0f, 5.0f, 3.0f});
-    this->getCam()->setLookAtPoint({0.0f, 0.0f, 0.0f});
+//    this->getCam()->setPosition({-10.0f, 5.0f, 3.0f});
+//    this->getCam()->setLookAtPoint({0.0f, 0.0f, 0.0f});
 
     std::unique_ptr<Box> box1(new Box({Texture2D(glm::vec3(1.0f, 1.0f, 0.0f))},
                                       {Texture2D(glm::vec3(1.0f))}));
@@ -80,6 +80,30 @@ void TestGame::loadWorld() {
                                       {Texture2D(glm::vec3(1.0f))}));
     box2->setPosition({0.0f, -1.0f, 3.0f});
     box2->setMass(1.0f);
+    this->obj = box2.get();
+    this->getCam()->setChaseObject(box2.get(), {-5.0f, 0.0f, 1.0f});
+    
+    auto leftThrottle = [ptr=this->obj](const auto& input){
+        glm::vec3 force{0.0f, -input.x * 20,
+                        input.y > 0.0f ? input.y * 30 : 0.0f};
+        
+        ptr->applyCentralForce(ptr->getOrientation() * force);
+    };
+    this->moveJoystick->registerOnTouchDownCallback(leftThrottle);
+    this->moveJoystick->registerOnTouchMoveCallback(leftThrottle);
+//    this->moveJoystick->registerOnTouchUpCallback(std::bind(&GameObject::clearForces, this->getCam(),
+//                                                            glm::vec2(0.0f)));
+    
+    auto rightThrottle = [ptr=this->obj](const auto& input){
+        glm::vec3 force{input.y * 20, 0.0f, 0.0f};
+        ptr->applyCentralForce(ptr->getOrientation() * force);
+    };
+    this->rotateJoystick->registerOnTouchDownCallback(rightThrottle);
+    this->rotateJoystick->registerOnTouchMoveCallback(rightThrottle);
+//    this->rotateJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onRotate, this->getCam(),
+//                                                              glm::vec2(0.0f)));
+//
+    
     this->addToWorldList(std::move(box2));
     
     std::unique_ptr<Quad> quad(new Quad({Texture2D("images/wood.png")},
@@ -145,8 +169,6 @@ void TestGame::loadWorld() {
 
 void TestGame::onUpdate(std::chrono::duration<float> updateDuration) {
     Game::onUpdate(updateDuration);
-    
-//    this->uav->rotate(glm::radians(20.0f) * updateDuration.count(), {1.0f, 1.0f, 1.0f});
 }
 
 } // namespace age
