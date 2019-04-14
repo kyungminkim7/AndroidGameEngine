@@ -2,11 +2,13 @@
 
 namespace age {
 
-PhysicsRigidBody::PhysicsRigidBody(std::unique_ptr<btCollisionShape> collisionShape)
+PhysicsRigidBody::PhysicsRigidBody(GameObject *gameObject, std::unique_ptr<btCollisionShape> collisionShape)
     : motionState(new PhysicsMotionState),
       collisionShape(std::move(collisionShape)),
       body(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(0.0f, this->motionState.get(),
-                                                                    this->collisionShape.get()))){}
+                                                                    this->collisionShape.get()))){
+    this->body->setUserPointer(gameObject);
+}
 
 void* PhysicsRigidBody::getNativeBody() {return this->body.get();}
 
@@ -60,6 +62,44 @@ std::pair<glm::mat3, glm::vec3> PhysicsRigidBody::getTransform() const {
                                     basis[0][1], basis[1][1], basis[2][1],
                                     basis[0][2], basis[1][2], basis[2][2]),
                           glm::vec3(origin.getX(), origin.getY(), origin.getZ()));
+}
+
+void PhysicsRigidBody::applyCentralForce(const glm::vec3 &force) {
+    if (!this->body->isStaticObject()) {
+        this->body->activate(true);
+        this->body->applyCentralForce({force.x, force.y, force.z});
+    }
+}
+
+void PhysicsRigidBody::applyTorque(const glm::vec3 &torque) {
+    if (!this->body->isStaticObject()) {
+        this->body->activate(true);
+        this->body->applyTorque({torque.x, torque.y, torque.z});
+    }
+}
+
+void PhysicsRigidBody::applyForce(const glm::vec3 &force, const glm::vec3 &relPos) {
+    if (!this->body->isStaticObject()) {
+        this->body->activate(true);
+        this->body->applyForce({force.x, force.y, force.z},
+                               {relPos.x, relPos.y, relPos.z});
+    }
+}
+
+void PhysicsRigidBody::clearForces() {this->body->clearForces();}
+
+void PhysicsRigidBody::setLinearVelocity(const glm::vec3 &velocity) {
+    if (!this->body->isStaticObject()) {
+        this->body->activate(true);
+        this->body->setLinearVelocity({velocity.x, velocity.y, velocity.z});
+    }
+}
+
+void PhysicsRigidBody::setAngularVelocity(const glm::vec3 &velocity) {
+    if (!this->body->isStaticObject()) {
+        this->body->activate(true);
+        this->body->setAngularVelocity({velocity.x, velocity.y, velocity.z});
+    }
 }
 
 } // namespace age

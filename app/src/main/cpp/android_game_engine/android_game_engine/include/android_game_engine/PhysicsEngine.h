@@ -8,13 +8,21 @@
 #include <BulletCollision/CollisionDispatch/btCollisionConfiguration.h>
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+#include <glm/vec3.hpp>
 
 #include <android_game_engine/PhysicsDebugDrawer.h>
 
 namespace age {
 
+class GameObject;
 class PhysicsRigidBody;
 class ShaderProgram;
+
+struct RaycastResult {
+    GameObject *gameObject;
+    glm::vec3 hitPoint;
+    glm::vec3 hitNormal;
+};
 
 ///
 /// \brief Encapsulates physics and collision detection behavior.
@@ -35,6 +43,8 @@ public:
     /// \param body
     ///
     void addRigidBody(PhysicsRigidBody *body);
+    
+    RaycastResult raycastClosest(const glm::vec3 &from, const glm::vec3 &to) const;
     
     ///
     /// Draw registered physics body collision objects and bounding boxes.

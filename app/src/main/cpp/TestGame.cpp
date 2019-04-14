@@ -30,10 +30,6 @@ void TestGame::setupGui() {
     const glm::vec4 joystickColor(0.0f, 0.6f, 0.7f, 0.8f);
     const glm::vec4 joystickHandleColor(0.0f, 0.7f, 0.9f, 0.8f);
     
-    this->getGui()->registerOnTouchDownCallback([](const auto& pos){
-        Log::info("Touched: " + std::to_string(pos.x) + ", " + std::to_string(pos.y));
-    });
-    
     this->moveJoystick = Joystick::New(this->getGui());
     this->moveJoystick->setGeometry(positionOffset, dimensions);
     this->moveJoystick->setColor(joystickColor);
@@ -137,6 +133,12 @@ void TestGame::loadWorld() {
 
 void TestGame::onUpdate(std::chrono::duration<float> updateDuration) {
     Game::onUpdate(updateDuration);
+}
+
+void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
+                                   const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
+    Log::info("Touched!");
+    gameObject->applyCentralForce(touchDirection * 40.0f);
 }
 
 } // namespace age

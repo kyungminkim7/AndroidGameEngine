@@ -16,7 +16,8 @@ GameObject::GameObject(const std::string &modelFilepath){
     ModelLoader3ds modelLoader(modelFilepath);
     this->unscaledDimensions = modelLoader.loadDimensions();
     this->meshes = std::move(modelLoader.loadMeshes());
-    this->physicsBody = std::make_unique<PhysicsRigidBody>(std::move(modelLoader.loadCollisionShape()));
+    this->physicsBody = std::make_unique<PhysicsRigidBody>(this,
+                                                           std::move(modelLoader.loadCollisionShape()));
 }
 
 void GameObject::onUpdate(std::chrono::duration<float> updateDuration) {}
@@ -140,7 +141,7 @@ void GameObject::setMass(float mass) {
 }
 
 void GameObject::setCollisionShape(std::unique_ptr<btCollisionShape> collisionShape) {
-    this->physicsBody = std::make_unique<PhysicsRigidBody>(std::move(collisionShape));
+    this->physicsBody = std::make_unique<PhysicsRigidBody>(this, std::move(collisionShape));
 }
 
 void GameObject::setUnscaledDimensions(const glm::vec3 &dimensions) {

@@ -31,6 +31,22 @@ void PhysicsEngine::addRigidBody(PhysicsRigidBody *body) {
     this->dynamicsWorld->addRigidBody(reinterpret_cast<btRigidBody*>(body->getNativeBody()));
 }
 
+RaycastResult PhysicsEngine::raycastClosest(const glm::vec3 &from, const glm::vec3 &to) const {
+    btVector3 btFrom(from.x, from.y, from.z), btTo(to.x, to.y, to.z);
+    btCollisionWorld::ClosestRayResultCallback callback(btFrom, btTo);
+    
+    this->dynamicsWorld->rayTest(btFrom, btTo, callback);
+    
+    if(callback.hasHit()) {
+        auto hitPoint = btFrom.lerp(btTo, callback.m_closestHitFraction);
+        return {static_cast<GameObject*>(callback.m_collisionObject->getUserPointer()),
+                glm::vec3(hitPoint.x(), hitPoint.y(), hitPoint.z()),
+                glm::vec3(callback.m_hitNormalWorld.x(), callback.m_hitNormalWorld.y(), callback.m_hitNormalWorld.z())};
+    } else {
+        return {nullptr, glm::vec3(0.0f), glm::vec3(0.0f)};
+    }
+}
+
 void PhysicsEngine::renderDebug() {
     this->dynamicsWorld->debugDrawWorld();
 }

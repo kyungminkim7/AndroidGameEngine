@@ -19,6 +19,11 @@ class Window;
 
 using CameraType = CameraFPV;
 
+struct Ray {
+    glm::vec3 origin;
+    glm::vec3 direction;
+};
+
 /**
  * Users should subclass Game and then run it using GameEngine::run with the derived
  * Game class.
@@ -42,13 +47,21 @@ public:
 
 protected:
     void setSkybox(std::unique_ptr<Skybox> skybox);
+    
     void addToWorldList(std::unique_ptr<GameObject> gameObject);
+    
+    virtual void onGameObjectTouched(GameObject *gameObject, const glm::vec3 &touchPoint,
+                                     const glm::vec3 &touchDirection, const glm::vec3 &touchNormal);
+    
+    Ray getTouchRay(const glm::vec2 &windowTouchPosition);
     
     Window* getGui();
     CameraType* getCam();
     LightDirectional* getDirectionalLight();
 
 private:
+    void raycastTouch(const glm::vec2 &windowTouchPosition, float length);
+    
     ShaderProgram defaultShader;
     ShaderProgram skyboxShader;
     ShaderProgram widgetShader;

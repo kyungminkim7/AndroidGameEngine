@@ -13,6 +13,10 @@ public:
     void loadWorld() override;
 
     void onUpdate(std::chrono::duration<float> updateDuration) override;
+
+protected:
+    void onGameObjectTouched(GameObject *gameObject, const glm::vec3 &touchPoint,
+                             const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) override;
     
 private:
     void setupGui();

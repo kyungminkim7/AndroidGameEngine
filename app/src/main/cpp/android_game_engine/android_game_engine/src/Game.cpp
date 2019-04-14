@@ -30,7 +30,9 @@ void Game::init() {
     this->gui = Window::New();
     this->gui->setGeometry({0.0f, 0.0f},
                            {ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight()});
-
+    this->gui->registerOnTouchDownCallback(std::bind(&Game::raycastTouch, this,
+                                           std::placeholders::_1, 1000.0f));
+    
     // Setup cam
     this->cam = std::make_unique<CameraType>(45.0f,
                                              static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
@@ -132,6 +134,40 @@ void Game::addToWorldList(std::unique_ptr<age::GameObject> gameObject) {
     }
     
     this->worldList.push_back(std::move(gameObject));
+}
+
+void Game::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
+                               const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {}
+
+Ray Game::getTouchRay(const glm::vec2 &windowTouchPosition) {
+    auto invProjectionView = glm::inverse(this->cam->getProjectionMatrix() * this->cam->getViewMatrix());
+    
+    glm::vec2 ndcPosition(windowTouchPosition.x,
+                          ManagerWindowing::getWindowHeight() - windowTouchPosition.y);
+    ndcPosition /= glm::vec2(ManagerWindowing::getWindowWidth(),
+                             ManagerWindowing::getWindowHeight());
+    ndcPosition = (ndcPosition - 0.5f) * 2.0f;
+    
+    glm::vec4 from(ndcPosition, -1.0f, 1.0f);
+    glm::vec4 to(ndcPosition, 0.0f, 1.0f);
+    
+    from = invProjectionView * from;
+    from /= from.w;
+    
+    to = invProjectionView * to;
+    to /= to.w;
+    
+    return {from, glm::normalize(glm::vec3(to - from))};
+}
+
+void Game::raycastTouch(const glm::vec2 &windowTouchPosition, float length) {
+    auto ray = this->getTouchRay(windowTouchPosition);
+    auto result = this->physics->raycastClosest(ray.origin, ray.origin + ray.direction * length);
+    
+    if (result.gameObject) {
+        this->onGameObjectTouched(result.gameObject, result.hitPoint,
+                                  ray.direction, result.hitNormal);
+    }
 }
 
 } // namespace age
