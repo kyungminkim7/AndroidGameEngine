@@ -41,26 +41,13 @@ void Joystick::setHandleSize(float handleSize) {
 
 void Joystick::setHandleColor(const glm::vec4 &color) {this->handle->setColor(color);}
 
-void Joystick::registerOnTouchDownCallback(OnTouchDownCallback callback) {
-    this->onTouchDownCallbacks.push_front(callback);
-}
-
-void Joystick::registerOnTouchMoveCallback(OnTouchMoveCallback callback) {
-    this->onTouchMoveCallbacks.push_front(callback);
-}
-
-void Joystick::registerOnTouchUpCallback(OnTouchUpCallback callback) {
-    this->onTouchUpCallbacks.push_front(callback);
-}
-
 void Joystick::onTouchDown(const glm::vec2 &position) {
     this->handle->setPosition(position - this->handle->getRadius());
     
     auto output = (position - this->getCenter()) / this->getRadius();
     output.y *= -1.0f;
-    for (const auto& callback : this->onTouchDownCallbacks) {
-        callback(output);
-    }
+    
+    Widget::onTouchDown(output);
 }
 
 void Joystick::onTouchMove(const glm::vec2 &position) {
@@ -75,16 +62,14 @@ void Joystick::onTouchMove(const glm::vec2 &position) {
     
     auto output = relativeHandleCenter / this->getRadius();
     output.y *= -1.0f;
-    for (const auto& callback : this->onTouchMoveCallbacks) {
-        callback(output);
-    }
+    
+    Widget::onTouchMove(output);
 }
 
 void Joystick::onTouchUp() {
     this->handle->setPosition(this->getCenter() - this->handle->getRadius());
-    for (const auto& callback : this->onTouchUpCallbacks) {
-        callback();
-    }
+    
+    Widget::onTouchUp();
 }
 
 float Joystick::getRadius() const {return this->getDimensions().x * 0.5f;}

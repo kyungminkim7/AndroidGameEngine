@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <android_game_engine/ManagerWindowing.h>
-#include <android_game_engine/Widget.h>
+#include <android_game_engine/Window.h>
 
 namespace age {
 
@@ -27,7 +27,7 @@ void Game::init() {
     this->widgetShader.use();
     this->widgetShader.setUniform("projection", widgetProjection);
     
-    this->gui = Widget::New();
+    this->gui = Window::New();
     this->gui->setGeometry({0.0f, 0.0f},
                            {ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight()});
 

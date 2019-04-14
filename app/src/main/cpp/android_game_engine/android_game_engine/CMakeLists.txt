@@ -15,6 +15,7 @@ add_library(${PROJECT_NAME} STATIC
         src/ElementBufferObject.cpp
         src/Game.cpp
         src/GameObject.cpp
+        src/Window.cpp
         src/Joystick.cpp
         src/JoystickHandle.cpp
         src/Light.cpp
@@ -32,6 +33,7 @@ add_library(${PROJECT_NAME} STATIC
         src/PhysicsMotionState.cpp
         src/PhysicsRigidBody.cpp
         src/Quad.cpp
+        src/Quadcopter.cpp
         src/ShaderProgram.cpp
         src/Skybox.cpp
         src/Texture2D.cpp

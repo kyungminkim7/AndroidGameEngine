@@ -9,7 +9,8 @@
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
 #include <android_game_engine/Quad.h>
-#include <android_game_engine/Widget.h>
+#include <android_game_engine/Quadcopter.h>
+#include <android_game_engine/Window.h>
 
 namespace age {
 
@@ -29,6 +30,10 @@ void TestGame::setupGui() {
     const glm::vec4 joystickColor(0.0f, 0.6f, 0.7f, 0.8f);
     const glm::vec4 joystickHandleColor(0.0f, 0.7f, 0.9f, 0.8f);
     
+    this->getGui()->registerOnTouchDownCallback([](const auto& pos){
+        Log::info("Touched: " + std::to_string(pos.x) + ", " + std::to_string(pos.y));
+    });
+    
     this->moveJoystick = Joystick::New(this->getGui());
     this->moveJoystick->setGeometry(positionOffset, dimensions);
     this->moveJoystick->setColor(joystickColor);
@@ -41,17 +46,17 @@ void TestGame::setupGui() {
     this->rotateJoystick->setColor(joystickColor);
     this->rotateJoystick->setHandleColor(joystickHandleColor);
     
-//    auto moveCam = std::bind(&CameraFPV::onMove, this->getCam(), _1);
-//    this->moveJoystick->registerOnTouchDownCallback(moveCam);
-//    this->moveJoystick->registerOnTouchMoveCallback(moveCam);
-//    this->moveJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onMove, this->getCam(),
-//                                                            glm::vec2(0.0f)));
-//
-//    auto rotateCam = std::bind(&CameraFPV::onRotate, this->getCam(), _1);
-//    this->rotateJoystick->registerOnTouchDownCallback(rotateCam);
-//    this->rotateJoystick->registerOnTouchMoveCallback(rotateCam);
-//    this->rotateJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onRotate, this->getCam(),
-//                                                              glm::vec2(0.0f)));
+    auto moveCam = std::bind(&CameraFPV::onMove, this->getCam(), _1);
+    this->moveJoystick->registerOnTouchDownCallback(moveCam);
+    this->moveJoystick->registerOnTouchMoveCallback(moveCam);
+    this->moveJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onMove, this->getCam(),
+                                                            glm::vec2(0.0f)));
+
+    auto rotateCam = std::bind(&CameraFPV::onRotate, this->getCam(), _1);
+    this->rotateJoystick->registerOnTouchDownCallback(rotateCam);
+    this->rotateJoystick->registerOnTouchMoveCallback(rotateCam);
+    this->rotateJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onRotate, this->getCam(),
+                                                              glm::vec2(0.0f)));
 }
 
 void TestGame::loadWorld() {
@@ -66,8 +71,8 @@ void TestGame::loadWorld() {
 //    };
 //    this->setSkybox(std::make_unique<Skybox>(skyboxImages));
     
-//    this->getCam()->setPosition({-10.0f, 5.0f, 3.0f});
-//    this->getCam()->setLookAtPoint({0.0f, 0.0f, 0.0f});
+    this->getCam()->setPosition({-15.0f, 5.0f, 10.0f});
+    this->getCam()->setLookAtPoint({0.0f, 0.0f, 2.0f});
 
     std::unique_ptr<Box> box1(new Box({Texture2D(glm::vec3(1.0f, 1.0f, 0.0f))},
                                       {Texture2D(glm::vec3(1.0f))}));
@@ -76,35 +81,29 @@ void TestGame::loadWorld() {
     box1->setMass(1.0f);
     this->addToWorldList(std::move(box1));
 
-    std::unique_ptr<Box> box2(new Box({Texture2D(glm::vec3(0.0f, 1.0f, 1.0f))},
-                                      {Texture2D(glm::vec3(1.0f))}));
-    box2->setPosition({0.0f, -1.0f, 3.0f});
-    box2->setMass(1.0f);
-    this->obj = box2.get();
-    this->getCam()->setChaseObject(box2.get(), {-5.0f, 0.0f, 1.0f});
+    using namespace std::placeholders;
+    std::unique_ptr<Quadcopter> uav(new Quadcopter(""));
+    uav->setPosition({0.0f, -1.0f, 3.0f});
+    uav->setMass(1.0f);
+    uav->setMaxMotorThrust(10.0f);
+//    this->getCam()->setChaseObject(uav.get(), {-5.0f, 0.0f, 1.0f});
     
-    auto leftThrottle = [ptr=this->obj](const auto& input){
-        glm::vec3 force{0.0f, -input.x * 20,
-                        input.y > 0.0f ? input.y * 30 : 0.0f};
-        
-        ptr->applyCentralForce(ptr->getOrientation() * force);
-    };
-    this->moveJoystick->registerOnTouchDownCallback(leftThrottle);
-    this->moveJoystick->registerOnTouchMoveCallback(leftThrottle);
-//    this->moveJoystick->registerOnTouchUpCallback(std::bind(&GameObject::clearForces, this->getCam(),
-//                                                            glm::vec2(0.0f)));
-    
-    auto rightThrottle = [ptr=this->obj](const auto& input){
-        glm::vec3 force{input.y * 20, 0.0f, 0.0f};
-        ptr->applyCentralForce(ptr->getOrientation() * force);
-    };
-    this->rotateJoystick->registerOnTouchDownCallback(rightThrottle);
-    this->rotateJoystick->registerOnTouchMoveCallback(rightThrottle);
+//    auto leftThrottle = std::bind(&Quadcopter::onThrottleInput, uav.get(), _1);
+//    this->moveJoystick->registerOnTouchDownCallback(leftThrottle);
+//    this->moveJoystick->registerOnTouchMoveCallback(leftThrottle);
+//    this->moveJoystick->registerOnTouchUpCallback(std::bind(&Quadcopter::onThrottleInput, uav.get(), glm::vec2(0.0f)));
+//
+//    auto rightThrottle = [ptr=this->obj](const auto& input){
+//        glm::vec3 force{input.y * 20, 0.0f, 0.0f};
+//        ptr->applyCentralForce(ptr->getOrientation() * force);
+//    };
+//    this->rotateJoystick->registerOnTouchDownCallback(rightThrottle);
+//    this->rotateJoystick->registerOnTouchMoveCallback(rightThrottle);
 //    this->rotateJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onRotate, this->getCam(),
 //                                                              glm::vec2(0.0f)));
 //
     
-    this->addToWorldList(std::move(box2));
+    this->addToWorldList(std::move(uav));
     
     std::unique_ptr<Quad> quad(new Quad({Texture2D("images/wood.png")},
                                         {Texture2D(glm::vec3(1.0f))},
@@ -133,37 +132,6 @@ void TestGame::loadWorld() {
 //
 //        auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
 //        Log::info("1st load time: " + std::to_string(time.count()) + " ms");
-//    }
-//
-//    {
-//        auto start = std::chrono::system_clock::now();
-//
-////        auto uav = std::make_unique<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
-//        auto uav = std::make_unique<GameObject>("models/C-17A_3DS/C-17A_DE.3ds");
-////        uav->setScale(glm::vec3(5.0f));
-//        uav->setPosition({1.0f, 5.0f, 1.0f});
-//        uav->setMass(10.0f);
-//
-//        this->addToWorldList(std::move(uav));
-//
-//        auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
-//        Log::info("2nd load time: " + std::to_string(time.count()) + " ms");
-//    }
-
-//    {
-//        auto start = std::chrono::system_clock::now();
-//
-////        auto uav = std::make_unique<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
-//        auto uav = std::make_unique<GameObject>("models/C-17A_3DS/C-17A_DE.3ds");
-////        uav->setScale(glm::vec3(15.0f));
-//        uav->setPosition({1.0f, -1.0f, 1.0f});
-//        uav->rotate(glm::radians(30.0f), {0.0f, 0.0f, 1.0f});
-//        uav->setMass(10.0f);
-//
-//        this->addToWorldList(std::move(uav));
-//
-//        auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
-//        Log::info("3rd load time: " + std::to_string(time.count()) + " ms");
 //    }
 }
 

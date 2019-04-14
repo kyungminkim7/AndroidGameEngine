@@ -1,6 +1,8 @@
 #pragma once
 
 #include <chrono>
+#include <forward_list>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -26,6 +28,10 @@ class ShaderProgram;
 ///
 class Widget {
 public:
+    using OnTouchDownCallback = std::function<void(const glm::vec2&)>;
+    using OnTouchMoveCallback = std::function<void(const glm::vec2&)>;
+    using OnTouchUpCallback = std::function<void()>;
+    
     static std::shared_ptr<Widget> New(Widget *parent=nullptr);
     virtual ~Widget();
     
@@ -52,6 +58,10 @@ public:
     
     virtual void render(ShaderProgram *shader);
     
+    void registerOnTouchDownCallback(OnTouchDownCallback callback);
+    void registerOnTouchMoveCallback(OnTouchMoveCallback callback);
+    void registerOnTouchUpCallback(OnTouchUpCallback callback);
+    
     void onTouchDownEvent(const TouchEvent &event);
     void onTouchMoveEvent(const TouchEvent &event);
     void onTouchUpEvent(const TouchEvent &event);
@@ -59,16 +69,23 @@ public:
     virtual void onTouchDown(const glm::vec2 &position);
     virtual void onTouchMove(const glm::vec2 &position);
     virtual void onTouchUp();
+    
+    virtual bool inBounds(const glm::vec2 &point) const;
 
 protected:
-    Widget(Widget *parent);
+    explicit Widget(Widget *parent);
+    
     Widget* getParent();
+    
+    std::vector<std::shared_ptr<Widget>>& getChildren();
 
 private:
-    virtual bool inBounds(const glm::vec2 &point) const;
-    
     Widget *parent;
     std::vector<std::shared_ptr<Widget>> children;
+    
+    std::forward_list<OnTouchDownCallback> onTouchDownCallbacks;
+    std::forward_list<OnTouchMoveCallback> onTouchMoveCallbacks;
+    std::forward_list<OnTouchUpCallback> onTouchUpCallbacks;
     
     Model model;
     glm::vec2 position; //< absolute position in window

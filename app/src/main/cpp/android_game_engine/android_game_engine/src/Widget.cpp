@@ -147,6 +147,18 @@ void Widget::onTouchDownEvent(const age::TouchEvent &event) {
     }
 }
 
+void Widget::registerOnTouchDownCallback(OnTouchDownCallback callback) {
+    this->onTouchDownCallbacks.push_front(callback);
+}
+
+void Widget::registerOnTouchMoveCallback(OnTouchMoveCallback callback) {
+    this->onTouchMoveCallbacks.push_front(callback);
+}
+
+void Widget::registerOnTouchUpCallback(OnTouchUpCallback callback) {
+    this->onTouchUpCallbacks.push_front(callback);
+}
+
 void Widget::onTouchMoveEvent(const age::TouchEvent &event) {
     // Extract the touched and event ids
     auto keyExtractor = [](const auto& item){return item.first;};
@@ -197,15 +209,33 @@ void Widget::onTouchUpEvent(const age::TouchEvent &event) {
     touchedWidgets.clear();
 }
 
-void Widget::onTouchDown(const glm::vec2 &position) {}
-void Widget::onTouchMove(const glm::vec2 &position) {}
-void Widget::onTouchUp() {}
+void Widget::onTouchDown(const glm::vec2 &position) {
+    for (const auto& callback : this->onTouchDownCallbacks) {
+        callback(position);
+    }
+}
+
+void Widget::onTouchMove(const glm::vec2 &position) {
+    for (const auto& callback : this->onTouchMoveCallbacks) {
+        callback(position);
+    }
+}
+
+void Widget::onTouchUp() {
+    for (const auto& callback : this->onTouchUpCallbacks) {
+        callback();
+    }
+}
 
 bool Widget::inBounds(const glm::vec2 &point) const {
     return (point.x > this->position.x) &&
            (point.x < this->position.x + this->dimensions.x) &&
            (point.y > this->position.y) &&
            (point.y < this->position.y + this->dimensions.y);
+}
+
+std::vector<std::shared_ptr<Widget>>& Widget::getChildren() {
+    return this->children;
 }
 
 } // namespace age
