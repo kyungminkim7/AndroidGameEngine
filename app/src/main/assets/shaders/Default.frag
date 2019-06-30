@@ -12,9 +12,9 @@ struct DirectionalLight {
 };
 
 struct Material {
+    float specularExponent;
     sampler2D diffuseTexture0;
     sampler2D specularTexture0;
-    float specularExponent;
 };
 
 varying vec3 vPosition;
