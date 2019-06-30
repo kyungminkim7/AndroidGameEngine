@@ -72,6 +72,7 @@ void TestGame::loadWorld() {
 
     std::unique_ptr<Box> box1(new Box({Texture2D(glm::vec3(1.0f, 1.0f, 0.0f))},
                                       {Texture2D(glm::vec3(1.0f))}));
+    box1->setLabel("Box1");
     box1->setPosition({0.0f, 1.0f, 3.0f});
 //    box1->setScale({1.0f, 2.0f, 3.0f});
     box1->setMass(1.0f);
@@ -79,6 +80,7 @@ void TestGame::loadWorld() {
 
     using namespace std::placeholders;
     std::unique_ptr<Quadcopter> uav(new Quadcopter(""));
+    uav->setLabel("Box2");
     uav->setPosition({0.0f, -1.0f, 3.0f});
     uav->setMass(1.0f);
     uav->setMaxMotorThrust(10.0f);
@@ -105,6 +107,7 @@ void TestGame::loadWorld() {
                                         {Texture2D(glm::vec3(1.0f))},
                                         glm::vec2(100.0f)));
 
+    quad->setLabel("Quad");
     quad->setScale(glm::vec3{100.0f});
     quad->setPosition({0.0f, 0.0f, -0.5f});
     quad->setSpecularExponent(32.0f);

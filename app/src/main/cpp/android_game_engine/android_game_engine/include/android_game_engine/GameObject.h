@@ -33,6 +33,9 @@ public:
     explicit GameObject(const std::string &modelFilepath);
     
     virtual ~GameObject() = default;
+
+    void setLabel(const std::string &label);
+    std::string getLabel() const;
     
     ///
     /// \brief onUpdate Updates the game object's state.
@@ -146,15 +149,18 @@ protected:
     void setUnscaledDimensions(const glm::vec3 &dimensions);
     
 private:
+    std::string label;
     Model model;
     glm::vec3 unscaledDimensions;
     
     std::shared_ptr<Meshes> meshes;
-    float specularExponent = 64.0f;
+    float specularExponent = 32.0f;
     
     std::unique_ptr<PhysicsRigidBody> physicsBody = nullptr;
 };
 
+inline void GameObject::setLabel(const std::string &label) {this->label = label;}
+inline std::string GameObject::getLabel() const {return this->label;}
 inline glm::mat4 GameObject::getModelMatrix() const {return this->model.getModelMatrix();}
 inline glm::mat3 GameObject::getNormalMatrix() const {return this->model.getNormalMatrix();}
 inline glm::mat4 GameObject::getViewMatrix() const {return this->model.getViewMatrix();}
