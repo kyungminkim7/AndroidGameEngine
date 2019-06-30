@@ -1,6 +1,6 @@
 #include <android_game_engine/Mesh.h>
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl32.h>
 #include <glm/vec3.hpp>
 
 #include <android_game_engine/ElementBufferObject.h>

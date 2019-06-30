@@ -10,7 +10,7 @@ EGLContext context = EGL_NO_CONTEXT;
 EGLSurface surface = EGL_NO_SURFACE;
 
 std::vector<EGLint> eglAttribs {
-    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
     EGL_BLUE_SIZE, 8,
     EGL_GREEN_SIZE, 8,
     EGL_RED_SIZE, 8,
@@ -20,7 +20,7 @@ std::vector<EGLint> eglAttribs {
 };
 
 std::vector<EGLint> contextAttribs {
-    EGL_CONTEXT_CLIENT_VERSION, 2,
+    EGL_CONTEXT_CLIENT_VERSION, 3,
     EGL_NONE
 };
 

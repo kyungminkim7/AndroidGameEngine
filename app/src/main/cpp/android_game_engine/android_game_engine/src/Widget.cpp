@@ -6,7 +6,7 @@
 #include <iterator>
 #include <unordered_map>
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl32.h>
 
 #include <android_game_engine/ManagerWindowing.h>
 #include <android_game_engine/ShaderProgram.h>

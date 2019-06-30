@@ -51,7 +51,7 @@ target_link_libraries(${PROJECT_NAME}
         EGL
         BulletDynamics
         BulletCollision
-        GLESv2
+        GLESv3
         LinearMath
         android
         glm

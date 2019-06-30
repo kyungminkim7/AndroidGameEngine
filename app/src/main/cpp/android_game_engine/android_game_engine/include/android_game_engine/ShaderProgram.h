@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl32.h>
 
 #include <glm/fwd.hpp>
 

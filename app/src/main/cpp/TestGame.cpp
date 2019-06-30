@@ -25,7 +25,7 @@ void TestGame::setupGui() {
     using namespace std::placeholders;
     
     // Set up joysticks
-    const glm::vec2 positionOffset(100.0f, 450.0f);
+    const glm::vec2 positionOffset(150.0f, 450.0f);
     const glm::vec2 dimensions(250.0f, 250.0f);
     const glm::vec4 joystickColor(0.0f, 0.6f, 0.7f, 0.8f);
     const glm::vec4 joystickHandleColor(0.0f, 0.7f, 0.9f, 0.8f);

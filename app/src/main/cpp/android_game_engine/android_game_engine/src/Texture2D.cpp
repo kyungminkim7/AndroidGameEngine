@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <unordered_map>
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl32.h>
 #include <glm/vec3.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION

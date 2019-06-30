@@ -1,6 +1,6 @@
 #include <android_game_engine/VertexBufferObject.h>
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl32.h>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 

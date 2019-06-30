@@ -1,6 +1,6 @@
 #include <android_game_engine/Game.h>
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl32.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <android_game_engine/ManagerWindowing.h>

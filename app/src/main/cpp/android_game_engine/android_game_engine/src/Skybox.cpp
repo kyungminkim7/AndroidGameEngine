@@ -3,7 +3,7 @@
 #include <array>
 #include <vector>
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl32.h>
 #include <stb_image.h>
 
 #include <android_game_engine/Exception.h>
