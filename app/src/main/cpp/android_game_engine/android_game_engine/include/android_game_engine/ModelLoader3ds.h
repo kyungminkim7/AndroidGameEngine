@@ -18,6 +18,7 @@ public:
     glm::vec3 loadDimensions() override;
 
 private:
+    std::unique_ptr<btCollisionShape> loadBox();
     std::unique_ptr<btCollisionShape> loadConvexHull();
     std::unique_ptr<btCollisionShape> loadCompoundShape();
     

@@ -9,10 +9,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <android_game_engine/PhysicsCompoundShape.h>
-#include <android_game_engine/ElementBufferObject.h>
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/ManagerAssets.h>
-#include <android_game_engine/VertexBufferObject.h>
+#include <android_game_engine/VertexArray.h>
 
 namespace {
 
@@ -163,10 +162,7 @@ std::shared_ptr<ModelLoader3ds::Meshes> ModelLoader3ds::loadMeshes() {
             }
         }
         
-        meshes->emplace_back(std::make_shared<VertexBufferObject>(positions,
-                                                                  normals,
-                                                                  textureCoords),
-                             std::make_shared<ElementBufferObject>(indices),
+        meshes->emplace_back(std::make_shared<VertexArray>(positions, normals, textureCoords, indices),
                              diffuseTextures, specularTextures);
     }
     
@@ -175,7 +171,12 @@ std::shared_ptr<ModelLoader3ds::Meshes> ModelLoader3ds::loadMeshes() {
 }
 
 std::unique_ptr<btCollisionShape> ModelLoader3ds::loadCollisionShape() {
-    return this->loadConvexHull();
+    return this->loadBox();
+}
+
+std::unique_ptr<btCollisionShape> ModelLoader3ds::loadBox() {
+    auto halfExtents = this->loadDimensions() * 0.5f;
+    return std::make_unique<btBoxShape>(btVector3{halfExtents.x, halfExtents.y, halfExtents.z});
 }
 
 std::unique_ptr<btCollisionShape> ModelLoader3ds::loadConvexHull() {
@@ -249,8 +250,8 @@ std::unique_ptr<btCollisionShape> ModelLoader3ds::loadCompoundShape() {
         
         lib3ds_mesh_bounding_box(mesh, minBound, maxBound);
         for (auto j = 0; j < 3; ++j) {
-            halfExtents[j] = std::abs(maxBound[j] - minBound[j]) / 2.0f;
-            localOrigin[j] = (minBound[j] + maxBound[j]) / 2.0f;
+            halfExtents[j] = std::abs(maxBound[j] - minBound[j]) * 0.5f;
+            localOrigin[j] = (minBound[j] + maxBound[j]) * 0.5f;
         }
         
         compoundShape->addChild(std::make_unique<btBoxShape>(halfExtents),

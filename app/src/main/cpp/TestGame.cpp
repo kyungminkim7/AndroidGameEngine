@@ -66,7 +66,7 @@ void TestGame::loadWorld() {
 //        skyboxDir + "bottom.jpg"
 //    };
 //    this->setSkybox(std::make_unique<Skybox>(skyboxImages));
-    
+
     this->getCam()->setPosition({-15.0f, 5.0f, 10.0f});
     this->getCam()->setLookAtPoint({0.0f, 0.0f, 2.0f});
 
@@ -74,16 +74,16 @@ void TestGame::loadWorld() {
                                       {Texture2D(glm::vec3(1.0f))}));
     box1->setLabel("Box1");
     box1->setPosition({0.0f, 1.0f, 3.0f});
-//    box1->setScale({1.0f, 2.0f, 3.0f});
+    box1->setScale({1.0f, 2.0f, 3.0f});
     box1->setMass(1.0f);
     this->addToWorldList(std::move(box1));
 
-    using namespace std::placeholders;
-    std::unique_ptr<Quadcopter> uav(new Quadcopter(""));
-    uav->setLabel("Box2");
-    uav->setPosition({0.0f, -1.0f, 3.0f});
-    uav->setMass(1.0f);
-    uav->setMaxMotorThrust(10.0f);
+//    using namespace std::placeholders;
+//    std::unique_ptr<Quadcopter> uav(new Quadcopter(""));
+//    uav->setLabel("Box2");
+//    uav->setPosition({0.0f, -1.0f, 3.0f});
+//    uav->setMass(1.0f);
+//    uav->setMaxMotorThrust(10.0f);
 //    this->getCam()->setChaseObject(uav.get(), {-5.0f, 0.0f, 1.0f});
     
 //    auto leftThrottle = std::bind(&Quadcopter::onThrottleInput, uav.get(), _1);
@@ -101,7 +101,7 @@ void TestGame::loadWorld() {
 //                                                              glm::vec2(0.0f)));
 //
     
-    this->addToWorldList(std::move(uav));
+//    this->addToWorldList(std::move(uav));
     
     std::unique_ptr<Quad> quad(new Quad({Texture2D("images/wood.png")},
                                         {Texture2D(glm::vec3(1.0f))},
@@ -116,22 +116,24 @@ void TestGame::loadWorld() {
 //    this->addToWorldList(std::move(box2));
     this->addToWorldList(std::move(quad));
     
-//    {
-//        auto start = std::chrono::system_clock::now();
-//
-////        auto uav = std::make_unique<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
-////        auto uav = std::make_unique<GameObject>("models/C-17A_3DS/C-17A_DE.3ds");
+    {
+        auto start = std::chrono::system_clock::now();
+
+//        std::unique_ptr<Box> uav(new Box({Texture2D(glm::vec3(1.0f, 1.0f, 0.0f))},
+//                                         {Texture2D(glm::vec3(1.0f))}));
+        auto uav = std::make_unique<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
+//        auto uav = std::make_unique<GameObject>("models/C-17A_3DS/C-17A_DE.3ds");
 //        auto uav = std::make_unique<GameObject>("models/mq9/mq9.3ds");
-//
-////        uav->setScale(glm::vec3(1.0f));
-//        uav->setPosition({0.0f, 0.0f, 30.0f});
-//        uav->setMass(10.0f);
-//
-//        this->addToWorldList(std::move(uav));
-//
-//        auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
-//        Log::info("1st load time: " + std::to_string(time.count()) + " ms");
-//    }
+
+        uav->setScale(glm::vec3(100.0f));
+        uav->setPosition({0.0f, 0.0f, 30.0f});
+        uav->setMass(1.0f);
+
+        this->addToWorldList(std::move(uav));
+
+        auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
+        Log::info("1st load time: " + std::to_string(time.count()) + " ms");
+    }
 }
 
 void TestGame::onUpdate(std::chrono::duration<float> updateDuration) {

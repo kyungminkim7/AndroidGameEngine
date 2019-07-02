@@ -91,7 +91,8 @@ private:
     glm::vec2 position; //< absolute position in window
     glm::vec2 dimensions;
     
-    std::shared_ptr<unsigned int> vbo;
+    unsigned int vao;
+    unsigned int vbo;
     std::unique_ptr<Texture2D> texture = nullptr;
     glm::vec4 color {0.0f, 0.0f, 0.0f, 1.0f};
 };

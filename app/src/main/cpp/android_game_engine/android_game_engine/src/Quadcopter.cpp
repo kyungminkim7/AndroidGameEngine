@@ -3,8 +3,8 @@
 #include <limits>
 
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
-#include <android_game_engine/VertexBufferObject.h>
-#include <android_game_engine/ElementBufferObject.h>
+
+#include <android_game_engine/VertexArray.h>
 
 namespace age {
 
@@ -130,9 +130,11 @@ const std::vector<glm::uvec3> indices {
 
 Quadcopter::Quadcopter(const std::string &modelFilepath)
     : GameObject(), maxMotorPercentDiff(0.05f), thrustMomentRatio(0.1f) {
-    
-    std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::make_shared<VertexBufferObject>(positions, normals, textureCoords),
-                                                   std::make_shared<ElementBufferObject>(indices),
+
+    std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::make_shared<VertexArray>(positions,
+                                                                                 normals,
+                                                                                 textureCoords,
+                                                                                 indices),
                                                    {Texture2D(glm::vec3{0.0f, 1.0f, 1.0f})},
                                                    {Texture2D(glm::vec3{1.0f, 1.0f, 1.0f})})});
     this->setMesh(std::move(meshes));

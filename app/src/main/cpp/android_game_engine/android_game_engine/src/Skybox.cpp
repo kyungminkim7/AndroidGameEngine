@@ -118,25 +118,31 @@ namespace age {
 
 Skybox::Skybox(const std::array<std::string, 6> &imageFilepaths) {
     this->texture = loadCubemapTexture(imageFilepaths);
-    
+
+    glGenVertexArrays(1, &this->vao);
+    glBindVertexArray(this->vao);
+
     glGenBuffers(1, &this->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     
     glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(positions.size() * sizeof(float)),
                  positions.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(0u, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                          reinterpret_cast<GLvoid*>(0));
+    glEnableVertexAttribArray(0u);
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 Skybox::~Skybox() {
     glDeleteTextures(1, &this->texture);
+    glDeleteVertexArrays(1, &this->vao);
     glDeleteBuffers(1, &this->vbo);
 }
 
 void Skybox::render(ShaderProgram *shader) {
-    glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-    shader->setVertexAttribPointer("aPos", 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-                                   reinterpret_cast<GLvoid*>(0));
-    shader->enableVertexAttribArray("aPos");
+    glBindVertexArray(this->vao);
     
     glActiveTexture(GL_TEXTURE0);
     shader->setUniform("skybox", 0);

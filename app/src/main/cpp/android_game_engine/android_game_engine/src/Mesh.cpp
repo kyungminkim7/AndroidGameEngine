@@ -3,33 +3,31 @@
 #include <GLES3/gl32.h>
 #include <glm/vec3.hpp>
 
-#include <android_game_engine/ElementBufferObject.h>
 #include <android_game_engine/ShaderProgram.h>
-#include <android_game_engine/VertexBufferObject.h>
+#include <android_game_engine/VertexArray.h>
 
 namespace age {
 
-Mesh::Mesh(std::shared_ptr<age::VertexBufferObject> vbo,
-           std::shared_ptr<age::ElementBufferObject> ebo,
+Mesh::Mesh(std::shared_ptr<age::VertexArray> vao,
            const std::set<std::string> &diffuseTextureFilepaths,
            const std::set<std::string> &specularTextureFilepaths)
-           : vbo(std::move(vbo)), ebo(std::move(ebo)) {
+        : vao(std::move(vao)) {
     for (const auto& file : diffuseTextureFilepaths) {
         this->diffuseTextures.emplace_back(file);
     }
-    
+
     for (const auto& file : specularTextureFilepaths) {
         this->specularTextures.emplace_back(file);
     }
-    
+
     this->init();
 }
 
-Mesh::Mesh(std::shared_ptr<VertexBufferObject> vbo, std::shared_ptr<ElementBufferObject> ebo,
+Mesh::Mesh(std::shared_ptr<VertexArray> vao,
            const std::vector<Texture2D> &diffuseTextures,
            const std::vector<Texture2D> &specularTextures)
-           : vbo(std::move(vbo)), ebo(std::move(ebo)),
-             diffuseTextures(diffuseTextures), specularTextures(specularTextures) {
+        : vao(std::move(vao)),
+          diffuseTextures(diffuseTextures), specularTextures(specularTextures) {
     this->init();
 }
 
@@ -44,11 +42,8 @@ void Mesh::init() {
 }
 
 void Mesh::render(ShaderProgram *shader) {
-    this->vbo->bind(shader);
-    this->ebo->bind();
     this->bindTextures(shader);
-    glDrawElements(GL_TRIANGLES, this->ebo->getNumIndices(),
-                   GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0));
+    this->vao->render();
 }
 
 void Mesh::bindTextures(ShaderProgram *shader) {

@@ -8,9 +8,8 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-#include <android_game_engine/ElementBufferObject.h>
 #include <android_game_engine/Mesh.h>
-#include <android_game_engine/VertexBufferObject.h>
+#include <android_game_engine/VertexArray.h>
 
 namespace {
 
@@ -36,11 +35,9 @@ const std::vector<glm::vec2> textureCoords {
 };
 
 const std::vector<glm::uvec3> indices {
-    {0, 1, 2},
-    {2, 3, 0}
+    {0u, 1u, 2u},
+    {2u, 3u, 0u}
 };
-
-std::weak_ptr<age::ElementBufferObject> eboCache;
 
 } // namespace
 
@@ -79,15 +76,8 @@ void Quad::init(const std::vector<age::Texture2D> &diffuseTextures,
                    [numTextureRepeat](const auto &tc){
                        return glm::vec2(tc.x * numTextureRepeat.x, tc.y * numTextureRepeat.y);
                    });
-    auto vbo = std::make_shared<VertexBufferObject>(positions, normals, repeatTextureCoords);
-    
-    auto ebo = eboCache.lock();
-    if (!ebo) {
-        ebo = std::make_shared<ElementBufferObject>(indices);
-        eboCache = ebo;
-    }
-    
-    std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::move(vbo), std::move(ebo),
+    auto vao = std::make_shared<VertexArray>(positions, normals, repeatTextureCoords, indices);
+    std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::move(vao),
                                                    diffuseTextures,
                                                    specularTextures)});
     this->setMesh(std::move(meshes));

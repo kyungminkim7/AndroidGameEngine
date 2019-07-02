@@ -12,7 +12,6 @@ add_library(${PROJECT_NAME} STATIC
         src/Camera.cpp
         src/CameraChase.cpp
         src/CameraFPV.cpp
-        src/ElementBufferObject.cpp
         src/Game.cpp
         src/GameObject.cpp
         src/Window.cpp
@@ -38,7 +37,7 @@ add_library(${PROJECT_NAME} STATIC
         src/Skybox.cpp
         src/Texture2D.cpp
         src/Utilities.cpp
-        src/VertexBufferObject.cpp
+        src/VertexArray.cpp
         src/Widget.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC

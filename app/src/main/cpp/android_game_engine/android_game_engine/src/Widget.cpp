@@ -43,30 +43,35 @@ std::shared_ptr<Widget> Widget::New(Widget *parent) {
 }
 
 Widget::Widget(Widget *parent) : parent(parent) {
-    this->vbo = vboCache.lock();
-    if (this->vbo) return;
-    
-    // Clean up vbo on GPU after last Widget is deleted
-    auto vboDeleter = [](auto vbo) {
-        glDeleteBuffers(1, vbo);
-        delete vbo;
-    };
-    this->vbo = std::shared_ptr<unsigned int>(new unsigned int, vboDeleter);
-    
+    glGenVertexArrays(1, &this->vao);
+    glBindVertexArray(this->vao);
+
+    glGenBuffers(1, &this->vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+
     // Load vertex data
-    glGenBuffers(1, this->vbo.get());
-    glBindBuffer(GL_ARRAY_BUFFER, *this->vbo);
+    constexpr static auto stride = 4 * sizeof(float);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(),
-            GL_STATIC_DRAW);
+                 GL_STATIC_DRAW);
+    glVertexAttribPointer(0u, 2, GL_FLOAT, GL_FALSE, stride,
+                          reinterpret_cast<GLvoid*>(0));
+    glEnableVertexAttribArray(0u);
+
+    glVertexAttribPointer(1u, 2, GL_FLOAT, GL_FALSE, stride,
+                          reinterpret_cast<GLvoid*>(2 * sizeof(float)));
+    glEnableVertexAttribArray(1u);
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
-    vboCache = this->vbo;
+    glBindVertexArray(0);
 }
 
 Widget::~Widget() {
     for (auto& child : this->children) {
         child->parent = nullptr;
     }
+
+    glDeleteVertexArrays(1, &this->vao);
+    glDeleteBuffers(1, &this->vbo);
 }
 
 void Widget::addChild(std::shared_ptr<Widget> child) {
@@ -110,21 +115,13 @@ void Widget::setDimensions(const glm::vec2 &dimensions) {
 void Widget::render(ShaderProgram *shader) {
     if (this->parent != nullptr) {
         shader->setUniform("model", this->model.getModelMatrix());
-    
-        // Bind vbo
-        constexpr static auto stride = 4 * sizeof(float);
-        glBindBuffer(GL_ARRAY_BUFFER, *this->vbo);
-        shader->setVertexAttribPointer("aPos", 2, GL_FLOAT, GL_FALSE, stride,
-                                       reinterpret_cast<GLvoid*>(0));
-        shader->setVertexAttribPointer("aTexCoord", 2, GL_FLOAT, GL_FALSE, stride,
-                                       reinterpret_cast<GLvoid*>(2 * sizeof(float)));
-    
-        // Bind texture
         shader->setUniform("color", this->color);
     
         shader->setUniform("texture0", 0);
         glActiveTexture(GL_TEXTURE0);
         this->texture->bind();
+
+        glBindVertexArray(this->vao);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }

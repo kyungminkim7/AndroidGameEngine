@@ -152,21 +152,6 @@ void ShaderProgram::use() {
     glUseProgram(this->id);
 }
 
-void ShaderProgram::setVertexAttribPointer(const std::string &attribName, GLint size,
-                                                     GLenum type, GLboolean normalized,
-                                                     GLsizei stride, const GLvoid *ptr) {
-    glVertexAttribPointer(static_cast<GLuint>(glGetAttribLocation(this->id, attribName.c_str())),
-            size, type, normalized, stride, ptr);
-}
-
-void ShaderProgram::enableVertexAttribArray(const std::string &attribName) {
-    glEnableVertexAttribArray(static_cast<GLuint>(glGetAttribLocation(this->id, attribName.c_str())));
-}
-
-void ShaderProgram::disableVertexAttribArray(const std::string &attribName) {
-    glDisableVertexAttribArray(static_cast<GLuint>(glGetAttribLocation(this->id, attribName.c_str())));
-}
-
 void ShaderProgram::setUniform(const std::string &name, bool value) {
     glUniform1i(glGetUniformLocation(this->id, name.c_str()), value);
 }

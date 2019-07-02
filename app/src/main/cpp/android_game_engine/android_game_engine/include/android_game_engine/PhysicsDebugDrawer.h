@@ -27,6 +27,7 @@ public:
     
 private:
     ShaderProgram *shader;
+    unsigned int vao;
     unsigned int vbo;
     int debugMode;
 };

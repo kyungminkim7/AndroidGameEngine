@@ -7,9 +7,8 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-#include <android_game_engine/ElementBufferObject.h>
 #include <android_game_engine/Mesh.h>
-#include <android_game_engine/VertexBufferObject.h>
+#include <android_game_engine/VertexArray.h>
 
 namespace {
 
@@ -133,8 +132,7 @@ const std::vector<glm::uvec3> indices {
     {21u, 20u, 23u}
 };
 
-std::weak_ptr<age::VertexBufferObject> vboCache;
-std::weak_ptr<age::ElementBufferObject> eboCache;
+std::weak_ptr<age::VertexArray> vaoCache;
 
 } // namespace
 
@@ -163,19 +161,13 @@ Box::Box(const std::vector<age::Texture2D> &diffuseTextures,
 void Box::init(const std::vector<age::Texture2D> &diffuseTextures,
                const std::vector<age::Texture2D> &specularTextures) {
     // Create mesh
-    auto vbo = vboCache.lock();
-    if (!vbo) {
-        vbo = std::make_shared<VertexBufferObject>(positions, normals, textureCoords);
-        vboCache = vbo;
+    auto vao = vaoCache.lock();
+    if (!vao) {
+        vao = std::make_shared<VertexArray>(positions, normals, textureCoords, indices);
+        vaoCache = vao;
     }
     
-    auto ebo = eboCache.lock();
-    if (!ebo) {
-        ebo = std::make_shared<ElementBufferObject>(indices);
-        eboCache = ebo;
-    }
-    
-    std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::move(vbo), std::move(ebo),
+    std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::move(vao),
                                                    diffuseTextures,
                                                    specularTextures)});
     this->setMesh(std::move(meshes));

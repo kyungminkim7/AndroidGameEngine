@@ -23,6 +23,7 @@ public:
     void render(ShaderProgram *shader);
 
 private:
+    unsigned int vao;
     unsigned int vbo;
     unsigned int texture;
 };

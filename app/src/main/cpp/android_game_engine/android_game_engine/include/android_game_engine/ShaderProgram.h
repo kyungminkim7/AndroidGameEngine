@@ -39,11 +39,6 @@ public:
     ///
     void use();
     
-    void setVertexAttribPointer(const std::string &attribName, GLint size, GLenum type,
-                                          GLboolean normalized, GLsizei stride, const GLvoid *ptr);
-    void enableVertexAttribArray(const std::string &attribName);
-    void disableVertexAttribArray(const std::string &attribName);
-    
     /// \name Uniforms
     /// Sets uniform value on this shader program. User must call ShaderProgram::use() before
     /// the 1st call to a ShaderProgram::setUniform() function to ensure that they are
