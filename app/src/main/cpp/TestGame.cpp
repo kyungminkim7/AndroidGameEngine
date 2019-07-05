@@ -103,12 +103,13 @@ void TestGame::loadWorld() {
     
 //    this->addToWorldList(std::move(uav));
     
-    std::unique_ptr<Quad> quad(new Quad({Texture2D("images/wood.png")},
-                                        {Texture2D(glm::vec3(1.0f))},
-                                        glm::vec2(100.0f)));
-
+//    std::unique_ptr<Quad> quad(new Quad({Texture2D("images/wood.png")},
+//                                        {Texture2D(glm::vec3(1.0f))},
+//                                        glm::vec2(100.0f)));
+    std::unique_ptr<Box> quad(new Box({Texture2D("images/wood.png")},
+                                      {Texture2D(glm::vec3(1.0f))}));
     quad->setLabel("Quad");
-    quad->setScale(glm::vec3{100.0f});
+    quad->setScale(glm::vec3{100.0f, 100.0f, 0.1f});
     quad->setPosition({0.0f, 0.0f, -0.5f});
     quad->setSpecularExponent(32.0f);
 
@@ -142,7 +143,6 @@ void TestGame::onUpdate(std::chrono::duration<float> updateDuration) {
 
 void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
                                    const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
-    Log::info("Touched!");
     gameObject->applyCentralForce(touchDirection * 40.0f);
 }
 

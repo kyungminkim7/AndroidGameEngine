@@ -33,7 +33,9 @@ public:
     
     void translate(const glm::vec3 &translation);
     void translateInLocalFrame(const glm::vec3 &translation);
-    
+
+    glm::mat4 getModelMatrix() const;
+    glm::mat4 getViewMatrix() const;
     virtual glm::mat4 getProjectionMatrix() const = 0;
     
     void setAmbient(const glm::vec3 &ambient);
@@ -65,6 +67,9 @@ inline glm::vec3 Light::getNormalDirection() const {return this->model.getNormal
 inline void Light::rotate(float angle_rad, const glm::vec3 &axis) {this->model.rotate(angle_rad, axis);}
 inline void Light::translate(const glm::vec3 &translation) {this->model.translate(translation);}
 inline void Light::translateInLocalFrame(const glm::vec3 &translation) {this->model.translateInLocalFrame(translation);}
+
+inline glm::mat4 Light::getModelMatrix() const {return this->model.getModelMatrix();}
+inline glm::mat4 Light::getViewMatrix() const {return this->model.getViewMatrix();}
 
 inline void Light::setAmbient(const glm::vec3 &ambient) {this->ambient = ambient;}
 inline void Light::setDiffuse(const glm::vec3 &diffuse) {this->diffuse = diffuse;}

@@ -34,6 +34,7 @@ add_library(${PROJECT_NAME} STATIC
         src/Quad.cpp
         src/Quadcopter.cpp
         src/ShaderProgram.cpp
+        src/ShadowMap.cpp
         src/Skybox.cpp
         src/Texture2D.cpp
         src/Utilities.cpp

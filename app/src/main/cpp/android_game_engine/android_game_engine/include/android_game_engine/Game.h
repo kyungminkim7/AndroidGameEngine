@@ -11,6 +11,7 @@
 #include "PhysicsEngine.h"
 #include "TouchEvent.h"
 #include "ShaderProgram.h"
+#include "ShadowMap.h"
 #include "Skybox.h"
 
 namespace age {
@@ -61,17 +62,21 @@ protected:
 
 private:
     void raycastTouch(const glm::vec2 &windowTouchPosition, float length);
-    
+
+    ShaderProgram shadowMapShader;
     ShaderProgram defaultShader;
     ShaderProgram skyboxShader;
     ShaderProgram widgetShader;
     ShaderProgram physicsDebugShader;
+
+    int shadowMapTextureUnit; // Shadow map is placed as the last texture unit to deconflict with game object material textures
     
     std::shared_ptr<Window> gui = nullptr;
     
     std::unique_ptr<Skybox> skybox = nullptr;
     std::unique_ptr<CameraType> cam = nullptr;
     std::unique_ptr<LightDirectional> directionalLight = nullptr;
+    std::unique_ptr<ShadowMap> shadowMap = nullptr;
     std::vector<std::unique_ptr<GameObject>> worldList;
     
     std::unique_ptr<PhysicsEngine> physics;

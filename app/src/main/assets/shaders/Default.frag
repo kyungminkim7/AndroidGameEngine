@@ -1,4 +1,7 @@
+#version 320 es
+
 precision mediump float;
+precision mediump sampler2DShadow;
 
 struct Lighting {
     vec3 ambient;
@@ -17,20 +20,30 @@ struct Material {
     sampler2D specularTexture0;
 };
 
-varying vec3 vPosition;
-varying vec3 vNormal;
-varying vec2 vTexCoord;
+in vec3 vPos;
+in vec3 vNormal;
+in vec2 vTexCoord;
+in vec4 vPosLightSpace;
 
 uniform vec3 viewPosition;
 uniform Material material;
 
 uniform DirectionalLight directionalLight;
+uniform sampler2D shadowMap;
+
+const float minShadowBias = 0.0005;
+const float maxShadowBias = 0.001;
+
+out vec4 gl_FragColor;
 
 Lighting calculateBaseLight(vec3 lightDirection, Lighting lighting);
-vec3 calculateDirectionalLight();
+float calculateShadow(vec3 lightDirection);
 
 void main() {
-	gl_FragColor = vec4(calculateDirectionalLight(), 1.0);
+    Lighting baseLighting = calculateBaseLight(directionalLight.direction,
+                                               directionalLight.lighting);
+	gl_FragColor = vec4(baseLighting.ambient + (1.0 - calculateShadow(directionalLight.direction))
+                        * (baseLighting.diffuse + baseLighting.specular), 1.0);
 }
 
 Lighting calculateBaseLight(vec3 lightDirection, Lighting lighting) {
@@ -38,7 +51,7 @@ Lighting calculateBaseLight(vec3 lightDirection, Lighting lighting) {
     Lighting result;
 
     // Sets ambient color the same as the diffuse color
-    vec3 materialDiffuse = texture2D(material.diffuseTexture0, vTexCoord).rgb;
+    vec3 materialDiffuse = texture(material.diffuseTexture0, vTexCoord).rgb;
     result.ambient = lighting.ambient * materialDiffuse;
 
     // Fragment is brighter the closer it is aligned to the light ray direction
@@ -48,19 +61,40 @@ Lighting calculateBaseLight(vec3 lightDirection, Lighting lighting) {
 
     // Specular light is brighter the closer the angle btwn the reflected
     // light ray and the viewing vector.
-    vec3 viewDirection = normalize(viewPosition - vPosition);
+    vec3 viewDirection = normalize(viewPosition - vPos);
     vec3 halfwayDirection = normalize(-lightDirection + viewDirection);
     float specularAngle = dot(halfwayDirection, vNormal);
 
     result.specular = lighting.specular *
             pow(max(specularAngle, 0.0), material.specularExponent) *
-            texture2D(material.specularTexture0, vTexCoord).rgb;
+            texture(material.specularTexture0, vTexCoord).rgb;
 
     return result;
 }
 
-vec3 calculateDirectionalLight() {
-    Lighting result = calculateBaseLight(directionalLight.direction,
-                                         directionalLight.lighting);
-    return result.ambient + result.diffuse + result.specular;
+float calculateShadow(vec3 lightDirection) {
+    vec3 projCoords = vPosLightSpace.xyz / vPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    // Keep objects outside of the light's depth range in the light
+    if (projCoords.z > 1.0) return 0.0;
+
+    // Remove shadow acne
+    float bias = max(maxShadowBias * (1.0 - dot(vNormal, -lightDirection)), minShadowBias);
+
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+
+    // Sample surrounding texels to create softer shadows
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / vec2(textureSize(shadowMap, 0));
+    for(int x = -1; x <= 1; ++x) {
+        for(int y = -1; y <= 1; ++y) {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 9.0;
+
+    return shadow;
 }

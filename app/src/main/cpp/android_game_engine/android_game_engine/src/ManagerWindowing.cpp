@@ -16,6 +16,7 @@ std::vector<EGLint> eglAttribs {
     EGL_RED_SIZE, 8,
     EGL_ALPHA_SIZE, 8,
     EGL_DEPTH_SIZE, 24,
+    EGL_STENCIL_SIZE, 8,
     EGL_NONE
 };
 

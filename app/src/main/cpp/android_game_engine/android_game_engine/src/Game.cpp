@@ -8,15 +8,20 @@
 
 namespace age {
 
-Game::Game() : defaultShader("shaders/Default.vert", "shaders/Default.frag"),
+Game::Game() : shadowMapShader("shaders/ShadowMap.vert", "shaders/ShadowMap.frag"),
+               defaultShader("shaders/Default.vert", "shaders/Default.frag"),
                skyboxShader("shaders/Skybox.vert", "shaders/Skybox.frag"),
                widgetShader("shaders/Widget.vert", "shaders/Widget.frag"),
                physicsDebugShader("shaders/PhysicsDebug.vert", "shaders/PhysicsDebug.frag"),
                physics(new PhysicsEngine(&this->physicsDebugShader)),
-               drawDebugPhysics(false) {}
+               drawDebugPhysics(false) {
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &this->shadowMapTextureUnit);
+    this->shadowMapTextureUnit -= 1;
+}
 
 void Game::init() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
     
     glViewport(0, 0, ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight());
     
@@ -38,10 +43,15 @@ void Game::init() {
                                              static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
                                              0.1f, 500.0f);
     
-    // Setup light
+    // Setup light and shadows
+    const auto lightLimit = 50.0f;
     this->directionalLight = std::make_unique<LightDirectional>(glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.8f),
-            -10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 250.0f);
-    this->directionalLight->setLookAtDirection({-1.0f, -1.0f, -1.0f});
+            -lightLimit, lightLimit, -lightLimit, lightLimit, 10.0f, 200.0f);
+    this->directionalLight->setPosition({25.0f, 10.0f, 25.0f});
+    this->directionalLight->setLookAtPoint({-5.0f, -5.0f, 0.0f});
+
+    auto shadowMapDimension = 2048u;
+    this->shadowMap = std::make_unique<ShadowMap>(shadowMapDimension, shadowMapDimension);
 }
 
 void Game::loadWorld() {}
@@ -60,27 +70,54 @@ void Game::onUpdate(std::chrono::duration<float> updateDuration) {
 }
 
 void Game::render() {
+    // Render world scene to shadow map from the light's perspective to calculate depth map
+    glViewport(0, 0, this->shadowMap->getWidth(), this->shadowMap->getHeight());
+    this->shadowMap->bindFramebuffer();
+
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    glCullFace(GL_FRONT);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    auto lightSpaceMatrix = this->directionalLight->getProjectionMatrix() *
+            this->directionalLight->getViewMatrix();
+
+    this->shadowMapShader.use();
+    this->shadowMapShader.setUniform("lightSpaceMatrix", lightSpaceMatrix);
+
+    for (auto &gameObject : this->worldList) {
+        gameObject->render(&this->shadowMapShader);
+    }
+
+    // Render world scene with shadow mapping
+    glViewport(0, 0, ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight());
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glCullFace(GL_BACK);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Render world
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-    
     auto projection = this->cam->getProjectionMatrix();
     auto view = this->cam->getViewMatrix();
     auto projectionView = projection * view;
-    
+
     this->defaultShader.use();
+    this->defaultShader.setUniform("lightSpaceMatrix", lightSpaceMatrix);
     this->defaultShader.setUniform("projection_view", projectionView);
     this->defaultShader.setUniform("viewPosition", this->cam->getPosition());
-    
+
+    // Set shadow properties
+    glActiveTexture(GL_TEXTURE0 + this->shadowMapTextureUnit);
+    this->shadowMap->bindDepthMap();
+    this->defaultShader.setUniform("shadowMap", this->shadowMapTextureUnit);
+
     this->directionalLight->render(&this->defaultShader);
 
     for (auto &gameObject : this->worldList) {
         gameObject->render(&this->defaultShader);
     }
-    
+
+    // Render physics debugging attributes
     if (this->drawDebugPhysics) {
         this->physicsDebugShader.use();
         this->physicsDebugShader.setUniform("projection_view", projectionView);
