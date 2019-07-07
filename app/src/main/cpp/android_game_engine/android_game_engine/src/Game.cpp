@@ -79,11 +79,11 @@ void Game::render() {
     glCullFace(GL_FRONT);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    auto lightSpaceMatrix = this->directionalLight->getProjectionMatrix() *
+    auto lightSpace = this->directionalLight->getProjectionMatrix() *
             this->directionalLight->getViewMatrix();
 
     this->shadowMapShader.use();
-    this->shadowMapShader.setUniform("lightSpaceMatrix", lightSpaceMatrix);
+    this->shadowMapShader.setUniform("lightSpace", lightSpace);
 
     for (auto &gameObject : this->worldList) {
         gameObject->render(&this->shadowMapShader);
@@ -102,7 +102,7 @@ void Game::render() {
     auto projectionView = projection * view;
 
     this->defaultShader.use();
-    this->defaultShader.setUniform("lightSpaceMatrix", lightSpaceMatrix);
+    this->defaultShader.setUniform("lightSpace", lightSpace);
     this->defaultShader.setUniform("projection_view", projectionView);
     this->defaultShader.setUniform("viewPosition", this->cam->getPosition());
 

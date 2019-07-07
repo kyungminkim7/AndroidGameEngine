@@ -1,15 +1,15 @@
 #version 320 es
 
-in vec3 aPos;
+in vec3 aPosition;
 
 uniform mat4 projection_view;
 
-out vec3 vTexCoord;
+out vec3 vTextureCoordinate;
 
 void main(void)
 {
-    vec4 pos = projection_view * vec4(aPos, 1.0);
-    gl_Position = pos.xyww;
+    vec4 position = projection_view * vec4(aPosition, 1.0);
+    gl_Position = position.xyww;
 
-    vTexCoord = aPos;
+    vTextureCoordinate = aPosition;
 }

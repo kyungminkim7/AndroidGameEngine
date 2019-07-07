@@ -1,10 +1,10 @@
 #version 320 es
 
-in vec3 aPos;
+in vec3 aPosition;
 
-uniform mat4 lightSpaceMatrix;
+uniform mat4 lightSpace;
 uniform mat4 model;
 
 void main() {
-    gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);
+    gl_Position = lightSpace * model * vec4(aPosition, 1.0);
 }
