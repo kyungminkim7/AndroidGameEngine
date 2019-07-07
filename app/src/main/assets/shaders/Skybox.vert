@@ -1,8 +1,10 @@
-attribute vec3 aPos;
+#version 320 es
+
+in vec3 aPos;
 
 uniform mat4 projection_view;
 
-varying vec3 vTexCoord;
+out vec3 vTexCoord;
 
 void main(void)
 {

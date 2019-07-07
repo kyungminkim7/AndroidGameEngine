@@ -1,7 +1,9 @@
-attribute vec2 aPos;
-attribute vec2 aTexCoord;
+#version 320 es
 
-varying vec2 vTexCoord;
+in vec2 aPos;
+in vec2 aTexCoord;
+
+out vec2 vTexCoord;
 
 uniform mat4 projection;
 uniform mat4 model;
