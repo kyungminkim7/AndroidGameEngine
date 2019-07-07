@@ -5,7 +5,7 @@
 #include <set>
 #include <vector>
 
-#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 
 #include "Texture2D.h"
 
@@ -17,14 +17,17 @@ namespace age {
 class Box : public GameObject {
 public:
     explicit Box(const std::set<std::string> &diffuseTextureFilepaths={},
-                 const std::set<std::string> &specularTextureFilepaths={});
+                 const std::set<std::string> &specularTextureFilepaths={},
+                 const glm::vec2 &numTextureRepeat = glm::vec2(1.0f));
     
     explicit Box(const std::vector<Texture2D> &diffuseTextures={},
-                 const std::vector<Texture2D> &specularTextures={});
+                 const std::vector<Texture2D> &specularTextures={},
+                 const glm::vec2 &numTextureRepeat = glm::vec2(1.0f));
 
 private:
     void init(const std::vector<Texture2D> &diffuseTextures,
-              const std::vector<Texture2D> &specularTextures);
+              const std::vector<Texture2D> &specularTextures,
+              const glm::vec2 &numTextureRepeat);
 };
 
 } // namespace age

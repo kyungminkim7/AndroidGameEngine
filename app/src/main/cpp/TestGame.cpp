@@ -106,10 +106,12 @@ void TestGame::loadWorld() {
 //    std::shared_ptr<Quad> quad(new Quad({Texture2D("images/wood.png")},
 //                                        {Texture2D(glm::vec3(1.0f))},
 //                                        glm::vec2(100.0f)));
+    const auto scale = 100.0f;
     std::shared_ptr<Box> quad(new Box({Texture2D("images/wood.png")},
-                                      {Texture2D(glm::vec3(1.0f))}));
+                                      {Texture2D(glm::vec3(1.0f))},
+                                      glm::vec2(scale)));
     quad->setLabel("Quad");
-    quad->setScale(glm::vec3{100.0f, 100.0f, 0.1f});
+    quad->setScale(glm::vec3{scale, scale, 0.1f});
     quad->setPosition({0.0f, 0.0f, -0.5f});
     quad->setSpecularExponent(32.0f);
 

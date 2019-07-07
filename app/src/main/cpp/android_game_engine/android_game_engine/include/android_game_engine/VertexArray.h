@@ -13,7 +13,7 @@ namespace age {
     public:
         VertexArray(const std::vector<glm::vec3> &positions,
                     const std::vector<glm::vec3> &normals,
-                    const std::vector<glm::vec2> &textureCoords,
+                    const std::vector<glm::vec2> &textureCoordinates,
                     const std::vector<glm::uvec3> &indices);
 
         ~VertexArray();

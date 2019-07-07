@@ -1,5 +1,6 @@
 #include <android_game_engine/Box.h>
 
+#include <algorithm>
 #include <memory>
 
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
@@ -78,7 +79,7 @@ const std::vector<glm::vec3> normals {
     {0.0f,  1.0f,  0.0f}  // bottom-left
 };
 
-const std::vector<glm::vec2> textureCoords {
+const std::vector<glm::vec2> textureCoordinates {
     // back face
     {0.0f, 0.0f}, // bottom-left
     {1.0f, 1.0f}, // top-right
@@ -132,14 +133,13 @@ const std::vector<glm::uvec3> indices {
     {21u, 20u, 23u}
 };
 
-std::weak_ptr<age::VertexArray> vaoCache;
-
 } // namespace
 
 namespace age {
 
 Box::Box(const std::set<std::string> &diffuseTextureFilepaths,
-         const std::set<std::string> &specularTextureFilepaths) {
+         const std::set<std::string> &specularTextureFilepaths,
+         const glm::vec2 &numTextureRepeat) {
     std::vector<Texture2D> diffuseTextures, specularTextures;
     
     for (const auto& filepath : diffuseTextureFilepaths) {
@@ -150,23 +150,27 @@ Box::Box(const std::set<std::string> &diffuseTextureFilepaths,
         specularTextures.emplace_back(filepath);
     }
     
-    this->init(diffuseTextures, specularTextures);
+    this->init(diffuseTextures, specularTextures, numTextureRepeat);
 }
 
 Box::Box(const std::vector<age::Texture2D> &diffuseTextures,
-         const std::vector<age::Texture2D> &specularTextures) {
-    this->init(diffuseTextures, specularTextures);
+         const std::vector<age::Texture2D> &specularTextures,
+         const glm::vec2 &numTextureRepeat) {
+    this->init(diffuseTextures, specularTextures, numTextureRepeat);
 }
 
 void Box::init(const std::vector<age::Texture2D> &diffuseTextures,
-               const std::vector<age::Texture2D> &specularTextures) {
+               const std::vector<age::Texture2D> &specularTextures,
+               const glm::vec2 &numTextureRepeat) {
     // Create mesh
-    auto vao = vaoCache.lock();
-    if (!vao) {
-        vao = std::make_shared<VertexArray>(positions, normals, textureCoords, indices);
-        vaoCache = vao;
-    }
-    
+    std::vector<glm::vec2> repeatTextureCoords(textureCoordinates);
+    std::transform(repeatTextureCoords.begin(), repeatTextureCoords.end(),
+                   repeatTextureCoords.begin(),
+                   [numTextureRepeat](const auto &tc){
+                       return glm::vec2(tc.x * numTextureRepeat.x, tc.y * numTextureRepeat.y);
+                   });
+    auto vao = std::make_shared<VertexArray>(positions, normals, repeatTextureCoords, indices);
+
     std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::move(vao),
                                                    diffuseTextures,
                                                    specularTextures)});

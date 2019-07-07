@@ -27,7 +27,7 @@ const std::vector<glm::vec3> normals {
     {0.0f, 0.0f, 1.0f}
 };
 
-const std::vector<glm::vec2> textureCoords {
+const std::vector<glm::vec2> textureCoordinates {
     {1.0f, 0.0f},
     {0.0f, 0.0f},
     {0.0f, 1.0f},
@@ -70,13 +70,13 @@ void Quad::init(const std::vector<age::Texture2D> &diffuseTextures,
                 const std::vector<age::Texture2D> &specularTextures,
                 const glm::vec2 &numTextureRepeat) {
     // Create mesh
-    std::vector<glm::vec2> repeatTextureCoords(textureCoords);
-    std::transform(repeatTextureCoords.begin(), repeatTextureCoords.end(),
-                   repeatTextureCoords.begin(),
+    std::vector<glm::vec2> repeatTextureCoordinates(textureCoordinates);
+    std::transform(repeatTextureCoordinates.begin(), repeatTextureCoordinates.end(),
+                   repeatTextureCoordinates.begin(),
                    [numTextureRepeat](const auto &tc){
                        return glm::vec2(tc.x * numTextureRepeat.x, tc.y * numTextureRepeat.y);
                    });
-    auto vao = std::make_shared<VertexArray>(positions, normals, repeatTextureCoords, indices);
+    auto vao = std::make_shared<VertexArray>(positions, normals, repeatTextureCoordinates, indices);
     std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::move(vao),
                                                    diffuseTextures,
                                                    specularTextures)});

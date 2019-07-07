@@ -8,7 +8,7 @@ namespace {
 
 constexpr auto positionStride = sizeof(glm::vec3);
 constexpr auto normalStride = sizeof(glm::vec3);
-constexpr auto textureCoordStride = sizeof(glm::vec2);
+constexpr auto textureCoordinatesStride = sizeof(glm::vec2);
 
 } // namespace
 
@@ -16,14 +16,14 @@ namespace age {
 
 VertexArray::VertexArray(const std::vector<glm::vec3> &positions,
                          const std::vector<glm::vec3> &normals,
-                         const std::vector<glm::vec2> &textureCoords,
+                         const std::vector<glm::vec2> &textureCoordinates,
                          const std::vector<glm::uvec3> &indices) {
     const auto positionsSize_bytes = positions.size() * sizeof(glm::vec3);
     const auto normalsSize_bytes = normals.size() * sizeof(glm::vec3);
-    const auto textureCoordsSize_bytes = textureCoords.size() * sizeof(glm::vec2);
+    const auto textureCoordinatesSize_bytes = textureCoordinates.size() * sizeof(glm::vec2);
 
     auto normalsOffset = positionsSize_bytes;
-    auto textureCoordsOffset = positionsSize_bytes + normalsSize_bytes;
+    auto textureCoordinatesOffset = positionsSize_bytes + normalsSize_bytes;
 
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
@@ -32,13 +32,13 @@ VertexArray::VertexArray(const std::vector<glm::vec3> &positions,
     glGenBuffers(1, &this->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     glBufferData(GL_ARRAY_BUFFER,
-                 positionsSize_bytes + normalsSize_bytes + textureCoordsSize_bytes,
+                 positionsSize_bytes + normalsSize_bytes + textureCoordinatesSize_bytes,
                  nullptr, GL_STATIC_DRAW);
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, positionsSize_bytes, positions.data());
     glBufferSubData(GL_ARRAY_BUFFER, positionsSize_bytes, normalsSize_bytes, normals.data());
     glBufferSubData(GL_ARRAY_BUFFER, positionsSize_bytes + normalsSize_bytes,
-                    textureCoordsSize_bytes, textureCoords.data());
+                    textureCoordinatesSize_bytes, textureCoordinates.data());
 
     // Assign vertex attributes
     glVertexAttribPointer(0u, 3, GL_FLOAT, GL_FALSE, positionStride,
@@ -49,8 +49,8 @@ VertexArray::VertexArray(const std::vector<glm::vec3> &positions,
                           reinterpret_cast<GLvoid*>(normalsOffset));
     glEnableVertexAttribArray(1u);
 
-    glVertexAttribPointer(2u, 2, GL_FLOAT, GL_FALSE, textureCoordStride,
-                          reinterpret_cast<GLvoid*>(textureCoordsOffset));
+    glVertexAttribPointer(2u, 2, GL_FLOAT, GL_FALSE, textureCoordinatesStride,
+                          reinterpret_cast<GLvoid*>(textureCoordinatesOffset));
     glEnableVertexAttribArray(2u);
 
     // Store indices data
