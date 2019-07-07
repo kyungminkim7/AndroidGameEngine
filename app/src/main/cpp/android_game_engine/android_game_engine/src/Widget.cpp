@@ -197,12 +197,10 @@ void Widget::onTouchMoveEvent(const age::TouchEvent &event) {
 }
 
 void Widget::onTouchUpEvent(const age::TouchEvent &event) {
-    for (const auto& e : event) {
-        auto w = touchedWidgets.find(e.first);
-        if (w != touchedWidgets.end()) {
-            w->second->onTouchUp();
-        }
+    for (auto w : touchedWidgets) {
+        w.second->onTouchUp();
     }
+
     touchedWidgets.clear();
 }
 
