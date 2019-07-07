@@ -165,11 +165,11 @@ void Game::setSkybox(std::unique_ptr<age::Skybox> skybox) {
     this->skybox = std::move(skybox);
 }
 
-void Game::addToWorldList(std::unique_ptr<age::GameObject> gameObject) {
+void Game::addToWorldList(std::shared_ptr<age::GameObject> gameObject) {
     if (gameObject->getPhysicsBody()) {
         this->physics->addRigidBody(gameObject->getPhysicsBody());
     }
-    
+
     this->worldList.push_back(std::move(gameObject));
 }
 

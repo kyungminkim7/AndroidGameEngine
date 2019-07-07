@@ -49,7 +49,7 @@ public:
 protected:
     void setSkybox(std::unique_ptr<Skybox> skybox);
     
-    void addToWorldList(std::unique_ptr<GameObject> gameObject);
+    void addToWorldList(std::shared_ptr<GameObject> gameObject);
     
     virtual void onGameObjectTouched(GameObject *gameObject, const glm::vec3 &touchPoint,
                                      const glm::vec3 &touchDirection, const glm::vec3 &touchNormal);
@@ -77,7 +77,7 @@ private:
     std::unique_ptr<CameraType> cam = nullptr;
     std::unique_ptr<LightDirectional> directionalLight = nullptr;
     std::unique_ptr<ShadowMap> shadowMap = nullptr;
-    std::vector<std::unique_ptr<GameObject>> worldList;
+    std::vector<std::shared_ptr<GameObject>> worldList;
     
     std::unique_ptr<PhysicsEngine> physics;
     bool drawDebugPhysics;

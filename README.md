@@ -3,8 +3,9 @@ This is a self-contained 3D Game Engine for Android written in native C++.
 
 ### Requirements/Dependencies
 - C++14 compiler
-- OpenGL ES 2.0
+- OpenGL ES 3.2
 - Currently only works with 3DS files for 3D models.
+- Min Android SDK version 24
 
 ### Installation
 1. Install the latest version of [git](https://git-scm.com/downloads).
@@ -28,5 +29,5 @@ This is a self-contained 3D Game Engine for Android written in native C++.
     - GLM_TEST_ENABLE (Line 103)
 	
 ### Project Setup
-- In order to create your game, provide a subclass of the Game class. An example template is shown by the TestGame.h and TestGame.cpp files.
+- In order to create your game, provide a subclass of the Game class in the cpp/ directory and make the necessary modifications to the CMakeLists.txt file in the same directory. An example template is shown by the TestGame.h and TestGame.cpp files.
 - TestGame will not compile right away since I am not making the 3D model files available in the assets directory. Replace them with your own.
