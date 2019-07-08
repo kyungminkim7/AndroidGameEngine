@@ -62,9 +62,9 @@ public:
     void registerOnTouchMoveCallback(OnTouchMoveCallback callback);
     void registerOnTouchUpCallback(OnTouchUpCallback callback);
     
-    void onTouchDownEvent(const TouchEvent &event);
-    void onTouchMoveEvent(const TouchEvent &event);
-    void onTouchUpEvent(const TouchEvent &event);
+    void onTouchDownEvent(const std::vector<TouchEvent> &event);
+    void onTouchMoveEvent(const std::vector<TouchEvent> &event);
+    void onTouchUpEvent(const std::vector<TouchEvent> &event);
     
     virtual void onTouchDown(const glm::vec2 &position);
     virtual void onTouchMove(const glm::vec2 &position);

@@ -142,18 +142,18 @@ void Game::render() {
     this->gui->render(&this->widgetShader);
 }
 
-bool Game::onTouchDownEvent(const age::TouchEvent &event) {
-    this->gui->onTouchDownEvent(event);
+bool Game::onTouchDownEvent(const std::vector<TouchEvent> &events) {
+    this->gui->onTouchDownEvent(events);
     return true;
 }
 
-bool Game::onTouchMoveEvent(const age::TouchEvent &event) {
-    this->gui->onTouchMoveEvent(event);
+bool Game::onTouchMoveEvent(const std::vector<TouchEvent> &events) {
+    this->gui->onTouchMoveEvent(events);
     return true;
 }
 
-bool Game::onTouchUpEvent(const age::TouchEvent &event) {
-    this->gui->onTouchUpEvent(event);
+bool Game::onTouchUpEvent(const std::vector<TouchEvent> &events) {
+    this->gui->onTouchUpEvent(events);
     return true;
 }
 

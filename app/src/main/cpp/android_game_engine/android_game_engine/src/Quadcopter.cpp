@@ -129,19 +129,19 @@ const std::vector<glm::uvec3> indices {
 };
 
 Quadcopter::Quadcopter(const std::string &modelFilepath)
-    : GameObject(), maxMotorPercentDiff(0.05f), thrustMomentRatio(0.1f) {
+    : GameObject(modelFilepath), maxMotorPercentDiff(0.05f), thrustMomentRatio(0.1f) {
 
-    std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::make_shared<VertexArray>(positions,
-                                                                                 normals,
-                                                                                 textureCoords,
-                                                                                 indices),
-                                                   {Texture2D(glm::vec3{0.0f, 1.0f, 1.0f})},
-                                                   {Texture2D(glm::vec3{1.0f, 1.0f, 1.0f})})});
-    this->setMesh(std::move(meshes));
-    
-    // Create collision shape
-    this->setCollisionShape(std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
-    this->setUnscaledDimensions(glm::vec3(1.0f));
+//    std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::make_shared<VertexArray>(positions,
+//                                                                                 normals,
+//                                                                                 textureCoords,
+//                                                                                 indices),
+//                                                   {Texture2D(glm::vec3{0.0f, 1.0f, 1.0f})},
+//                                                   {Texture2D(glm::vec3{1.0f, 1.0f, 1.0f})})});
+//    this->setMesh(std::move(meshes));
+//
+//    // Create collision shape
+//    this->setCollisionShape(std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
+//    this->setUnscaledDimensions(glm::vec3(1.0f));
 }
 
 void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {

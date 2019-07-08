@@ -40,9 +40,9 @@ public:
     virtual void onUpdate(std::chrono::duration<float> updateDuration);
     virtual void render();
     
-    virtual bool onTouchDownEvent(const TouchEvent &event);
-    virtual bool onTouchMoveEvent(const TouchEvent &event);
-    virtual bool onTouchUpEvent(const TouchEvent &event);
+    virtual bool onTouchDownEvent(const std::vector<TouchEvent> &event);
+    virtual bool onTouchMoveEvent(const std::vector<TouchEvent> &event);
+    virtual bool onTouchUpEvent(const std::vector<TouchEvent> &event);
     
     void enablePhysicsDebugDrawer(bool enable);
 

@@ -131,19 +131,6 @@ void Widget::render(ShaderProgram *shader) {
     }
 }
 
-void Widget::onTouchDownEvent(const age::TouchEvent &event) {
-    for (const auto& e : event) {
-        if (this->inBounds(e.second)) {
-            touchedWidgets[e.first] = this;
-            this->onTouchDown(e.second);
-            
-            for (auto& child : this->children) {
-                child->onTouchDownEvent({e});
-            }
-        }
-    }
-}
-
 void Widget::registerOnTouchDownCallback(OnTouchDownCallback callback) {
     this->onTouchDownCallbacks.push_front(callback);
 }
@@ -156,52 +143,36 @@ void Widget::registerOnTouchUpCallback(OnTouchUpCallback callback) {
     this->onTouchUpCallbacks.push_front(callback);
 }
 
-void Widget::onTouchMoveEvent(const age::TouchEvent &event) {
-    // Extract the touched and event ids
-    auto keyExtractor = [](const auto& item){return item.first;};
-    
-    std::vector<int> touchedIds;
-    touchedIds.reserve(touchedWidgets.size());
-    std::transform(touchedWidgets.begin(), touchedWidgets.end(),
-            std::back_inserter(touchedIds), keyExtractor);
-    
-    std::vector<int> eventIds;
-    eventIds.reserve(event.size());
-    std::transform(event.begin(), event.end(),
-            std::back_inserter(eventIds), keyExtractor);
-    
-    // Find which widgets have been released
-    std::sort(touchedIds.begin(), touchedIds.end());
-    std::sort(eventIds.begin(), eventIds.end());
-    
-    std::forward_list<int> touchUpIds;
-    std::set_difference(touchedIds.begin(), touchedIds.end(),
-                        eventIds.begin(), eventIds.end(),
-                        std::front_inserter(touchUpIds));
-    
-    for (auto id : touchUpIds) {
-        touchedWidgets[id]->onTouchUp();
-        touchedWidgets.erase(id);
-    }
-    
-    for (const auto& e : event) {
-        auto w = touchedWidgets.find(e.first);
-        if (w != touchedWidgets.end()) {
-            // Find the corresponding widget the move event belongs to
-            w->second->onTouchMove(e.second);
-        } else {
-            // A new widget has been touched
-            this->onTouchDownEvent({e});
+void Widget::onTouchDownEvent(const std::vector<TouchEvent> &events) {
+    for (const auto& e : events) {
+        if (this->inBounds(e.coordinate)) {
+            touchedWidgets[e.id] = this;
+            this->onTouchDown(e.coordinate);
+
+            for (auto& child : this->children) {
+                child->onTouchDownEvent({e});
+            }
         }
     }
 }
 
-void Widget::onTouchUpEvent(const age::TouchEvent &event) {
-    for (auto w : touchedWidgets) {
-        w.second->onTouchUp();
+void Widget::onTouchMoveEvent(const std::vector<TouchEvent> &events) {
+    for (const auto& e : events) {
+        auto w = touchedWidgets.find(e.id);
+        if (w != touchedWidgets.end()) {
+            w->second->onTouchMove(e.coordinate);
+        }
     }
+}
 
-    touchedWidgets.clear();
+void Widget::onTouchUpEvent(const std::vector<TouchEvent> &events) {
+    for (const auto& e : events) {
+        auto w = touchedWidgets.find(e.id);
+        if (w != touchedWidgets.end()) {
+            w->second->onTouchUp();
+            touchedWidgets.erase(e.id);
+        }
+    }
 }
 
 void Widget::onTouchDown(const glm::vec2 &position) {

@@ -6,6 +6,7 @@
 namespace age {
 
 class Box;
+class Quadcopter;
 
 class TestGame : public Game {
 public:
@@ -24,7 +25,7 @@ private:
     std::shared_ptr<Joystick> moveJoystick;
     std::shared_ptr<Joystick> rotateJoystick;
     
-    std::shared_ptr<GameObject> obj;
+    std::shared_ptr<Quadcopter> uav;
 };
 
 } // namespace age

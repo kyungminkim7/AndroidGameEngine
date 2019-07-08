@@ -8,7 +8,6 @@
 #include <android_game_engine/Box.h>
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
-#include <android_game_engine/Quad.h>
 #include <android_game_engine/Quadcopter.h>
 #include <android_game_engine/Window.h>
 
@@ -56,86 +55,61 @@ void TestGame::setupGui() {
 }
 
 void TestGame::loadWorld() {
-//    const std::string skyboxDir = "skyboxes/early_morning/";
-//    std::array<std::string, 6> skyboxImages {
-//        skyboxDir + "front.jpg",
-//        skyboxDir + "back.jpg",
-//        skyboxDir + "right.jpg",
-//        skyboxDir + "left.jpg",
-//        skyboxDir + "top.jpg",
-//        skyboxDir + "bottom.jpg"
-//    };
-//    this->setSkybox(std::make_unique<Skybox>(skyboxImages));
-
     this->getCam()->setPosition({-15.0f, 5.0f, 10.0f});
     this->getCam()->setLookAtPoint({0.0f, 0.0f, 2.0f});
 
-    std::shared_ptr<Box> box1(new Box({Texture2D(glm::vec3(1.0f, 1.0f, 0.0f))},
-                                      {Texture2D(glm::vec3(1.0f))}));
-    box1->setLabel("Box1");
-    box1->setPosition({0.0f, 1.0f, 3.0f});
-    box1->setScale({1.0f, 2.0f, 3.0f});
-    box1->setMass(1.0f);
-    this->addToWorldList(box1);
+    {
+        std::shared_ptr<Box> box1(new Box({Texture2D(glm::vec3(1.0f, 1.0f, 0.0f))},
+                                          {Texture2D(glm::vec3(1.0f))}));
+        box1->setLabel("Box1");
+        box1->setPosition({0.0f, 1.0f, 3.0f});
+        box1->setScale({1.0f, 2.0f, 3.0f});
+        box1->setMass(1.0f);
+        this->addToWorldList(box1);
+    }
 
-//    using namespace std::placeholders;
-//    std::shared_ptr<Quadcopter> uav(new Quadcopter(""));
-//    uav->setLabel("Box2");
-//    uav->setPosition({0.0f, -1.0f, 3.0f});
-//    uav->setMass(1.0f);
-//    uav->setMaxMotorThrust(10.0f);
-//    this->getCam()->setChaseObject(uav.get(), {-5.0f, 0.0f, 1.0f});
-    
-//    auto leftThrottle = std::bind(&Quadcopter::onThrottleInput, uav.get(), _1);
-//    this->moveJoystick->registerOnTouchDownCallback(leftThrottle);
-//    this->moveJoystick->registerOnTouchMoveCallback(leftThrottle);
-//    this->moveJoystick->registerOnTouchUpCallback(std::bind(&Quadcopter::onThrottleInput, uav.get(), glm::vec2(0.0f)));
-//
-//    auto rightThrottle = [ptr=this->obj](const auto& input){
-//        glm::vec3 force{input.y * 20, 0.0f, 0.0f};
-//        ptr->applyCentralForce(ptr->getOrientation() * force);
-//    };
-//    this->rotateJoystick->registerOnTouchDownCallback(rightThrottle);
-//    this->rotateJoystick->registerOnTouchMoveCallback(rightThrottle);
-//    this->rotateJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onRotate, this->getCam(),
-//                                                              glm::vec2(0.0f)));
-//
-    
-//    this->addToWorldList(uav);
-    
-//    std::shared_ptr<Quad> quad(new Quad({Texture2D("images/wood.png")},
-//                                        {Texture2D(glm::vec3(1.0f))},
-//                                        glm::vec2(100.0f)));
-    const auto scale = 100.0f;
-    std::shared_ptr<Box> quad(new Box({Texture2D("images/wood.png")},
-                                      {Texture2D(glm::vec3(1.0f))},
-                                      glm::vec2(scale)));
-    quad->setLabel("Quad");
-    quad->setScale(glm::vec3{scale, scale, 0.1f});
-    quad->setPosition({0.0f, 0.0f, -0.5f});
-    quad->setSpecularExponent(32.0f);
-
-//    this->addToWorldList(box1);
-//    this->addToWorldList(box2);
-    this->addToWorldList(quad);
+    {
+        const auto scale = 100.0f;
+        std::shared_ptr<Box> floor(new Box({Texture2D("images/wood.png")},
+                                           {Texture2D(glm::vec3(1.0f))},
+                                           glm::vec2(scale)));
+        floor->setLabel("Floor");
+        floor->setScale(glm::vec3{scale, scale, 0.1f});
+        floor->setPosition({0.0f, 0.0f, -0.5f});
+        floor->setSpecularExponent(32.0f);
+        this->addToWorldList(floor);
+    }
     
     {
-        auto start = std::chrono::system_clock::now();
+        using namespace std::placeholders;
 
-//        std::shared_ptr<Box> uav(new Box({Texture2D(glm::vec3(1.0f, 1.0f, 0.0f))},
-//                                         {Texture2D(glm::vec3(1.0f))}));
-        auto uav = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
-//        auto uav = std::make_shared<GameObject>("models/C-17A_3DS/C-17A_DE.3ds");
-//        auto uav = std::make_shared<GameObject>("models/mq9/mq9.3ds");
+        // Create UAV
+        this->uav = std::make_shared<Quadcopter>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
+        this->uav->setLabel("UAV");
+        this->uav->setScale(glm::vec3(50.0f));
+        this->uav->setPosition({0.0f, 0.0f, 30.0f});
+        this->uav->setMass(1.0f);
 
-        uav->setScale(glm::vec3(100.0f));
-        uav->setPosition({0.0f, 0.0f, 30.0f});
-        uav->setMass(1.0f);
+        // Connect UAV to joystick controls
+        this->uav->setMaxMotorThrust(10.0f);
+//        this->getCam()->setChaseObject(uav.get(), {-15.0f, 0.0f, 5.0f});
 
-        this->addToWorldList(uav);
+//        auto leftThrottle = std::bind(&Quadcopter::onThrottleInput, this->uav.get(), _1);
+//        this->moveJoystick->registerOnTouchDownCallback(leftThrottle);
+//        this->moveJoystick->registerOnTouchMoveCallback(leftThrottle);
+//        this->moveJoystick->registerOnTouchUpCallback(std::bind(&Quadcopter::onThrottleInput, this->uav.get(), glm::vec2(0.0f)));
+//
+//        auto rightThrottle = [ptr=this->uav.get()](const auto& input){
+//            glm::vec3 force{input.y * 20, 0.0f, 0.0f};
+//            ptr->applyCentralForce(ptr->getOrientation() * force);
+//        };
+//        this->rotateJoystick->registerOnTouchDownCallback(rightThrottle);
+//        this->rotateJoystick->registerOnTouchMoveCallback(rightThrottle);
+//        this->rotateJoystick->registerOnTouchUpCallback(std::bind(&Quadcopter::onControlInput, this->uav.get(),
+//                                                                  glm::vec2(0.0f)));
 
-        auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
-        Log::info("1st load time: " + std::to_string(time.count()) + " ms");
+        this->addToWorldList(this->uav);
+
     }
 }
 

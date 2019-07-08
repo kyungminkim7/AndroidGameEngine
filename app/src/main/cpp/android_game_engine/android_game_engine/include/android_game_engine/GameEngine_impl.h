@@ -128,28 +128,55 @@ int32_t inputEventCallback(android_app *app, AInputEvent *event) {
     
     auto eventType = AInputEvent_getType(event);
     if (eventType == AINPUT_EVENT_TYPE_MOTION) {
-        TouchEvent touchEvent;
-        auto numPointers = AMotionEvent_getPointerCount(event);
-        for (auto i = 0u; i < numPointers; ++i) {
-            touchEvent[AMotionEvent_getPointerId(event, i)] = {AMotionEvent_getX(event, i),
-                                                               AMotionEvent_getY(event, i)};
-        }
-    
-        switch (AMotionEvent_getAction(event)) {
-            case AMOTION_EVENT_ACTION_DOWN:
-                return game->onTouchDownEvent(touchEvent);
-        
+        auto getAllPointerEvents = [event]{
+            auto numPointers = AMotionEvent_getPointerCount(event);
+
+            std::vector<TouchEvent> touchEvents;
+            touchEvents.reserve(numPointers);
+
+            for (auto i = 0u; i < numPointers; ++i) {
+                touchEvents.emplace_back(AMotionEvent_getPointerId(event, i),
+                        glm::vec2(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i)));
+            }
+
+            return touchEvents;
+        };
+
+        auto getActivePointerEvent = [event] {
+            std::vector<TouchEvent> touchEvents;
+
+            auto i = AMotionEvent_getAction(event) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+            touchEvents.emplace_back(AMotionEvent_getPointerId(event, i),
+                    glm::vec2(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i)));
+
+            return touchEvents;
+        };
+
+        switch (AMotionEvent_getAction(event) & AMOTION_EVENT_ACTION_MASK) {
             case AMOTION_EVENT_ACTION_MOVE:
-                return game->onTouchMoveEvent(touchEvent);
-        
+                return game->onTouchMoveEvent(getAllPointerEvents());
+
+            case AMOTION_EVENT_ACTION_DOWN:
+                getAllPointerEvents;
+                return game->onTouchDownEvent(getAllPointerEvents());
+
             case AMOTION_EVENT_ACTION_UP:
-                return game->onTouchUpEvent(touchEvent);
-    
+                getAllPointerEvents;
+                return game->onTouchUpEvent(getAllPointerEvents());
+
+            case AMOTION_EVENT_ACTION_POINTER_DOWN:
+                getActivePointerEvent;
+                return game->onTouchDownEvent(getActivePointerEvent());
+
+            case AMOTION_EVENT_ACTION_POINTER_UP:
+                getActivePointerEvent();
+                return game->onTouchUpEvent(getActivePointerEvent());
+
             default:
                 break;
         }
     }
-    
+
     return 0;
 }
 
