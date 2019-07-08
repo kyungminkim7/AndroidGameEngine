@@ -22,6 +22,8 @@ template <typename T>
 void appCmdCallback(android_app *app, int32_t cmd);
 
 int32_t inputEventCallback(android_app *app, AInputEvent *event);
+std::vector<TouchEvent> getAllPointerEvents(AInputEvent *event);
+std::vector<TouchEvent> getActivePointerEvent(AInputEvent *event);
 
 template <typename T>
 void run(android_app *app) {
@@ -128,49 +130,21 @@ int32_t inputEventCallback(android_app *app, AInputEvent *event) {
     
     auto eventType = AInputEvent_getType(event);
     if (eventType == AINPUT_EVENT_TYPE_MOTION) {
-        auto getAllPointerEvents = [event]{
-            auto numPointers = AMotionEvent_getPointerCount(event);
-
-            std::vector<TouchEvent> touchEvents;
-            touchEvents.reserve(numPointers);
-
-            for (auto i = 0u; i < numPointers; ++i) {
-                touchEvents.emplace_back(AMotionEvent_getPointerId(event, i),
-                        glm::vec2(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i)));
-            }
-
-            return touchEvents;
-        };
-
-        auto getActivePointerEvent = [event] {
-            std::vector<TouchEvent> touchEvents;
-
-            auto i = AMotionEvent_getAction(event) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-            touchEvents.emplace_back(AMotionEvent_getPointerId(event, i),
-                    glm::vec2(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i)));
-
-            return touchEvents;
-        };
-
         switch (AMotionEvent_getAction(event) & AMOTION_EVENT_ACTION_MASK) {
             case AMOTION_EVENT_ACTION_MOVE:
-                return game->onTouchMoveEvent(getAllPointerEvents());
+                return game->onTouchMoveEvent(getAllPointerEvents(event));
 
             case AMOTION_EVENT_ACTION_DOWN:
-                getAllPointerEvents;
-                return game->onTouchDownEvent(getAllPointerEvents());
+                return game->onTouchDownEvent(getAllPointerEvents(event));
 
             case AMOTION_EVENT_ACTION_UP:
-                getAllPointerEvents;
-                return game->onTouchUpEvent(getAllPointerEvents());
+                return game->onTouchUpEvent(getAllPointerEvents(event));
 
             case AMOTION_EVENT_ACTION_POINTER_DOWN:
-                getActivePointerEvent;
-                return game->onTouchDownEvent(getActivePointerEvent());
+                return game->onTouchDownEvent(getActivePointerEvent(event));
 
             case AMOTION_EVENT_ACTION_POINTER_UP:
-                getActivePointerEvent();
-                return game->onTouchUpEvent(getActivePointerEvent());
+                return game->onTouchUpEvent(getActivePointerEvent(event));
 
             default:
                 break;
@@ -178,6 +152,30 @@ int32_t inputEventCallback(android_app *app, AInputEvent *event) {
     }
 
     return 0;
+}
+
+std::vector<TouchEvent> getAllPointerEvents(AInputEvent *event) {
+    auto numPointers = AMotionEvent_getPointerCount(event);
+
+    std::vector<TouchEvent> touchEvents;
+    touchEvents.reserve(numPointers);
+
+    for (auto i = 0u; i < numPointers; ++i) {
+        touchEvents.emplace_back(AMotionEvent_getPointerId(event, i),
+                                 glm::vec2(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i)));
+    }
+
+    return touchEvents;
+}
+
+std::vector<TouchEvent> getActivePointerEvent(AInputEvent *event) {
+    std::vector<TouchEvent> touchEvents;
+
+    auto i = AMotionEvent_getAction(event) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+    touchEvents.emplace_back(AMotionEvent_getPointerId(event, i),
+                             glm::vec2(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i)));
+
+    return touchEvents;
 }
 
 } // namespace GameEngine
