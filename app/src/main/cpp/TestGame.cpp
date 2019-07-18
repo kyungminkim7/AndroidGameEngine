@@ -90,7 +90,7 @@ void TestGame::loadWorld() {
         params.maxRollRate = glm::radians(90.0f);
         params.maxPitchRate = glm::radians(90.0f);
         params.maxYawRate = glm::radians(45.0f);
-        params.maxThrust = 10.0f;
+        params.maxThrust = 8.0f;
         params.controlRates2MotorRotationSpeed = 500.0f;
         params.angle_kp = 0.15f;
         params.angle_ki = 0.0f;

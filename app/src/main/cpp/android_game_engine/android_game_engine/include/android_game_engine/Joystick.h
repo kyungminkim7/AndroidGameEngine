@@ -27,8 +27,8 @@ public:
     void onTouchDown(const glm::vec2 &position) override;
     void onTouchMove(const glm::vec2 &position) override;
     void onTouchUp() override;
-    
-    bool inBounds(const glm::vec2 &point) const override;
+
+    virtual bool inBounds(const glm::vec2 &point) const;
 
 protected:
     explicit Joystick(Widget *parent);

@@ -8,6 +8,7 @@
 #include <android_game_engine/JoystickHandle.h>
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
+#include <android_game_engine/Utilities.h>
 
 namespace age {
 
@@ -44,25 +45,28 @@ void Joystick::setHandleColor(const glm::vec4 &color) {this->handle->setColor(co
 void Joystick::onTouchDown(const glm::vec2 &position) {
     this->handle->setPosition(position - this->handle->getRadius());
     
-    auto output = (position - this->getCenter()) / this->getRadius();
+    auto output = (position - this->getCenter()) /
+            (this->getDimensions() - this->handle->getDimensions()) * 2.0f;
     output.y *= -1.0f;
-    
+
     Widget::onTouchDown(output);
 }
 
 void Joystick::onTouchMove(const glm::vec2 &position) {
     auto center = this->getCenter();
-    auto v = position - center;
-    auto angle = std::atan2(v.y, v.x);
-    auto touchRadius = std::min(glm::distance(center, position),
-            this->getRadius());
+    auto halfDimensions = this->getDimensions() * 0.5f;
+    auto handleHalfDimensions = this->handle->getDimensions() * 0.5f;
+    auto lowerBound = center - halfDimensions + handleHalfDimensions;
+    auto upperBound = center + halfDimensions - handleHalfDimensions;
+    glm::vec2 handlePosition(
+            clip(position.x, lowerBound.x, upperBound.x),
+            clip(position.y, lowerBound.y, upperBound.y));
+
+    this->handle->setPosition(handlePosition - this->handle->getRadius());
     
-    auto relativeHandleCenter = glm::rotate(glm::vec2{touchRadius, 0.0f}, angle);
-    this->handle->setPosition(center + relativeHandleCenter - this->handle->getRadius());
-    
-    auto output = relativeHandleCenter / this->getRadius();
+    auto output = (handlePosition - center) / (halfDimensions - handleHalfDimensions);
     output.y *= -1.0f;
-    
+
     Widget::onTouchMove(output);
 }
 
@@ -72,16 +76,21 @@ void Joystick::onTouchUp() {
     Widget::onTouchUp();
 }
 
+bool Joystick::inBounds(const glm::vec2 &point) const {
+    auto center = this->getCenter();
+    auto halfDimensions = this->getDimensions() * 0.5f;
+    auto handleHalfDimensions = this->handle->getDimensions() * 0.5f;
+    auto lowerBound = center - halfDimensions + handleHalfDimensions;
+    auto upperBound = center + halfDimensions - handleHalfDimensions;
+    return point.x >= lowerBound.x && point.y >= lowerBound.y &&
+        point.x <= upperBound.x && point.y <= upperBound.y;
+}
+
 float Joystick::getRadius() const {return this->getDimensions().x * 0.5f;}
 
 glm::vec2 Joystick::getCenter() const {
     auto radius = this->getRadius();
     return this->getPosition() + glm::vec2(radius, radius);
-}
-
-bool Joystick::inBounds(const glm::vec2 &point) const {
-    auto radius = this->getRadius();
-    return glm::distance2(point, this->getCenter()) < radius * radius;
 }
 
 } // namespace
