@@ -26,6 +26,7 @@ add_library(${PROJECT_NAME} STATIC
         src/Model.cpp
         src/ModelLoader.cpp
         src/ModelLoader3ds.cpp
+        src/PID.cpp
         src/PhysicsCompoundShape.cpp
         src/PhysicsDebugDrawer.cpp
         src/PhysicsEngine.cpp

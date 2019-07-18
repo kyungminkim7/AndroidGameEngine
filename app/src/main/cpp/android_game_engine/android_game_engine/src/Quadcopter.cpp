@@ -1,10 +1,12 @@
 #include <android_game_engine/Quadcopter.h>
 
-#include <limits>
-
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/norm.hpp>
 
+#include <android_game_engine/Log.h>
 #include <android_game_engine/VertexArray.h>
+#include <android_game_engine/Utilities.h>
 
 namespace age {
 
@@ -128,77 +130,120 @@ const std::vector<glm::uvec3> indices {
         {21u, 20u, 23u}
 };
 
-Quadcopter::Quadcopter(const std::string &modelFilepath)
-    : GameObject(modelFilepath), maxMotorPercentDiff(0.05f), thrustMomentRatio(0.1f) {
+Quadcopter::Quadcopter(const std::string &modelFilepath, const Parameters &params)
+    : GameObject(), mode(Mode::ACRO), maxRoll(params.maxRoll), maxPitch(params.maxPitch),
+    maxRollRate(params.maxRollRate), maxPitchRate(params.maxPitchRate), maxYawRate(params.maxYawRate),
+    maxThrust(params.maxThrust),
+    rollController(params.angle_kp, params.angle_ki, params.angle_kd),
+    pitchController(params.angle_kp, params.angle_ki, params.angle_kd),
+    motors{Motor(params.motorRotationSpeed2Thrust),
+           Motor(params.motorRotationSpeed2Thrust),
+           Motor(params.motorRotationSpeed2Thrust),
+           Motor(params.motorRotationSpeed2Thrust)} {
+    std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::make_shared<VertexArray>(positions,
+                                                                                 normals,
+                                                                                 textureCoords,
+                                                                                 indices),
+                                                   {Texture2D(glm::vec3{0.0f, 1.0f, 1.0f})},
+                                                   {Texture2D(glm::vec3{1.0f, 1.0f, 1.0f})})});
+    this->setMesh(std::move(meshes));
 
-//    std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::make_shared<VertexArray>(positions,
-//                                                                                 normals,
-//                                                                                 textureCoords,
-//                                                                                 indices),
-//                                                   {Texture2D(glm::vec3{0.0f, 1.0f, 1.0f})},
-//                                                   {Texture2D(glm::vec3{1.0f, 1.0f, 1.0f})})});
-//    this->setMesh(std::move(meshes));
-//
-//    // Create collision shape
-//    this->setCollisionShape(std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
-//    this->setUnscaledDimensions(glm::vec3(1.0f));
+    // Create collision shape
+    this->setCollisionShape(std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
+    this->setUnscaledDimensions(glm::vec3(1.0f));
+
+    auto k = params.controlRates2MotorRotationSpeed;
+    this->controlRates2MotorRotationSpeeds = glm::mat4(k,  k,  k,  k,
+                                                      -k,  k, -k,  k,
+                                                      -k, -k,  k,  k,
+                                                       k, -k, -k,  k);
+    this->setMass(params.mass);
 }
+
+void Quadcopter::setMode(Mode mode) { this->mode = mode; }
 
 void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
-    if (this->frontLeftThrust <= std::numeric_limits<float>::min() &&
-        this->frontRightThrust <= std::numeric_limits<float>::min() &&
-        this->backRightThrust <= std::numeric_limits<float>::min() &&
-        this->backLeftThrust <= std::numeric_limits<float>::min()) return;
-    
-    auto frontLeftTorque = this->frontLeftThrust * this->thrustMomentRatio;
-    auto frontRightTorque = this->frontRightThrust * this->thrustMomentRatio;
-    auto backRightTorque = this->backRightThrust * this->thrustMomentRatio;
-    auto backLeftTorque = this->backLeftThrust * this->thrustMomentRatio;
-    
+    if (this->mode == Mode::ANGLE) {
+        // Calculate the roll and pitch rates to achieve target angles
+        auto q = glm::quat_cast(this->getOrientation());
+        auto roll = glm::roll(q);
+        auto pitch = glm::pitch(q);
+
+        this->controlRates[0] = this->rollController.computeCorrection(roll, this->targetRoll, updateDuration);
+        this->controlRates[1] = this->pitchController.computeCorrection(pitch, this->targetPitch, updateDuration);
+
+        this->controlRates[0] = clip(this->controlRates[0], -this->maxRollRate, this->maxRollRate);
+        this->controlRates[1] = clip(this->controlRates[1], -this->maxPitchRate, this->maxPitchRate);
+
+    }
+
+    if (glm::length2(this->controlRates) < 0.001f) return;
+
+    // Apply correction to motors
+    auto rotationSpeeds = this->controlRates2MotorRotationSpeeds * this->controlRates;
+    for (auto i = 0u; i < this->motors.size(); ++i) {
+        motors[i].setRotationSpeed(rotationSpeeds[i]);
+    }
+
+    // Apply motor thrust
     auto halfDimensions = this->getScaledDimensions() / 2.0f;
     auto orientation = this->getOrientation();
-    
-    this->applyForce(orientation * glm::vec3(0.0f, 0.0f, this->frontLeftThrust),
-                     {halfDimensions.x, halfDimensions.y, halfDimensions.z});
-    this->applyForce(orientation * glm::vec3(0.0f, 0.0f, this->frontRightThrust),
-                     {halfDimensions.x, -halfDimensions.y, halfDimensions.z});
-    this->applyForce(orientation * glm::vec3(0.0f, 0.0f, this->backRightThrust),
-                     {-halfDimensions.x, -halfDimensions.y, halfDimensions.z});
-    this->applyForce(orientation * glm::vec3(0.0f, 0.0f, this->backLeftThrust),
-                     {-halfDimensions.x, halfDimensions.y, halfDimensions.z});
-    
-    this->applyTorque(orientation * glm::vec3(0.0f, 0.0f, frontLeftTorque));
-    this->applyTorque(orientation * glm::vec3(0.0f, 0.0f, -frontRightTorque));
-    this->applyTorque(orientation * glm::vec3(0.0f, 0.0f, backRightTorque));
-    this->applyTorque(orientation * glm::vec3(0.0f, 0.0f, -backLeftTorque));
+
+    auto frontLeftForce = orientation * glm::vec3(0.0f, 0.0f, this->motors[0].getThrust());
+    auto frontRightForce = orientation * glm::vec3(0.0f, 0.0f, this->motors[1].getThrust());
+    auto backRightForce = orientation * glm::vec3(0.0f, 0.0f, this->motors[2].getThrust());
+    auto backLeftForce = orientation * glm::vec3(0.0f, 0.0f, this->motors[3].getThrust());
+
+    this->applyForce(frontLeftForce, {halfDimensions.x, halfDimensions.y, halfDimensions.z});
+    this->applyForce(frontRightForce, {halfDimensions.x, -halfDimensions.y, halfDimensions.z});
+    this->applyForce(backRightForce, {-halfDimensions.x, -halfDimensions.y, halfDimensions.z});
+    this->applyForce(backLeftForce, {-halfDimensions.x, halfDimensions.y, halfDimensions.z});
+
+    // Apply motor moments
+    auto moment = glm::length(glm::vec3{halfDimensions.x, halfDimensions.y, 0.0f}) *
+            (-this->motors[0].getThrust() +
+              this->motors[1].getThrust() -
+              this->motors[2].getThrust() +
+              this->motors[3].getThrust());
+    this->applyTorque(orientation * glm::vec3(0.0f, 0.0f, moment));
 }
 
-void Quadcopter::onThrottleInput(const glm::vec2 &input) {
-    if (input.y <= 0) {
-        this->frontLeftThrust = this->frontRightThrust =
-            this->backRightThrust = this->backLeftThrust = 0.0f;
-        return;
+void Quadcopter::onRollThrustInput(const glm::vec2 &input) {
+    switch (this->mode) {
+        case Mode::ACRO:
+            this->controlRates[0] = input.x * this->maxRollRate;
+            break;
+
+        case Mode::ANGLE:
+            this->targetRoll = input.x * this->maxRoll;
+            break;
+
+        default:
+            break;
     }
-    
-    auto thrust = this->maxMotorThrust * input.y;
-    this->frontLeftThrust = this->frontRightThrust =
-        this->backRightThrust = this->backLeftThrust =
-            this->maxMotorThrust * input.y;
-    
-    this->frontLeftThrust = this->backLeftThrust =
-        thrust * (1.0f - this->maxMotorPercentDiff * -input.x);
+
+    this->controlRates[3] = input.y > 0.0f ? input.y * this->maxThrust : 0.0f;
 }
 
-void Quadcopter::onControlInput(const glm::vec2 &input) {
+void Quadcopter::onYawPitchInput(const glm::vec2 &input) {
+    switch (this->mode) {
+        case Mode::ACRO:
+            this->controlRates[1] = input.y * this->maxPitchRate;
+            break;
 
+        case Mode::ANGLE:
+            this->targetPitch = input.y * this->maxPitch;
+            break;
+
+        default:
+            break;
+    }
+
+    this->controlRates[2] = -input.x * this->maxYawRate;
 }
 
-void Quadcopter::setMaxMotorThrust(float thrust) {
-    this->maxMotorThrust = thrust;
-}
-
-void Quadcopter::setThrustMomentRatio(float thrustMomentRatio) {
-    this->thrustMomentRatio = thrustMomentRatio;
-}
+Quadcopter::Motor::Motor(float rotationSpeed2Thrust) : rotationSpeed2Thrust(rotationSpeed2Thrust) {}
+void Quadcopter::Motor::setRotationSpeed(float rotationSpeed) {this->rotationSpeed = rotationSpeed;}
+float Quadcopter::Motor::getThrust() const {return this->rotationSpeed * this->rotationSpeed * this->rotationSpeed2Thrust;}
 
 } // namespace age

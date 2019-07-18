@@ -19,6 +19,7 @@ namespace age {
 class Window;
 
 using CameraType = CameraFPV;
+//using CameraType = CameraChase;
 
 struct Ray {
     glm::vec3 origin;
