@@ -1,8 +1,9 @@
 #include <android_game_engine/Quadcopter.h>
 
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
-#include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/norm.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 #include <android_game_engine/Log.h>
 #include <android_game_engine/VertexArray.h>
@@ -136,10 +137,10 @@ Quadcopter::Quadcopter(const std::string &modelFilepath, const Parameters &param
     maxThrust(params.maxThrust),
     rollController(params.angle_kp, params.angle_ki, params.angle_kd),
     pitchController(params.angle_kp, params.angle_ki, params.angle_kd),
-    motors{Motor(params.motorRotationSpeed2Thrust),
-           Motor(params.motorRotationSpeed2Thrust),
-           Motor(params.motorRotationSpeed2Thrust),
-           Motor(params.motorRotationSpeed2Thrust)} {
+    motors{Motor(0, params.motorRotationSpeed2Thrust),
+           Motor(1, params.motorRotationSpeed2Thrust),
+           Motor(2, params.motorRotationSpeed2Thrust),
+           Motor(3, params.motorRotationSpeed2Thrust)} {
     std::shared_ptr<Meshes> meshes(new Meshes{Mesh(std::make_shared<VertexArray>(positions,
                                                                                  normals,
                                                                                  textureCoords,
@@ -163,25 +164,48 @@ Quadcopter::Quadcopter(const std::string &modelFilepath, const Parameters &param
 void Quadcopter::setMode(Mode mode) { this->mode = mode; }
 
 void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
+    if (this->controlRates[3] < 0.001f) return;
+
     if (this->mode == Mode::ANGLE) {
         // Calculate the roll and pitch rates to achieve target angles
-        auto q = glm::quat_cast(this->getOrientation());
-        auto roll = glm::roll(q);
-        auto pitch = glm::pitch(q);
+        glm::vec3 z_ref(0.0f, 0.0f, 1.0f);
+        auto y_ref = glm::cross(z_ref, this->getOrientationX());
+        auto x_ref = glm::cross(y_ref, z_ref);
+        glm::mat3 R_world_ref(x_ref, y_ref, z_ref);
 
-        this->controlRates[0] = this->rollController.computeCorrection(roll, this->targetRoll, updateDuration);
-        this->controlRates[1] = this->pitchController.computeCorrection(pitch, this->targetPitch, updateDuration);
+        auto R_ref_body = glm::transpose(R_world_ref) * this->getOrientation();
+        auto rpy = glm::eulerAngles(glm::toQuat(R_ref_body));
+
+        this->controlRates[0] = this->rollController.computeCorrection(rpy[0], this->targetRoll, updateDuration);
+        this->controlRates[1] = this->pitchController.computeCorrection(rpy[1], this->targetPitch, updateDuration);
+
+//        Log::info("Roll correction: " + std::to_string(glm::degrees(this->controlRates[0])));
+//        Log::info("Pitch correction: " + std::to_string(glm::degrees(this->controlRates[1])));
 
         this->controlRates[0] = clip(this->controlRates[0], -this->maxRollRate, this->maxRollRate);
         this->controlRates[1] = clip(this->controlRates[1], -this->maxPitchRate, this->maxPitchRate);
-
     }
-
-    if (glm::length2(this->controlRates) < 0.001f) return;
 
     // Apply correction to motors
     auto rotationSpeeds = this->controlRates2MotorRotationSpeeds * this->controlRates;
+
+    // Cap motor speeds
     for (auto i = 0u; i < this->motors.size(); ++i) {
+        switch (i) {
+            case 0:
+            case 3:
+                if (rotationSpeeds[i] < 0.0f) rotationSpeeds[i] = 0.0f;
+                break;
+
+            case 1:
+            case 2:
+                rotationSpeeds[i] *= (rotationSpeeds[i] > 0.0f ? 0.0f : -1.0f);
+                break;
+
+            default:
+                break;
+            }
+
         motors[i].setRotationSpeed(rotationSpeeds[i]);
     }
 
@@ -200,12 +224,20 @@ void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
     this->applyForce(backLeftForce, {-halfDimensions.x, halfDimensions.y, halfDimensions.z});
 
     // Apply motor moments
-    auto moment = glm::length(glm::vec3{halfDimensions.x, halfDimensions.y, 0.0f}) *
+    auto armLength = glm::length(glm::vec3{halfDimensions.x, halfDimensions.y, 0.0f});
+
+    for (auto i = 0u; i < this->motors.size(); ++i) {
+        auto moment = armLength * this->motors[i].getThrust();
+        this->applyTorque(orientation * glm::rotateZ(glm::vec3(moment, 0.0f, 0.0f),
+                                                     glm::radians(-45.0f - 90.0f * i)));
+    }
+
+    auto yawMoment = armLength *
             (-this->motors[0].getThrust() +
               this->motors[1].getThrust() -
               this->motors[2].getThrust() +
               this->motors[3].getThrust());
-    this->applyTorque(orientation * glm::vec3(0.0f, 0.0f, moment));
+    this->applyTorque(orientation * glm::vec3(0.0f, 0.0f, yawMoment));
 }
 
 void Quadcopter::onRollThrustInput(const glm::vec2 &input) {
@@ -242,8 +274,14 @@ void Quadcopter::onYawPitchInput(const glm::vec2 &input) {
     this->controlRates[2] = -input.x * this->maxYawRate;
 }
 
-Quadcopter::Motor::Motor(float rotationSpeed2Thrust) : rotationSpeed2Thrust(rotationSpeed2Thrust) {}
+Quadcopter::Motor::Motor(int id, float rotationSpeed2Thrust) : id(id), rotationSpeed2Thrust(rotationSpeed2Thrust) {}
 void Quadcopter::Motor::setRotationSpeed(float rotationSpeed) {this->rotationSpeed = rotationSpeed;}
-float Quadcopter::Motor::getThrust() const {return this->rotationSpeed * this->rotationSpeed * this->rotationSpeed2Thrust;}
+float Quadcopter::Motor::getThrust() const {
+//    Log::info("Motor: " + std::to_string(id));
+//    Log::info("Rpm: " + std::to_string(this->rotationSpeed * 30.0f / 3.14f));
+//    Log::info("Thrust: " + std::to_string(this->rotationSpeed * this->rotationSpeed2Thrust) + "\n");
+    return this->rotationSpeed * this->rotationSpeed2Thrust;
+}
+
 
 } // namespace age

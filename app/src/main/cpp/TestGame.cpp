@@ -78,7 +78,7 @@ void TestGame::loadWorld() {
         floor->setSpecularExponent(32.0f);
         this->addToWorldList(floor);
     }
-    
+
     {
         using namespace std::placeholders;
 
@@ -87,21 +87,21 @@ void TestGame::loadWorld() {
         params.mass = 1.0f;
         params.maxRoll = glm::radians(45.0f);
         params.maxPitch = glm::radians(45.0f);
-        params.maxRollRate = glm::radians(90.0f);
-        params.maxPitchRate = glm::radians(90.0f);
+        params.maxRollRate = glm::radians(135.0f);
+        params.maxPitchRate = glm::radians(135.0f);
         params.maxYawRate = glm::radians(45.0f);
-        params.maxThrust = 8.0f;
-        params.controlRates2MotorRotationSpeed = 500.0f;
-        params.angle_kp = 0.15f;
+        params.maxThrust = 15.0f;
+        params.controlRates2MotorRotationSpeed = 150.0f;
+        params.angle_kp = 3.0f;
         params.angle_ki = 0.0f;
-        params.angle_kd = 0.03f;
-        params.motorRotationSpeed2Thrust = 6.0e-7;
-
+        params.angle_kd = 0.5f;
+        params.motorRotationSpeed2Thrust = 2.0E-3f;
 
         this->uav = std::make_shared<Quadcopter>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds", params);
         this->uav->setLabel("UAV");
         this->uav->setScale({0.363f, 0.363f, 0.053f});
         this->uav->setPosition({0.0f, 0.0f, 3.0f});
+        this->uav->setMode(Quadcopter::Mode::ANGLE);
 
         // Connect UAV to joystick controls
 //        this->getCam()->setChaseObject(uav.get(), {-5.0f, 0.0f, 1.0f});
@@ -128,7 +128,7 @@ void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 
                                    const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
     gameObject->applyCentralForce(touchDirection * 400.0f);
     this->uav->setOrientation(glm::mat3(1.0f));
-    this->uav->setPosition({0.0f, 0.0f, 1.0f});
+    this->uav->setPosition({0.0f, 0.0f, 0.5f});
 }
 
 } // namespace age

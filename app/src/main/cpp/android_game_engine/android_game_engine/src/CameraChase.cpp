@@ -19,6 +19,7 @@ void CameraChase::onUpdate(std::chrono::duration<float> updateDuration) {
     
     this->setLookAtPoint(objPosition);
     this->setNormalDirection(this->chaseObject->getNormalDirection());
+//    this->setNormalDirection({0.0f, 0.0f, 1.0f});
 }
 
 void CameraChase::setChaseObject(age::GameObject *object, const glm::vec3 &relativeOffset) {

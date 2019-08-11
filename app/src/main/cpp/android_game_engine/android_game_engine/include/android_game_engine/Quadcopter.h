@@ -47,12 +47,13 @@ public:
 private:
     class Motor {
     public:
-        Motor(float rotationSpeed2Thrust);
+        Motor(int id, float rotationSpeed2Thrust);
 
         void setRotationSpeed(float rotationSpeed);
         float getThrust() const;
 
     private:
+        int id;
         float rotationSpeed = 0.0f;
         float rotationSpeed2Thrust;
     };
