@@ -42,6 +42,8 @@ public:
     
     void setLinearVelocity(const glm::vec3 &velocity);
     void setAngularVelocity(const glm::vec3 &velocity);
+
+    void setFriction(float friction);
     
 private:
     std::unique_ptr<PhysicsMotionState> motionState;

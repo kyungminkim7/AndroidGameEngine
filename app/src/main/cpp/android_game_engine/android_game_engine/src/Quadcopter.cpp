@@ -173,6 +173,11 @@ void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
         auto x_ref = glm::cross(y_ref, z_ref);
         glm::mat3 R_world_ref(x_ref, y_ref, z_ref);
 
+//        auto yaw = glm::eulerAngles(glm::toQuat(this->getOrientation()))[2];
+//        auto R_world_ref = static_cast<glm::mat3>(glm::rotate(glm::mat4(1.0f),
+//                                                              yaw,
+//                                                              glm::vec3(0.0f, 0.0f, 1.0f)));
+
         auto R_ref_body = glm::transpose(R_world_ref) * this->getOrientation();
         auto rpy = glm::eulerAngles(glm::toQuat(R_ref_body));
 

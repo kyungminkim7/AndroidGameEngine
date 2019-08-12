@@ -76,6 +76,7 @@ void TestGame::loadWorld() {
         floor->setScale(glm::vec3{scale, scale, 0.2f});
         floor->setPosition(glm::vec3(0.0f));
         floor->setSpecularExponent(32.0f);
+        floor->setFriction(1.0f);
         this->addToWorldList(floor);
     }
 
@@ -85,16 +86,16 @@ void TestGame::loadWorld() {
         // Create UAV
         Quadcopter::Parameters params;
         params.mass = 1.0f;
-        params.maxRoll = glm::radians(45.0f);
-        params.maxPitch = glm::radians(45.0f);
-        params.maxRollRate = glm::radians(135.0f);
-        params.maxPitchRate = glm::radians(135.0f);
+        params.maxRoll = glm::radians(35.0f);
+        params.maxPitch = glm::radians(35.0f);
+        params.maxRollRate = glm::radians(360.0f);
+        params.maxPitchRate = glm::radians(360.0f);
         params.maxYawRate = glm::radians(45.0f);
         params.maxThrust = 15.0f;
         params.controlRates2MotorRotationSpeed = 150.0f;
-        params.angle_kp = 3.0f;
+        params.angle_kp = 2.5f;
         params.angle_ki = 0.0f;
-        params.angle_kd = 0.5f;
+        params.angle_kd = 0.8f;
         params.motorRotationSpeed2Thrust = 2.0E-3f;
 
         this->uav = std::make_shared<Quadcopter>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds", params);

@@ -102,4 +102,8 @@ void PhysicsRigidBody::setAngularVelocity(const glm::vec3 &velocity) {
     }
 }
 
+void PhysicsRigidBody::setFriction(float friction) {
+    this->body->setFriction(friction);
+}
+
 } // namespace age

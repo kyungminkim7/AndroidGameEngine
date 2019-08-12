@@ -138,6 +138,7 @@ public:
     PhysicsRigidBody* getPhysicsBody();
     
     void setMass(float mass);
+    void setFriction(float friction);
     
     void applyCentralForce(const glm::vec3 &force);
     void applyTorque(const glm::vec3 &torque);

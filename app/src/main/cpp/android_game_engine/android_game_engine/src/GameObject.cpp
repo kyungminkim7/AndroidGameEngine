@@ -140,6 +140,10 @@ void GameObject::setMass(float mass) {
     }
 }
 
+void GameObject::setFriction(float friction) {
+    this->physicsBody->setFriction(friction);
+}
+
 void GameObject::setCollisionShape(std::unique_ptr<btCollisionShape> collisionShape) {
     this->physicsBody = std::make_unique<PhysicsRigidBody>(this, std::move(collisionShape));
 }
