@@ -223,10 +223,10 @@ void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
     auto backRightForce = orientation * glm::vec3(0.0f, 0.0f, this->motors[2].getThrust());
     auto backLeftForce = orientation * glm::vec3(0.0f, 0.0f, this->motors[3].getThrust());
 
-    this->applyForce(frontLeftForce, {halfDimensions.x, halfDimensions.y, halfDimensions.z});
-    this->applyForce(frontRightForce, {halfDimensions.x, -halfDimensions.y, halfDimensions.z});
-    this->applyForce(backRightForce, {-halfDimensions.x, -halfDimensions.y, halfDimensions.z});
-    this->applyForce(backLeftForce, {-halfDimensions.x, halfDimensions.y, halfDimensions.z});
+    this->applyForce(frontLeftForce, orientation * glm::vec3(halfDimensions.x, halfDimensions.y, halfDimensions.z));
+    this->applyForce(frontRightForce, orientation * glm::vec3(halfDimensions.x, -halfDimensions.y, halfDimensions.z));
+    this->applyForce(backRightForce, orientation * glm::vec3(-halfDimensions.x, -halfDimensions.y, halfDimensions.z));
+    this->applyForce(backLeftForce, orientation * glm::vec3(-halfDimensions.x, halfDimensions.y, halfDimensions.z));
 
     // Apply motor moments
     auto armLength = glm::length(glm::vec3{halfDimensions.x, halfDimensions.y, 0.0f});
