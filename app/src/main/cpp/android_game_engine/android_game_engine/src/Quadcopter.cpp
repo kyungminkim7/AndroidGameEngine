@@ -137,6 +137,7 @@ Quadcopter::Quadcopter(const std::string &modelFilepath, const Parameters &param
     maxThrust(params.maxThrust),
     rollController(params.angle_kp, params.angle_ki, params.angle_kd),
     pitchController(params.angle_kp, params.angle_ki, params.angle_kd),
+    yawRateController(params.angleRate_kp, params.angleRate_ki, params.angleRate_kd),
     motors{Motor(0, params.motorRotationSpeed2Thrust),
            Motor(1, params.motorRotationSpeed2Thrust),
            Motor(2, params.motorRotationSpeed2Thrust),
@@ -190,6 +191,11 @@ void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
         this->controlRates[0] = clip(this->controlRates[0], -this->maxRollRate, this->maxRollRate);
         this->controlRates[1] = clip(this->controlRates[1], -this->maxPitchRate, this->maxPitchRate);
     }
+
+    // Calculate yaw correction to reach target yaw rate
+    auto yawRate = this->getAngularVelocity().z;
+    this->controlRates[2] = this->yawRateController.computeCorrection(yawRate, this->targetYawRate, updateDuration);
+    this->controlRates[2] = clip(this->controlRates[2], -this->maxYawRate, this->maxYawRate);
 
     // Apply correction to motors
     auto rotationSpeeds = this->controlRates2MotorRotationSpeeds * this->controlRates;
@@ -276,7 +282,7 @@ void Quadcopter::onYawPitchInput(const glm::vec2 &input) {
             break;
     }
 
-    this->controlRates[2] = -input.x * this->maxYawRate;
+    this->targetYawRate = -input.x * this->maxYawRate;
 }
 
 Quadcopter::Motor::Motor(int id, float rotationSpeed2Thrust) : id(id), rotationSpeed2Thrust(rotationSpeed2Thrust) {}

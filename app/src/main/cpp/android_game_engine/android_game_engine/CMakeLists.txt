@@ -6,6 +6,13 @@ add_library(native_app_glue STATIC
 
 target_link_libraries(native_app_glue PUBLIC log)
 
+add_library(arcore SHARED IMPORTED)
+
+set_target_properties(arcore PROPERTIES IMPORTED_LOCATION
+        ${ARCORE_LIBPATH}/${ANDROID_ABI}/libarcore_sdk_c.so
+        INTERFACE_INCLUDE_DIRECTORIES ${ARCORE_INCLUDE}
+)
+
 add_library(${PROJECT_NAME} STATIC
         src/Asset.cpp
         src/Box.cpp
@@ -59,6 +66,7 @@ target_link_libraries(${PROJECT_NAME}
         lib3ds
         log
         native_app_glue
+        arcore
     PRIVATE
         stb)
 

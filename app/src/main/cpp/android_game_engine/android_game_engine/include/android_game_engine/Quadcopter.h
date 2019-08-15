@@ -31,6 +31,11 @@ public:
         float angle_ki;
         float angle_kd;
 
+        // Angle rate PID
+        float angleRate_kp;
+        float angleRate_ki;
+        float angleRate_kd;
+
         // Motor attributes
         float motorRotationSpeed2Thrust;
     };
@@ -69,12 +74,14 @@ private:
 
     float targetRoll = 0.0f;
     float targetPitch = 0.0f;
+    float targetYawRate = 0.0f;
 
     glm::vec4 controlRates = glm::vec4(0.0f); ///< rpy rates, thrust
     glm::mat4 controlRates2MotorRotationSpeeds;
 
     PID rollController;
     PID pitchController;
+    PID yawRateController;
 
     std::array<Motor, 4> motors; ///< Motor order: front left, front right, back right, back left
 };

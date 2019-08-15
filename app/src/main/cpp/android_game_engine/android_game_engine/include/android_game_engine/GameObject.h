@@ -139,11 +139,15 @@ public:
     
     void setMass(float mass);
     void setFriction(float friction);
+    void setDamping(float linearDamping, float angularDamping);
     
     void applyCentralForce(const glm::vec3 &force);
     void applyTorque(const glm::vec3 &torque);
     void applyForce(const glm::vec3 &force, const glm::vec3 &relPos);
     void clearForces();
+
+    glm::vec3 getLinearVelocity() const;
+    glm::vec3 getAngularVelocity() const;
 
 protected:
     void setCollisionShape(std::unique_ptr<btCollisionShape> collisionShape);
@@ -177,5 +181,7 @@ inline void GameObject::applyCentralForce(const glm::vec3 &force) {this->physics
 inline void GameObject::applyTorque(const glm::vec3 &torque) {this->physicsBody->applyTorque(torque);}
 inline void GameObject::applyForce(const glm::vec3 &force, const glm::vec3 &relPos) {this->physicsBody->applyForce(force, relPos);}
 inline void GameObject::clearForces() {this->physicsBody->clearForces();}
+inline glm::vec3 GameObject::getLinearVelocity() const {return this->physicsBody->getLinearVelocity();}
+inline glm::vec3 GameObject::getAngularVelocity() const {return this->physicsBody->getAngularVelocity();}
 
 } // namespace age

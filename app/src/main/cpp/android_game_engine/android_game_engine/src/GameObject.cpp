@@ -126,6 +126,10 @@ void GameObject::setScale(const glm::vec3& scale) {
     }
 }
 
+void GameObject::setDamping(float linearDamping, float angularDamping) {
+    this->physicsBody->setDamping(linearDamping, angularDamping);
+}
+
 void GameObject::setSpecularExponent(float specularExponent) {
     this->specularExponent = specularExponent;
 }

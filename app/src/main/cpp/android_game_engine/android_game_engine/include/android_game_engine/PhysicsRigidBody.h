@@ -43,6 +43,9 @@ public:
     void setLinearVelocity(const glm::vec3 &velocity);
     void setAngularVelocity(const glm::vec3 &velocity);
 
+    glm::vec3 getLinearVelocity() const;
+    glm::vec3 getAngularVelocity() const;
+
     void setFriction(float friction);
     
 private:
@@ -52,5 +55,15 @@ private:
 };
 
 inline bool PhysicsRigidBody::isActive() const {return this->body->isActive();}
+
+inline glm::vec3 PhysicsRigidBody::getLinearVelocity() const {
+    auto velocity = this->body->getLinearVelocity();
+    return {velocity.x(), velocity.y(), velocity.z()};
+}
+
+inline glm::vec3 PhysicsRigidBody::getAngularVelocity() const {
+    auto velocity = this->body->getAngularVelocity();
+    return {velocity.x(), velocity.y(), velocity.z()};
+}
 
 } // namespace age
