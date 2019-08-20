@@ -1,5 +1,14 @@
 apply plugin: 'com.android.application'
 
+/*
+The ARCore aar library contains the native shared libraries. These are
+extracted before building to a temporary directory.
+*/
+def arcore_libpath = "${buildDir}/arcore-native"
+
+// Create a configuration to mark which aars to extract .so files from
+configurations { natives }
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -12,6 +21,9 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++14"
+                arguments "-DANDROID_STL=c++_static",
+                        "-DARCORE_LIBPATH=${arcore_libpath}/jni",
+                        "-DARCORE_INCLUDE=${project.rootDir}/app/src/main/cpp/android_game_engine/arcore/include"
             }
         }
     }
@@ -35,4 +47,32 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    implementation 'com.google.ar:core:1.11.0'
+    natives 'com.google.ar:core:1.11.0'
+
+    implementation 'com.android.support:support-v4:28.0.0'
+}
+
+// Extracts the shared libraries from aars in the natives configuration.
+// This is done so that NDK builds can access these libraries.
+task extractNativeLibraries() {
+    // Extract every time.
+    outputs.upToDateWhen { false }
+
+    doFirst {
+        configurations.natives.files.each { f ->
+            copy {
+                from zipTree(f)
+                into arcore_libpath
+                include "jni/**/*"
+            }
+        }
+    }
+}
+
+tasks.whenTaskAdded {
+    task-> if (task.name.contains("external") && !task.name.contains("Clean")) {
+        task.dependsOn(extractNativeLibraries)
+    }
 }

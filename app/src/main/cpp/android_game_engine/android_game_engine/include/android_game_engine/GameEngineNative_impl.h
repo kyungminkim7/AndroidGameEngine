@@ -8,7 +8,7 @@
 #include "TouchEvent.h"
 
 namespace age {
-namespace GameEngine {
+namespace GameEngineNative {
 
 enum class State {RUNNING, PAUSED, QUIT};
 
@@ -178,5 +178,5 @@ std::vector<TouchEvent> getActivePointerEvent(AInputEvent *event) {
     return touchEvents;
 }
 
-} // namespace GameEngine
+} // namespace GameEngineNative
 } // namespace age

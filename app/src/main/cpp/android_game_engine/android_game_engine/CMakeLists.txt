@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 project(android_game_engine)
 
-add_library(native_app_glue STATIC
-        ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
-
-target_link_libraries(native_app_glue PUBLIC log)
+# Used for creating fully native C++ apps
+#add_library(native_app_glue STATIC
+#        ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+#
+#target_link_libraries(native_app_glue PUBLIC log)
 
 add_library(arcore SHARED IMPORTED)
 
@@ -65,7 +66,7 @@ target_link_libraries(${PROJECT_NAME}
         glm
         lib3ds
         log
-        native_app_glue
+#        native_app_glue
         arcore
     PRIVATE
         stb)

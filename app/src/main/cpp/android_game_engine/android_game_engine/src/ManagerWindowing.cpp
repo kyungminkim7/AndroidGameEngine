@@ -90,6 +90,11 @@ void init(ANativeWindow *window) {
     }
 }
 
+void init(int width, int height) {
+    windowWidth = width;
+    windowHeight = height;
+}
+
 void shutdown() {
     if (display != EGL_NO_DISPLAY) {
         eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -110,6 +115,11 @@ void shutdown() {
     
     windowWidth = 0;
     windowHeight = 0;
+}
+
+void setWindowDimensions(int width, int height) {
+    windowWidth = width;
+    windowHeight = height;
 }
 
 void swapBuffers() { eglSwapBuffers(display, surface); }

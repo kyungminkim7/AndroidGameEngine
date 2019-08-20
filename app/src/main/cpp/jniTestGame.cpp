@@ -1,4 +1,4 @@
-#include "TestGame.h"
+#include "jniTestGame.h"
 
 #include <array>
 #include <functional>
@@ -13,48 +13,12 @@
 
 namespace age {
 
-void TestGame::init() {
+void JNITestGame::init() {
     Game::init();
     this->enablePhysicsDebugDrawer(true);
-    
-    this->setupGui();
 }
 
-void TestGame::setupGui() {
-    using namespace std::placeholders;
-    
-    // Set up joysticks
-    const glm::vec2 positionOffset(150.0f, 450.0f);
-    const glm::vec2 dimensions(300.0f, 300.0f);
-    const glm::vec4 joystickColor(0.0f, 0.6f, 0.7f, 0.8f);
-    const glm::vec4 joystickHandleColor(0.0f, 0.7f, 0.9f, 0.8f);
-    
-    this->moveJoystick = Joystick::New(this->getGui());
-    this->moveJoystick->setGeometry(positionOffset, dimensions);
-    this->moveJoystick->setColor(joystickColor);
-    this->moveJoystick->setHandleColor(joystickHandleColor);
-
-    this->rotateJoystick = Joystick::New(this->getGui());
-    this->rotateJoystick->setGeometry({ManagerWindowing::getWindowWidth() - positionOffset.x - dimensions.x,
-                                       positionOffset.y},
-                                      dimensions);
-    this->rotateJoystick->setColor(joystickColor);
-    this->rotateJoystick->setHandleColor(joystickHandleColor);
-
-//    auto moveCam = std::bind(&CameraFPV::onMove, this->getCam(), _1);
-//    this->moveJoystick->registerOnTouchDownCallback(moveCam);
-//    this->moveJoystick->registerOnTouchMoveCallback(moveCam);
-//    this->moveJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onMove, this->getCam(),
-//                                                            glm::vec2(0.0f)));
-//
-//    auto rotateCam = std::bind(&CameraFPV::onRotate, this->getCam(), _1);
-//    this->rotateJoystick->registerOnTouchDownCallback(rotateCam);
-//    this->rotateJoystick->registerOnTouchMoveCallback(rotateCam);
-//    this->rotateJoystick->registerOnTouchUpCallback(std::bind(&CameraFPV::onRotate, this->getCam(),
-//                                                              glm::vec2(0.0f)));
-}
-
-void TestGame::loadWorld() {
+void JNITestGame::loadWorld() {
     this->getCam()->setPosition({-10.0f, 5.0f, 7.0f});
     this->getCam()->setLookAtPoint({2.0f, 0.0f, 1.0f});
 
@@ -116,26 +80,26 @@ void TestGame::loadWorld() {
 
         // Connect UAV to joystick controls
 //        this->getCam()->setChaseObject(uav.get(), {-5.0f, 0.0f, 1.0f});
-
-        auto leftThrottle = std::bind(&Quadcopter::onRollThrustInput, this->uav.get(), _1);
-        this->moveJoystick->registerOnTouchDownCallback(leftThrottle);
-        this->moveJoystick->registerOnTouchMoveCallback(leftThrottle);
-        this->moveJoystick->registerOnTouchUpCallback(std::bind(&Quadcopter::onRollThrustInput, this->uav.get(), glm::vec2(0.0f)));
-
-        auto rightThrottle = std::bind(&Quadcopter::onYawPitchInput, this->uav.get(), _1);
-        this->rotateJoystick->registerOnTouchDownCallback(rightThrottle);
-        this->rotateJoystick->registerOnTouchMoveCallback(rightThrottle);
-        this->rotateJoystick->registerOnTouchUpCallback(std::bind(&Quadcopter::onYawPitchInput, this->uav.get(), glm::vec2(0.0f)));
+//
+//        auto leftThrottle = std::bind(&Quadcopter::onRollThrustInput, this->uav.get(), _1);
+//        this->moveJoystick->registerOnTouchDownCallback(leftThrottle);
+//        this->moveJoystick->registerOnTouchMoveCallback(leftThrottle);
+//        this->moveJoystick->registerOnTouchUpCallback(std::bind(&Quadcopter::onRollThrustInput, this->uav.get(), glm::vec2(0.0f)));
+//
+//        auto rightThrottle = std::bind(&Quadcopter::onYawPitchInput, this->uav.get(), _1);
+//        this->rotateJoystick->registerOnTouchDownCallback(rightThrottle);
+//        this->rotateJoystick->registerOnTouchMoveCallback(rightThrottle);
+//        this->rotateJoystick->registerOnTouchUpCallback(std::bind(&Quadcopter::onYawPitchInput, this->uav.get(), glm::vec2(0.0f)));
 
         this->addToWorldList(this->uav);
     }
 }
 
-void TestGame::onUpdate(std::chrono::duration<float> updateDuration) {
+void JNITestGame::onUpdate(std::chrono::duration<float> updateDuration) {
     Game::onUpdate(updateDuration);
 }
 
-void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
+void JNITestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
                                    const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
     gameObject->applyCentralForce(touchDirection * 400.0f);
     this->uav->setOrientation(glm::mat3(1.0f));

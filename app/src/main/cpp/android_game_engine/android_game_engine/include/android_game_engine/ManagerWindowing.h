@@ -17,6 +17,7 @@ namespace age {
 namespace ManagerWindowing {
 
 void init(ANativeWindow *window);
+void init(int width, int height);
 void shutdown();
 
 void swapBuffers();
@@ -33,6 +34,8 @@ void setEglAttribs(const std::vector<EGLint> &attribs);
 /// \param attribs
 ///
 void setContextAttribs(const std::vector<EGLint> &attribs);
+
+void setWindowDimensions(int width, int height);
 
 int getWindowWidth();
 int getWindowHeight();
