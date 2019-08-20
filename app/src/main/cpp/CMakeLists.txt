@@ -18,7 +18,6 @@ set(CMAKE_CXX_STANDARD 14)
 #        nativeTestGame.h)
 
 add_library(game SHARED
-        jniMain.cpp
         jniTestGame.cpp
         jniTestGame.h)
 

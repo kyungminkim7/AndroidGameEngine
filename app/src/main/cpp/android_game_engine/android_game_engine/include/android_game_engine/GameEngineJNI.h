@@ -29,9 +29,9 @@ namespace GameEngineJNI {
 ///
 void init(JNIEnv *env, int windowWidth, int windowHeight, jobject j_asset_manager);
 void loadGame(std::unique_ptr<Game> game);
+Game* getGame();
 
 extern "C" {
-
 JNI_METHOD_DECLARATION(void, setWindowSize)(JNIEnv *, jclass, int width, int height);
 JNI_METHOD_DECLARATION(void, update)(JNIEnv *, jclass);
 JNI_METHOD_DECLARATION(void, render)(JNIEnv *, jclass);
@@ -40,7 +40,6 @@ JNI_METHOD_DECLARATION(void, shutdown)(JNIEnv *, jclass);
 JNI_METHOD_DECLARATION(void, onTouchDownEvent)(JNIEnv *, jclass, float x, float y);
 JNI_METHOD_DECLARATION(void, onTouchMoveEvent)(JNIEnv *, jclass, float x, float y);
 JNI_METHOD_DECLARATION(void, onTouchUpEvent)(JNIEnv *, jclass, float x, float y);
-
 }
 
 } // namespace GameEngineJNI

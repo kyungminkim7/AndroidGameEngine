@@ -3,7 +3,6 @@
 #include "Log.h"
 #include "ManagerAssets.h"
 #include "ManagerWindowing.h"
-#include "TouchEvent.h"
 
 namespace age {
 namespace GameEngineJNI {
@@ -22,6 +21,10 @@ void loadGame(std::unique_ptr<Game> g) {
     game = std::move(g);
     game->init();
     game->loadWorld();
+}
+
+Game* getGame() {
+    return game.get();
 }
 
 JNI_METHOD_DEFINITION(void, setWindowSize)(JNIEnv *, jclass, int width, int height) {

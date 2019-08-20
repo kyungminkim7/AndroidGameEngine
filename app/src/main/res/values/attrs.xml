@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Joystick">
+        <attr name="baseColor" format="integer"/>
+        <attr name="handleColor" format="integer"/>
+
+        <attr name="handleSizeRatio" format="float"/>
+    </declare-styleable>
+</resources>

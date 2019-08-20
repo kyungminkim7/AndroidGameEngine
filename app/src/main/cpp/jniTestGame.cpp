@@ -2,6 +2,7 @@
 
 #include <array>
 #include <functional>
+#include <memory>
 
 #include <glm/trigonometric.hpp>
 
@@ -12,6 +13,20 @@
 #include <android_game_engine/Window.h>
 
 namespace age {
+
+JNI_METHOD_DEFINITION(void, init)
+    (JNIEnv *env, jclass, int windowWidth, int windowHeight, jobject j_asset_manager) {
+    GameEngineJNI::init(env, windowWidth, windowHeight, j_asset_manager);
+    GameEngineJNI::loadGame(std::make_unique<JNITestGame>());
+}
+
+JNI_METHOD_DEFINITION(void, onRollThrustInput)(JNIEnv *env, jclass, float roll, float thrust) {
+    dynamic_cast<JNITestGame*>(GameEngineJNI::getGame())->onRollThrustInput(roll, thrust);
+}
+
+JNI_METHOD_DEFINITION(void, onYawPitchInput)(JNIEnv *env, jclass, float yaw, float pitch) {
+    dynamic_cast<JNITestGame*>(GameEngineJNI::getGame())->onYawPitchInput(yaw, pitch);
+}
 
 void JNITestGame::init() {
     Game::init();
@@ -80,23 +95,16 @@ void JNITestGame::loadWorld() {
 
         // Connect UAV to joystick controls
 //        this->getCam()->setChaseObject(uav.get(), {-5.0f, 0.0f, 1.0f});
-//
-//        auto leftThrottle = std::bind(&Quadcopter::onRollThrustInput, this->uav.get(), _1);
-//        this->moveJoystick->registerOnTouchDownCallback(leftThrottle);
-//        this->moveJoystick->registerOnTouchMoveCallback(leftThrottle);
-//        this->moveJoystick->registerOnTouchUpCallback(std::bind(&Quadcopter::onRollThrustInput, this->uav.get(), glm::vec2(0.0f)));
-//
-//        auto rightThrottle = std::bind(&Quadcopter::onYawPitchInput, this->uav.get(), _1);
-//        this->rotateJoystick->registerOnTouchDownCallback(rightThrottle);
-//        this->rotateJoystick->registerOnTouchMoveCallback(rightThrottle);
-//        this->rotateJoystick->registerOnTouchUpCallback(std::bind(&Quadcopter::onYawPitchInput, this->uav.get(), glm::vec2(0.0f)));
-
         this->addToWorldList(this->uav);
     }
 }
 
-void JNITestGame::onUpdate(std::chrono::duration<float> updateDuration) {
-    Game::onUpdate(updateDuration);
+void JNITestGame::onRollThrustInput(float roll, float thrust) {
+    this->uav->onRollThrustInput({roll, thrust});
+}
+
+void JNITestGame::onYawPitchInput(float yaw, float pitch) {
+    this->uav->onYawPitchInput({yaw, pitch});
 }
 
 void JNITestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,

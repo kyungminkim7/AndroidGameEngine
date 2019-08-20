@@ -18,4 +18,7 @@ public class GameJNI {
     public static native void onTouchDownEvent(float x, float y);
     public static native void onTouchMoveEvent(float x, float y);
     public static native void onTouchUpEvent(float x, float y);
+
+    public static native void onRollThrustInput(float roll, float thrust);
+    public static native void onYawPitchInput(float yaw, float pitch);
 }
