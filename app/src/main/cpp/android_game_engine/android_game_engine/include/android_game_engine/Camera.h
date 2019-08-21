@@ -93,7 +93,7 @@ public:
     /// set the new orientation.
     ///@{
     void setNormalDirection(const glm::vec3 &normalDirection);
-    ///@>
+    ///@}
     
     glm::vec3 getNormalDirection() const;
     

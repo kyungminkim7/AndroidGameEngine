@@ -1,4 +1,4 @@
-#include "jniTestGame.h"
+#include "TestGame.h"
 
 #include <array>
 #include <functional>
@@ -10,30 +10,26 @@
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
 #include <android_game_engine/Quadcopter.h>
-#include <android_game_engine/Window.h>
 
 namespace age {
 
-JNI_METHOD_DEFINITION(void, init)
+JNI_METHOD_DEFINITION(void, onSurfaceCreated)
     (JNIEnv *env, jclass, int windowWidth, int windowHeight, jobject j_asset_manager) {
     GameEngineJNI::init(env, windowWidth, windowHeight, j_asset_manager);
-    GameEngineJNI::loadGame(std::make_unique<JNITestGame>());
+    GameEngineJNI::onCreate(std::make_unique<TestGame>());
 }
 
 JNI_METHOD_DEFINITION(void, onRollThrustInput)(JNIEnv *env, jclass, float roll, float thrust) {
-    dynamic_cast<JNITestGame*>(GameEngineJNI::getGame())->onRollThrustInput(roll, thrust);
+    dynamic_cast<TestGame*>(GameEngineJNI::getGame())->onRollThrustInput(roll, thrust);
 }
 
 JNI_METHOD_DEFINITION(void, onYawPitchInput)(JNIEnv *env, jclass, float yaw, float pitch) {
-    dynamic_cast<JNITestGame*>(GameEngineJNI::getGame())->onYawPitchInput(yaw, pitch);
+    dynamic_cast<TestGame*>(GameEngineJNI::getGame())->onYawPitchInput(yaw, pitch);
 }
-
-void JNITestGame::init() {
-    Game::init();
+void TestGame::onCreate() {
+    Game::onCreate();
     this->enablePhysicsDebugDrawer(true);
-}
 
-void JNITestGame::loadWorld() {
     this->getCam()->setPosition({-10.0f, 5.0f, 7.0f});
     this->getCam()->setLookAtPoint({2.0f, 0.0f, 1.0f});
 
@@ -99,15 +95,15 @@ void JNITestGame::loadWorld() {
     }
 }
 
-void JNITestGame::onRollThrustInput(float roll, float thrust) {
+void TestGame::onRollThrustInput(float roll, float thrust) {
     this->uav->onRollThrustInput({roll, thrust});
 }
 
-void JNITestGame::onYawPitchInput(float yaw, float pitch) {
+void TestGame::onYawPitchInput(float yaw, float pitch) {
     this->uav->onYawPitchInput({yaw, pitch});
 }
 
-void JNITestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
+void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
                                    const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
     gameObject->applyCentralForce(touchDirection * 400.0f);
     this->uav->setOrientation(glm::mat3(1.0f));

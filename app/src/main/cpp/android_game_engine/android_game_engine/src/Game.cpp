@@ -4,16 +4,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <android_game_engine/ManagerWindowing.h>
-#include <android_game_engine/Window.h>
 
 namespace age {
 
 Game::Game() : shadowMapShader("shaders/ShadowMap.vert", "shaders/ShadowMap.frag"),
                defaultShader("shaders/Default.vert", "shaders/Default.frag"),
                skyboxShader("shaders/Skybox.vert", "shaders/Skybox.frag"),
-#ifdef NATIVE_GUI
-               widgetShader("shaders/Widget.vert", "shaders/Widget.frag"),
-#endif
                physicsDebugShader("shaders/PhysicsDebug.vert", "shaders/PhysicsDebug.frag"),
                physics(new PhysicsEngine(&this->physicsDebugShader)),
                drawDebugPhysics(false) {
@@ -21,36 +17,21 @@ Game::Game() : shadowMapShader("shaders/ShadowMap.vert", "shaders/ShadowMap.frag
     this->shadowMapTextureUnit -= 1;
 }
 
-void Game::init() {
+void Game::onCreate() {
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);
-    
-    glViewport(0, 0, ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight());
 
-#ifdef NATIVE_GUI
-    // Setup gui
-    auto widgetProjection = glm::ortho(0.0f, static_cast<float>(ManagerWindowing::getWindowWidth()),
-                                       0.0f, static_cast<float>(ManagerWindowing::getWindowHeight()));
-    
-    this->widgetShader.use();
-    this->widgetShader.setUniform("projection", widgetProjection);
-
-    this->gui = Window::New();
-    this->gui->setGeometry({0.0f, 0.0f},
-                           {ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight()});
-    this->gui->registerOnTouchDownCallback(std::bind(&Game::raycastTouch, this,
-                                           std::placeholders::_1, 1000.0f));
-#endif
-    
     // Setup cam
     this->cam = std::make_unique<CameraType>(45.0f,
                                              static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
                                              0.1f, 500.0f);
-    
+
     // Setup light and shadows
     const auto lightLimit = 50.0f;
     this->directionalLight = std::make_unique<LightDirectional>(glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.8f),
-            -lightLimit, lightLimit, -lightLimit, lightLimit, 10.0f, 200.0f);
+                                                                -lightLimit, lightLimit, -lightLimit, lightLimit, 10.0f, 200.0f);
     this->directionalLight->setPosition({25.0f, 10.0f, 25.0f});
     this->directionalLight->setLookAtPoint({-5.0f, -5.0f, 0.0f});
 
@@ -58,9 +39,15 @@ void Game::init() {
     this->shadowMap = std::make_unique<ShadowMap>(shadowMapDimension, shadowMapDimension);
 }
 
-void Game::loadWorld() {}
+void Game::onStart() {}
+void Game::onResume() {}
+void Game::onPause() {}
+void Game::onStop() {}
+void Game::onDestroy() {}
 
-void Game::onWindowSizeChanged(int width, int height) {}
+void Game::onWindowSizeChanged(int width, int height) {
+    this->cam->setAspectRatioWidthToHeight(static_cast<float>(width) / height);
+}
 
 void Game::onUpdate(std::chrono::duration<float> updateDuration) {
     this->cam->onUpdate(updateDuration);
@@ -80,8 +67,6 @@ void Game::render() {
     glViewport(0, 0, this->shadowMap->getWidth(), this->shadowMap->getHeight());
     this->shadowMap->bindFramebuffer();
 
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
     glCullFace(GL_FRONT);
     glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -139,15 +124,6 @@ void Game::render() {
         this->skybox->render(&this->defaultShader);
         glDepthFunc(GL_LESS);
     }
-
-#ifdef NATIVE_GUI
-    // Render GUI widgets
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    
-    this->widgetShader.use();
-    this->gui->render(&this->widgetShader);
-#endif
 }
 
 bool Game::onTouchDownEvent(float x, float y) {
@@ -157,23 +133,6 @@ bool Game::onTouchDownEvent(float x, float y) {
 
 bool Game::onTouchMoveEvent(float x, float y) {return true;}
 bool Game::onTouchUpEvent(float x, float y) {return true;}
-
-#ifdef NATIVE_GUI
-bool Game::onTouchDownEvent(const std::vector<TouchEvent> &events) {
-    this->gui->onTouchDownEvent(events);
-    return true;
-}
-
-bool Game::onTouchMoveEvent(const std::vector<TouchEvent> &events) {
-    this->gui->onTouchMoveEvent(events);
-    return true;
-}
-
-bool Game::onTouchUpEvent(const std::vector<TouchEvent> &events) {
-    this->gui->onTouchUpEvent(events);
-    return true;
-}
-#endif
 
 void Game::enablePhysicsDebugDrawer(bool enable) {
     this->drawDebugPhysics = enable;

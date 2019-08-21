@@ -1,12 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 project(android_game_engine)
 
-# Used for creating fully native C++ apps
-#add_library(native_app_glue STATIC
-#        ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
-#
-#target_link_libraries(native_app_glue PUBLIC log)
-
 add_library(arcore SHARED IMPORTED)
 
 set_target_properties(arcore PROPERTIES IMPORTED_LOCATION
@@ -22,9 +16,6 @@ add_library(${PROJECT_NAME} STATIC
         src/CameraFPV.cpp
         src/Game.cpp
         src/GameObject.cpp
-        src/Window.cpp
-        src/Joystick.cpp
-        src/JoystickHandle.cpp
         src/Light.cpp
         src/LightDirectional.cpp
         src/Log.cpp
@@ -47,13 +38,11 @@ add_library(${PROJECT_NAME} STATIC
         src/Skybox.cpp
         src/Texture2D.cpp
         src/Utilities.cpp
-        src/VertexArray.cpp
-        src/Widget.cpp)
+        src/VertexArray.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        ${ANDROID_NDK}/sources/android/native_app_glue)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
@@ -66,7 +55,6 @@ target_link_libraries(${PROJECT_NAME}
         glm
         lib3ds
         log
-#        native_app_glue
         arcore
     PRIVATE
         stb)

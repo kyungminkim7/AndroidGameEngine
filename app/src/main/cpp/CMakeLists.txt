@@ -12,14 +12,9 @@ set(CMAKE_SHARED_LINKER_FLAGS
 
 set(CMAKE_CXX_STANDARD 14)
 
-#add_library(game SHARED
-#        nativeMain.cpp
-#        nativeTestGame.cpp
-#        nativeTestGame.h)
-
 add_library(game SHARED
-        jniTestGame.cpp
-        jniTestGame.h)
+        TestGame.cpp
+        TestGame.h)
 
 target_include_directories(game INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

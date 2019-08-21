@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -54,14 +55,51 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        GameJNI.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GameJNI.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        GameJNI.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        GameJNI.onStop();
+    }
+
+    @Override
     protected void onDestroy() {
-        GameJNI.shutdown();
+        GameJNI.onDestroy();
         super.onDestroy();
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
+        if (!CameraPermissionHelper.hasCameraPermission(this)) {
+            Toast.makeText(this, "Camera permission is needed to run this application", Toast.LENGTH_LONG)
+                    .show();
+            if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(this)) {
+                // Permission denied with checking "Do not ask again".
+                CameraPermissionHelper.launchPermissionSettings(this);
+            }
+            this.finish();
+        }
+    }
+
+    @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        GameJNI.init(this.glSurfaceView.getWidth(), this.glSurfaceView.getHeight(), getAssets());
+        GameJNI.onSurfaceCreated(this.glSurfaceView.getWidth(), this.glSurfaceView.getHeight(), getAssets());
 
         this.rollThrustJoystick.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -108,14 +146,12 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        GameJNI.setWindowSize(width, height);
+        GameJNI.onSurfaceChanged(width, height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        synchronized (this) {
-            GameJNI.update();
-            GameJNI.render();
-        }
+        GameJNI.update();
+        GameJNI.render();
     }
 }

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.androidgameengine">
 
+    <uses-permission android:name="android.permission.CAMERA"/>
+
     <uses-feature android:glEsVersion="0x00030001" android:required="true" />
     <uses-feature android:name="android.hardware.camera.ar" android:required="true" />
 
