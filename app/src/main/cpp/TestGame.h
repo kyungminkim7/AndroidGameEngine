@@ -7,15 +7,17 @@
 namespace age {
 
 extern "C" {
-JNI_METHOD_DECLARATION(void, onSurfaceCreated)(JNIEnv *env, jclass, int windowWidth, int windowHeight, jobject j_asset_manager);
-JNI_METHOD_DECLARATION(void, onRollThrustInput)(JNIEnv *env, jclass, float roll, float thrust);
-JNI_METHOD_DECLARATION(void, onYawPitchInput)(JNIEnv *env, jclass, float yaw, float pitch);
+JNI_METHOD_DECLARATION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject gameActivity, int windowWidth, int windowHeight, jobject j_asset_manager);
+JNI_METHOD_DECLARATION(void, onRollThrustInputJNI)(JNIEnv *env, jobject gameActivity, float roll, float thrust);
+JNI_METHOD_DECLARATION(void, onYawPitchInputJNI)(JNIEnv *env, jobject gameActivity, float yaw, float pitch);
 }
 
 class Quadcopter;
 
 class TestGame : public Game {
 public:
+    TestGame(JNIEnv *env, jobject javaActivityObject);
+
     void onCreate() override;
 
     void onRollThrustInput(float roll, float thrust);

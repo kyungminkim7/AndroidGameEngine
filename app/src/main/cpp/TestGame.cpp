@@ -13,19 +13,22 @@
 
 namespace age {
 
-JNI_METHOD_DEFINITION(void, onSurfaceCreated)
-    (JNIEnv *env, jclass, int windowWidth, int windowHeight, jobject j_asset_manager) {
+JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)
+    (JNIEnv *env, jobject gameActivity, int windowWidth, int windowHeight, jobject j_asset_manager) {
     GameEngineJNI::init(env, windowWidth, windowHeight, j_asset_manager);
-    GameEngineJNI::onCreate(std::make_unique<TestGame>());
+    GameEngineJNI::onCreate(std::make_unique<TestGame>(env, gameActivity));
 }
 
-JNI_METHOD_DEFINITION(void, onRollThrustInput)(JNIEnv *env, jclass, float roll, float thrust) {
-    dynamic_cast<TestGame*>(GameEngineJNI::getGame())->onRollThrustInput(roll, thrust);
+JNI_METHOD_DEFINITION(void, onRollThrustInputJNI)(JNIEnv *env, jobject gameActivity, float roll, float thrust) {
+    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onRollThrustInput(roll, thrust);
 }
 
-JNI_METHOD_DEFINITION(void, onYawPitchInput)(JNIEnv *env, jclass, float yaw, float pitch) {
-    dynamic_cast<TestGame*>(GameEngineJNI::getGame())->onYawPitchInput(yaw, pitch);
+JNI_METHOD_DEFINITION(void, onYawPitchInputJNI)(JNIEnv *env, jobject gameActivity, float yaw, float pitch) {
+    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onYawPitchInput(yaw, pitch);
 }
+
+TestGame::TestGame(JNIEnv *env, jobject javaActivityObject) : Game(env, javaActivityObject) {}
+
 void TestGame::onCreate() {
     Game::onCreate();
     this->enablePhysicsDebugDrawer(true);

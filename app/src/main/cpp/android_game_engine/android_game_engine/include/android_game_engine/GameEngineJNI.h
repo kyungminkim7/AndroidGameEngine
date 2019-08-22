@@ -8,7 +8,7 @@
 #include "Game.h"
 
 #define JNI_METHOD_DEFINITION(return_type, method_name) \
-  return_type JNICALL Java_com_example_androidgameengine_GameJNI_##method_name
+  return_type JNICALL Java_com_example_androidgameengine_GameActivity_##method_name
 
 #define JNI_METHOD_DECLARATION(return_type, method_name) \
   JNIEXPORT JNI_METHOD_DEFINITION(return_type, method_name)
@@ -33,18 +33,18 @@ void onCreate(std::unique_ptr<Game> game);
 Game* getGame();
 
 extern "C" {
-JNI_METHOD_DECLARATION(void, onStart)(JNIEnv *env, jclass);
-JNI_METHOD_DECLARATION(void, onResume)(JNIEnv *env, jclass);
-JNI_METHOD_DECLARATION(void, onPause)(JNIEnv *env, jclass);
-JNI_METHOD_DECLARATION(void, onStop)(JNIEnv *env, jclass);
-JNI_METHOD_DECLARATION(void, onDestroy)(JNIEnv *env, jclass);
-JNI_METHOD_DECLARATION(void, onSurfaceChanged)(JNIEnv *env, jclass, int width, int height);
-JNI_METHOD_DECLARATION(void, update)(JNIEnv *env, jclass);
-JNI_METHOD_DECLARATION(void, render)(JNIEnv *env, jclass);
+JNI_METHOD_DECLARATION(void, onStartJNI)(JNIEnv *env, jobject);
+JNI_METHOD_DECLARATION(void, onResumeJNI)(JNIEnv *env, jobject);
+JNI_METHOD_DECLARATION(void, onPauseJNI)(JNIEnv *env, jobject);
+JNI_METHOD_DECLARATION(void, onStopJNI)(JNIEnv *env, jobject);
+JNI_METHOD_DECLARATION(void, onDestroyJNI)(JNIEnv *env, jobject);
+JNI_METHOD_DECLARATION(void, onSurfaceChangedJNI)(JNIEnv *env, jobject, int width, int height);
+JNI_METHOD_DECLARATION(void, updateJNI)(JNIEnv *env, jobject);
+JNI_METHOD_DECLARATION(void, renderJNI)(JNIEnv *env, jobject);
 
-JNI_METHOD_DECLARATION(void, onTouchDownEvent)(JNIEnv *env, jclass, float x, float y);
-JNI_METHOD_DECLARATION(void, onTouchMoveEvent)(JNIEnv *env, jclass, float x, float y);
-JNI_METHOD_DECLARATION(void, onTouchUpEvent)(JNIEnv *env, jclass, float x, float y);
+JNI_METHOD_DECLARATION(void, onTouchDownEventJNI)(JNIEnv *env, jobject, float x, float y);
+JNI_METHOD_DECLARATION(void, onTouchMoveEventJNI)(JNIEnv *env, jobject, float x, float y);
+JNI_METHOD_DECLARATION(void, onTouchUpEventJNI)(JNIEnv *env, jobject, float x, float y);
 }
 
 } // namespace GameEngineJNI

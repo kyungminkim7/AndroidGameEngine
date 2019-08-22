@@ -27,35 +27,35 @@ Game* getGame() {
     return game.get();
 }
 
-JNI_METHOD_DEFINITION(void, onStart)(JNIEnv *env, jclass) {
+JNI_METHOD_DEFINITION(void, onStartJNI)(JNIEnv *env, jobject) {
     if (game) game->onStart();
 }
 
-JNI_METHOD_DEFINITION(void, onResume)(JNIEnv *env, jclass) {
+JNI_METHOD_DEFINITION(void, onResumeJNI)(JNIEnv *env, jobject) {
     if (game) game->onResume();
 }
 
-JNI_METHOD_DEFINITION(void, onPause)(JNIEnv *env, jclass) {
+JNI_METHOD_DEFINITION(void, onPauseJNI)(JNIEnv *env, jobject) {
     game->onPause();
 }
 
-JNI_METHOD_DEFINITION(void, onStop)(JNIEnv *env, jclass) {
+JNI_METHOD_DEFINITION(void, onStopJNI)(JNIEnv *env, jobject) {
     game->onStop();
 }
 
-JNI_METHOD_DEFINITION(void, onDestroy)(JNIEnv *env, jclass) {
+JNI_METHOD_DEFINITION(void, onDestroyJNI)(JNIEnv *env, jobject) {
     game->onDestroy();
     game.reset();
     ManagerAssets::shutdown();
     ManagerWindowing::shutdown();
 }
 
-JNI_METHOD_DEFINITION(void, onSurfaceChanged)(JNIEnv *env, jclass, int width, int height) {
+JNI_METHOD_DEFINITION(void, onSurfaceChangedJNI)(JNIEnv *env, jobject, int width, int height) {
     ManagerWindowing::setWindowDimensions(width, height);
     game->onWindowSizeChanged(width, height);
 }
 
-JNI_METHOD_DEFINITION(void, update)(JNIEnv *env, jclass) {
+JNI_METHOD_DEFINITION(void, updateJNI)(JNIEnv *env, jobject) {
     auto currentUpdateTime = std::chrono::system_clock::now();
     auto updateDuration = currentUpdateTime - lastUpdateTime;
     lastUpdateTime = currentUpdateTime;
@@ -63,19 +63,19 @@ JNI_METHOD_DEFINITION(void, update)(JNIEnv *env, jclass) {
     game->onUpdate(updateDuration);
 }
 
-JNI_METHOD_DEFINITION(void, render)(JNIEnv *env, jclass) {
+JNI_METHOD_DEFINITION(void, renderJNI)(JNIEnv *env, jobject) {
     game->render();
 }
 
-JNI_METHOD_DEFINITION(void, onTouchDownEvent)(JNIEnv *env, jclass, float x, float y) {
+JNI_METHOD_DEFINITION(void, onTouchDownEventJNI)(JNIEnv *env, jobject, float x, float y) {
     game->onTouchDownEvent(x, y);
 }
 
-JNI_METHOD_DEFINITION(void, onTouchMoveEvent)(JNIEnv *env, jclass, float x, float y) {
+JNI_METHOD_DEFINITION(void, onTouchMoveEventJNI)(JNIEnv *env, jobject, float x, float y) {
     game->onTouchMoveEvent(x, y);
 }
 
-JNI_METHOD_DEFINITION(void, onTouchUpEvent)(JNIEnv *env, jclass, float x, float y) {
+JNI_METHOD_DEFINITION(void, onTouchUpEventJNI)(JNIEnv *env, jobject, float x, float y) {
     game->onTouchUpEvent(x, y);
 }
 

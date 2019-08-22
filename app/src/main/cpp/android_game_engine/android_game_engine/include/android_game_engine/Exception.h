@@ -45,4 +45,12 @@ class LoadError : public Error {
 public:
     explicit LoadError(const std::string &whatArg) : Error(whatArg) {}
 };
+
+///
+/// \brief The JNIError class deals with errors that may occur with JNI
+///
+class JNIError : public Error {
+public:
+    explicit JNIError(const std::string &whatArg) : Error(whatArg) {}
+};
 } // namespace age

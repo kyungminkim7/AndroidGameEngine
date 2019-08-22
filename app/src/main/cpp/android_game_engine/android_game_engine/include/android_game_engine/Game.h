@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 
+#include <jni.h>
+
 #include "CameraChase.h"
 #include "CameraFPV.h"
 #include "GameObject.h"
@@ -29,8 +31,8 @@ struct Ray {
  */
 class Game {
 public:
-    Game();
-    virtual ~Game() = default;
+    Game(JNIEnv *env, jobject javaActivityObject);
+    virtual ~Game();
 
     virtual void onCreate();
     virtual void onStart();
@@ -51,6 +53,9 @@ public:
     void enablePhysicsDebugDrawer(bool enable);
 
 protected:
+    JNIEnv* getJNIEnv();
+    jobject getJavaActivityObject();
+
     void setSkybox(std::unique_ptr<Skybox> skybox);
     
     void addToWorldList(std::shared_ptr<GameObject> gameObject);
@@ -64,6 +69,9 @@ protected:
 private:
     void raycastTouch(const glm::vec2 &windowTouchPosition, float length);
     Ray getTouchRay(const glm::vec2 &windowTouchPosition);
+
+    JavaVM *javaVM;
+    jobject javaActivityObject;
 
     ShaderProgram shadowMapShader;
     ShaderProgram defaultShader;

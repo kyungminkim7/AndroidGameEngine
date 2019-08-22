@@ -3,19 +3,40 @@
 #include <GLES3/gl32.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <android_game_engine/Exception.h>
+#include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
 
 namespace age {
 
-Game::Game() : shadowMapShader("shaders/ShadowMap.vert", "shaders/ShadowMap.frag"),
+Game::Game(JNIEnv *env, jobject javaActivityObject) :
+               shadowMapShader("shaders/ShadowMap.vert", "shaders/ShadowMap.frag"),
                defaultShader("shaders/Default.vert", "shaders/Default.frag"),
                skyboxShader("shaders/Skybox.vert", "shaders/Skybox.frag"),
                physicsDebugShader("shaders/PhysicsDebug.vert", "shaders/PhysicsDebug.frag"),
                physics(new PhysicsEngine(&this->physicsDebugShader)),
                drawDebugPhysics(false) {
+    if (env->GetJavaVM(&this->javaVM) != JNI_OK) throw JNIError("Failed to obtain Java VM.");
+    this->javaActivityObject = env->NewGlobalRef(javaActivityObject);
+
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &this->shadowMapTextureUnit);
     this->shadowMapTextureUnit -= 1;
 }
+
+Game::~Game() {
+    auto env = this->getJNIEnv();
+    env->DeleteGlobalRef(this->javaActivityObject);
+};
+
+JNIEnv* Game::getJNIEnv() {
+    JNIEnv *env;
+    if (javaVM->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+        throw JNIError("Failed to obtain JNIEnv from javaVM");
+    }
+    return env;
+}
+
+jobject Game::getJavaActivityObject() {return this->javaActivityObject;}
 
 void Game::onCreate() {
     glEnable(GL_DEPTH_TEST);
