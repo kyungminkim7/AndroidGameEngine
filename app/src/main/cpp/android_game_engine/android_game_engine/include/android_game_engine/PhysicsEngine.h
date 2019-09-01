@@ -43,6 +43,8 @@ public:
     /// \param body
     ///
     void addRigidBody(PhysicsRigidBody *body);
+
+    void removeRigidBody(PhysicsRigidBody *body);
     
     RaycastResult raycastClosest(const glm::vec3 &from, const glm::vec3 &to) const;
     

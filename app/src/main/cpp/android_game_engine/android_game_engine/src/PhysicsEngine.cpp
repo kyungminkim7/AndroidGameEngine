@@ -31,6 +31,10 @@ void PhysicsEngine::addRigidBody(PhysicsRigidBody *body) {
     this->dynamicsWorld->addRigidBody(reinterpret_cast<btRigidBody*>(body->getNativeBody()));
 }
 
+void PhysicsEngine::removeRigidBody(age::PhysicsRigidBody *body) {
+    this->dynamicsWorld->removeRigidBody(reinterpret_cast<btRigidBody*>(body->getNativeBody()));
+}
+
 RaycastResult PhysicsEngine::raycastClosest(const glm::vec3 &from, const glm::vec3 &to) const {
     btVector3 btFrom(from.x, from.y, from.z), btTo(to.x, to.y, to.z);
     btCollisionWorld::ClosestRayResultCallback callback(btFrom, btTo);

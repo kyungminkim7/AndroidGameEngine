@@ -186,6 +186,10 @@ void Game::registerPhysics(age::GameObject *gameObject) {
     }
 }
 
+void Game::unregisterPhysics(age::GameObject *gameObject) {
+    this->physics->removeRigidBody(gameObject->getPhysicsBody());
+}
+
 void Game::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
                                const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {}
 

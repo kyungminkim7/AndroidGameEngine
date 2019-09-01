@@ -34,7 +34,7 @@ TestGame::TestGame(JNIEnv *env, jobject javaApplicationContext, jobject javaActi
 
 void TestGame::onCreate() {
     BaseGameType::onCreate();
-    this->enablePhysicsDebugDrawer(true);
+//    this->enablePhysicsDebugDrawer(true);
 
 //    this->getCam()->setPosition({-10.0f, 5.0f, 7.0f});
 //    this->getCam()->setLookAtPoint({2.0f, 0.0f, 1.0f});

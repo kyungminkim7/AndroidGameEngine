@@ -56,7 +56,7 @@ ARPlaneCircle::ARPlaneCircle(const Texture2D &texture,
     glGenBuffers(1, &this->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     glBufferData(GL_ARRAY_BUFFER, positionsSize_bytes + textureCoordinatesSize_bytes + opacitiesSize_bytes,
-                 nullptr, GL_STATIC_DRAW);
+                 nullptr, GL_DYNAMIC_DRAW);
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, positionsSize_bytes, positions.data());
     glBufferSubData(GL_ARRAY_BUFFER, this->textureCoordinatesOffset, textureCoordinatesSize_bytes,
@@ -119,8 +119,8 @@ void ARPlaneCircle::render(age::ShaderProgram *shader) {
     shader->setUniform("model", this->getModelMatrix());
 
     shader->setUniform("color", this->color);
-    glActiveTexture(GL_TEXTURE5);
-    shader->setUniform("planeTexture", 5);
+    glActiveTexture(GL_TEXTURE0);
+    shader->setUniform("planeTexture", 0);
     this->texture.bind();
 
     glBindVertexArray(this->vao);

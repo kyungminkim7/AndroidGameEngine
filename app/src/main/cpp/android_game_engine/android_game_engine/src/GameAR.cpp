@@ -11,10 +11,6 @@ GameAR::GameAR(JNIEnv *env, jobject javaApplicationContext, jobject javaActivity
     Game(env, javaApplicationContext, javaActivityObject),
     arCameraBackgroundShader("shaders/ARCameraBackground.vert", "shaders/ARCameraBackground.frag"),
     arPlaneShader("shaders/ARPlane.vert", "shaders/ARPlane.frag") {
-    this->arPlanePool = std::make_shared<ARPlaneCircle>(Texture2D("images/trigrid.png"));
-    this->registerPhysics(this->arPlanePool.get());
-//    this->arPlanePool->setScale(glm::vec3(0.0f));
-
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -148,6 +144,12 @@ void GameAR::updatePlanes() {
     int32_t numPlanes = 0;
     ArTrackableList_getSize(this->arSession, planeList, &numPlanes);
 
+    while (this->arPlanePool.size() < numPlanes) {
+        this->arPlanePool.emplace_back(std::make_shared<ARPlaneCircle>(Texture2D("images/trigrid.png")));
+    }
+    auto prevNumActivePlanes = this->numActivePlanes;
+    this->numActivePlanes = 0;
+
     for (auto i = 0; i < numPlanes; ++i) {
         ArTrackable *plane = nullptr;
         ArTrackableList_acquireItem(this->arSession, planeList, i, &plane);
@@ -158,6 +160,7 @@ void GameAR::updatePlanes() {
             ArTrackingState trackingState;
             ArTrackable_getTrackingState(this->arSession, plane, &trackingState);
             if (trackingState == ArTrackingState::AR_TRACKING_STATE_TRACKING) {
+                // Found a unique plane, extract the pose and dimensions
                 ArPose *pose;
                 ArPose_create(this->arSession, nullptr, &pose);
                 ArPlane_getCenterPose(this->arSession, ArAsPlane(plane), pose);
@@ -167,22 +170,33 @@ void GameAR::updatePlanes() {
 
                 ArPose_destroy(pose);
 
-                this->arPlanePool->setPosition(planePose[3]);
-                this->arPlanePool->setOrientation(planePose);
-
                 float width, length;
                 ArPlane_getExtentX(this->arSession, ArAsPlane(plane), &width);
                 ArPlane_getExtentZ(this->arSession, ArAsPlane(plane), &length);
-                this->arPlanePool->setDiameter(std::min(width, length));
+
+                // Adjust the next available plane in the plane pool to reflect the extracted data
+                auto planeCircle = this->arPlanePool[this->numActivePlanes++].get();
+                if (this->numActivePlanes > prevNumActivePlanes) {
+                    this->registerPhysics(planeCircle);
+                }
+
+                planeCircle->setPosition(planePose[3]);
+                planeCircle->setOrientation(planePose);
 
                 // Convert from OpenGL frame
-                this->arPlanePool->rotate(glm::radians(90.0f), this->arPlanePool->getOrientationZ());
-                this->arPlanePool->rotate(glm::radians(90.0f), this->arPlanePool->getOrientationY());
+                planeCircle->rotate(glm::radians(90.0f), planeCircle->getOrientationZ());
+                planeCircle->rotate(glm::radians(90.0f), planeCircle->getOrientationY());
+
+                planeCircle->setDiameter(std::min(width, length));
             }
         }
 
         ArTrackable_release(ArAsTrackable(subsumePlane));
         ArTrackable_release(plane);
+    }
+
+    for (auto i = this->numActivePlanes; i < prevNumActivePlanes; ++i) {
+        this->unregisterPhysics(this->arPlanePool[i].get());
     }
 
     ArTrackableList_destroy(planeList);
@@ -211,13 +225,14 @@ void GameAR::render() {
     this->renderWorld();
 
     // Render planes
-    Log::info("Rendering plane");
-//    glDepthMask(GL_FALSE);
+    glDepthMask(GL_FALSE);
     this->arPlaneShader.use();
     this->arPlaneShader.setUniform("projection_view",
                                    this->getCam()->getProjectionMatrix() * this->getCam()->getViewMatrix());
-    this->arPlanePool->render(&this->arPlaneShader);
-//    glDepthMask(GL_TRUE);
+    for (auto i = 0u; i < this->numActivePlanes; ++i) {
+        this->arPlanePool[i]->render(&this->arPlaneShader);
+    }
+    glDepthMask(GL_TRUE);
 }
 
 void GameAR::setStateRender(age::GameAR::StateRender stateRender) {

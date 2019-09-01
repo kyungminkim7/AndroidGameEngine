@@ -34,7 +34,7 @@ ARCameraBackground::ARCameraBackground() : textureCoordinates(positions.size()) 
 
     glBufferData(GL_ARRAY_BUFFER,
                  positionsSize_bytes + textureCoordinatesSize_bytes,
-                 nullptr, GL_STATIC_DRAW);
+                 nullptr, GL_DYNAMIC_DRAW);
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, positionsSize_bytes, positions.data());
     glBufferSubData(GL_ARRAY_BUFFER, positionsSize_bytes,

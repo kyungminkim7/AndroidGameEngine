@@ -70,7 +70,8 @@ private:
     ARCameraBackground arCameraBackground;
     ArTrackingState arCameraTrackingState;
 
-    std::shared_ptr<ARPlaneCircle> arPlanePool;
+    std::vector<std::shared_ptr<ARPlaneCircle>> arPlanePool;
+    int numActivePlanes = 0;
 };
 
 } // namespace age
