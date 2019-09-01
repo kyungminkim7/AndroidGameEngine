@@ -28,7 +28,7 @@ namespace GameEngineJNI {
 /// \param windowHeight
 /// \param j_asset_manager Android asset manager
 ///
-void init(JNIEnv *env, int windowWidth, int windowHeight, jobject j_asset_manager);
+void init(JNIEnv *env, int windowWidth, int windowHeight, int displayRotation, jobject j_asset_manager);
 void onCreate(std::unique_ptr<Game> game);
 Game* getGame();
 
@@ -38,7 +38,7 @@ JNI_METHOD_DECLARATION(void, onResumeJNI)(JNIEnv *env, jobject);
 JNI_METHOD_DECLARATION(void, onPauseJNI)(JNIEnv *env, jobject);
 JNI_METHOD_DECLARATION(void, onStopJNI)(JNIEnv *env, jobject);
 JNI_METHOD_DECLARATION(void, onDestroyJNI)(JNIEnv *env, jobject);
-JNI_METHOD_DECLARATION(void, onSurfaceChangedJNI)(JNIEnv *env, jobject, int width, int height);
+JNI_METHOD_DECLARATION(void, onSurfaceChangedJNI)(JNIEnv *env, jobject, int width, int height, int displayRotation);
 JNI_METHOD_DECLARATION(void, updateJNI)(JNIEnv *env, jobject);
 JNI_METHOD_DECLARATION(void, renderJNI)(JNIEnv *env, jobject);
 

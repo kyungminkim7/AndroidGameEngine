@@ -1,8 +1,11 @@
 package com.example.androidgameengine;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -25,7 +28,9 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     ///
     /// Starting point for game and engine initialization.
     ///
-    private native void onSurfaceCreatedJNI(int windowWidth, int windowHeight, AssetManager assetManager);
+    private native void onSurfaceCreatedJNI(Context applicationContext,
+                                            int windowWidth, int windowHeight, int displayRotation,
+                                            AssetManager assetManager);
 
     private native void onRollThrustInputJNI(float roll, float thrust);
     private native void onYawPitchInputJNI(float yaw, float pitch);
@@ -41,7 +46,7 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     private native void onStopJNI();
     private native void onDestroyJNI();
 
-    private native void onSurfaceChangedJNI(int width, int height);
+    private native void onSurfaceChangedJNI(int width, int height, int displayRotation);
 
     private native void updateJNI();
     private native void renderJNI();
@@ -52,10 +57,21 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     ///@}
 
     private static final String TAG = GameActivity.class.getSimpleName();
+    private static final int SNACKBAR_COLOR = 0xbf323232;
 
     private GLSurfaceView glSurfaceView;
     private Joystick rollThrustJoystick;
     private Joystick yawPitchJoystick;
+
+    private Handler arPlaneFoundHandler;
+
+    private Runnable arPlaneFoundRunnable = ()->{
+        Snackbar foundSnackbar = Snackbar.make(GameActivity.this.findViewById(android.R.id.content),
+                                         "Found surfaces 2!",
+                                               Snackbar.LENGTH_INDEFINITE);
+        foundSnackbar.getView().setBackgroundColor(0xbf323232);
+        foundSnackbar.show();
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +107,8 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
         this.rollThrustJoystick = findViewById(R.id.rollThrustJoystick);
         this.yawPitchJoystick = findViewById(R.id.yawPitchJoystick);
+
+        this.arPlaneFoundHandler = new Handler();
     }
 
     @Override
@@ -108,6 +126,12 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
             return;
         }
 
+//        Snackbar loadingSnackbar = Snackbar.make(this.findViewById(android.R.id.content),
+//                                           "Searching for surfaces. Move camera slowly...",
+//                                                 Snackbar.LENGTH_INDEFINITE);
+//        loadingSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
+//        loadingSnackbar.show();
+
         this.onResumeJNI();
         this.glSurfaceView.onResume();
     }
@@ -117,6 +141,8 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
         super.onPause();
         this.glSurfaceView.onPause();
         this.onPauseJNI();
+
+        this.arPlaneFoundHandler.removeCallbacks(this.arPlaneFoundRunnable);
     }
 
     @Override
@@ -150,7 +176,10 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        this.onSurfaceCreatedJNI(this.glSurfaceView.getWidth(), this.glSurfaceView.getHeight(), getAssets());
+        this.onSurfaceCreatedJNI(this.getApplicationContext(),
+                                 this.glSurfaceView.getWidth(), this.glSurfaceView.getHeight(),
+                                 this.getWindowManager().getDefaultDisplay().getRotation(),
+                                 getAssets());
 
         this.rollThrustJoystick.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -197,7 +226,8 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        this.onSurfaceChangedJNI(width, height);
+        this.onSurfaceChangedJNI(width, height,
+                                 this.getWindowManager().getDefaultDisplay().getRotation());
     }
 
     @Override
@@ -207,5 +237,9 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
             this.updateJNI();
             this.renderJNI();
         }
+    }
+
+    private void myCallback() {
+//        this.arPlaneFoundHandler.post(this.arPlaneFoundRunnable);
     }
 }

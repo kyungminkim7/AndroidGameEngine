@@ -27,6 +27,7 @@ std::vector<EGLint> contextAttribs {
 
 int windowWidth = 0;
 int windowHeight = 0;
+int displayRotation = 0;
 
 } // namespace
 
@@ -90,9 +91,10 @@ void init(ANativeWindow *window) {
     }
 }
 
-void init(int width, int height) {
+void init(int width, int height, int rotation) {
     windowWidth = width;
     windowHeight = height;
+    displayRotation = rotation;
 }
 
 void shutdown() {
@@ -122,13 +124,18 @@ void setWindowDimensions(int width, int height) {
     windowHeight = height;
 }
 
+void setDisplayRotation(int rotation) {
+    displayRotation = rotation;
+}
+
 void swapBuffers() { eglSwapBuffers(display, surface); }
 
 void setEglAttribs(const std::vector<EGLint> &attribs) { eglAttribs = attribs; }
 void setContextAttribs(const std::vector<EGLint> &attribs) { contextAttribs = attribs; }
 
-int getWindowWidth() { return windowWidth; }
-int getWindowHeight() { return windowHeight; }
+int getWindowWidth() {return windowWidth;}
+int getWindowHeight() {return windowHeight;}
+int getDisplayRotation() {return displayRotation;}
 
 }
 } // namespace age

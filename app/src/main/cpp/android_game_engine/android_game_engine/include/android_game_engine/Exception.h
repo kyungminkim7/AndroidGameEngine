@@ -53,4 +53,13 @@ class JNIError : public Error {
 public:
     explicit JNIError(const std::string &whatArg) : Error(whatArg) {}
 };
+
+///
+/// \brief The ARError class deals with errors that may occur with AR
+///
+class ARError : public Error {
+public:
+    explicit ARError(const std::string &whatArg) : Error(whatArg) {}
+};
+
 } // namespace age

@@ -14,11 +14,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
+        <meta-data android:name="com.google.ar.core" android:value="optional" />
+
         <activity android:name=".GameActivity"
                   android:screenOrientation="landscape">
             <meta-data android:name="android.app.lib_name"
                        android:value="game"/>
-            <meta-data android:name="com.google.ar.core" android:value="optional" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

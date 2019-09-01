@@ -18,12 +18,12 @@ VertexArray::VertexArray(const std::vector<glm::vec3> &positions,
                          const std::vector<glm::vec3> &normals,
                          const std::vector<glm::vec2> &textureCoordinates,
                          const std::vector<glm::uvec3> &indices) {
-    const auto positionsSize_bytes = positions.size() * sizeof(glm::vec3);
-    const auto normalsSize_bytes = normals.size() * sizeof(glm::vec3);
-    const auto textureCoordinatesSize_bytes = textureCoordinates.size() * sizeof(glm::vec2);
+    const auto positionsSize_bytes = positions.size() * positionStride;
+    const auto normalsSize_bytes = normals.size() * normalStride;
+    const auto textureCoordinatesSize_bytes = textureCoordinates.size() * textureCoordinatesStride;
 
-    auto normalsOffset = positionsSize_bytes;
-    auto textureCoordinatesOffset = positionsSize_bytes + normalsSize_bytes;
+    const auto normalsOffset = positionsSize_bytes;
+    const auto textureCoordinatesOffset = normalsOffset + normalsSize_bytes;
 
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
@@ -36,8 +36,8 @@ VertexArray::VertexArray(const std::vector<glm::vec3> &positions,
                  nullptr, GL_STATIC_DRAW);
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, positionsSize_bytes, positions.data());
-    glBufferSubData(GL_ARRAY_BUFFER, positionsSize_bytes, normalsSize_bytes, normals.data());
-    glBufferSubData(GL_ARRAY_BUFFER, positionsSize_bytes + normalsSize_bytes,
+    glBufferSubData(GL_ARRAY_BUFFER, normalsOffset, normalsSize_bytes, normals.data());
+    glBufferSubData(GL_ARRAY_BUFFER, textureCoordinatesOffset,
                     textureCoordinatesSize_bytes, textureCoordinates.data());
 
     // Assign vertex attributes

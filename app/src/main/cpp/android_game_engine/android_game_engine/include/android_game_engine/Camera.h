@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Model.h"
 
 namespace age {
@@ -27,6 +29,9 @@ public:
     float getFov_deg() const;
     
     void setAspectRatioWidthToHeight(float aspectRatioWidthToHeight);
+
+    float getNearPlane() const;
+    float getFarPlane() const;
     
     ///
     /// \brief onUpdate Updates the game object's state.
@@ -58,6 +63,7 @@ public:
     glm::mat4 getViewMatrix() const;
     
     glm::mat4 getProjectionMatrix() const;
+    const float* getProjectionMatrixPtr();
     
     void setPosition(const glm::vec3 &position);
     glm::vec3 getPosition() const;
@@ -132,10 +138,13 @@ private:
     glm::mat4 projectionMatrix {1.0f};
 };
 
+inline float Camera::getNearPlane() const {return this->nearPlane;}
+inline float Camera::getFarPlane() const {return this->farPlane;}
 inline glm::mat4 Camera::getModelMatrix() const {return this->model.getModelMatrix();}
 inline glm::mat3 Camera::getNormalMatrix() const {return this->model.getNormalMatrix();}
 inline glm::mat4 Camera::getViewMatrix() const {return this->model.getViewMatrix();}
 inline glm::mat4 Camera::getProjectionMatrix() const {return this->projectionMatrix;}
+inline const float* Camera::getProjectionMatrixPtr() {return glm::value_ptr(this->projectionMatrix);}
 inline void Camera::setPosition(const glm::vec3 &position) {this->model.setPosition(position);}
 inline glm::vec3 Camera::getPosition() const {return this->model.getPosition();}
 inline void Camera::setOrientation(const glm::mat3& orientation) {this->model.setOrientation(orientation);}

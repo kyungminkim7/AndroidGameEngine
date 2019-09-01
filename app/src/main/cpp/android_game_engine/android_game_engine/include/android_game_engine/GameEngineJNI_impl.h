@@ -11,8 +11,8 @@ std::unique_ptr<Game> game;
 
 std::chrono::system_clock::time_point lastUpdateTime;
 
-void init(JNIEnv *env, int windowWidth, int windowHeight, jobject j_asset_manager) {
-    ManagerWindowing::init(windowWidth, windowHeight);
+void init(JNIEnv *env, int windowWidth, int windowHeight, int displayRotation, jobject j_asset_manager) {
+    ManagerWindowing::init(windowWidth, windowHeight, displayRotation);
     ManagerAssets::init(AAssetManager_fromJava(env, j_asset_manager));
 }
 
@@ -50,9 +50,11 @@ JNI_METHOD_DEFINITION(void, onDestroyJNI)(JNIEnv *env, jobject) {
     ManagerWindowing::shutdown();
 }
 
-JNI_METHOD_DEFINITION(void, onSurfaceChangedJNI)(JNIEnv *env, jobject, int width, int height) {
+JNI_METHOD_DEFINITION(void, onSurfaceChangedJNI)(JNIEnv *env, jobject, int width, int height, int displayRotation) {
     ManagerWindowing::setWindowDimensions(width, height);
-    game->onWindowSizeChanged(width, height);
+    ManagerWindowing::setDisplayRotation(displayRotation);
+
+    game->onWindowChanged(width, height, displayRotation);
 }
 
 JNI_METHOD_DEFINITION(void, updateJNI)(JNIEnv *env, jobject) {

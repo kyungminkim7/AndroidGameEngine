@@ -5,7 +5,6 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
-#include <android_game_engine/Log.h>
 #include <android_game_engine/VertexArray.h>
 #include <android_game_engine/Utilities.h>
 
@@ -185,9 +184,6 @@ void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
         this->controlRates[0] = this->rollController.computeCorrection(rpy[0], this->targetRoll, updateDuration);
         this->controlRates[1] = this->pitchController.computeCorrection(rpy[1], this->targetPitch, updateDuration);
 
-//        Log::info("Roll correction: " + std::to_string(glm::degrees(this->controlRates[0])));
-//        Log::info("Pitch correction: " + std::to_string(glm::degrees(this->controlRates[1])));
-
         this->controlRates[0] = clip(this->controlRates[0], -this->maxRollRate, this->maxRollRate);
         this->controlRates[1] = clip(this->controlRates[1], -this->maxPitchRate, this->maxPitchRate);
     }
@@ -287,12 +283,7 @@ void Quadcopter::onYawPitchInput(const glm::vec2 &input) {
 
 Quadcopter::Motor::Motor(int id, float rotationSpeed2Thrust) : id(id), rotationSpeed2Thrust(rotationSpeed2Thrust) {}
 void Quadcopter::Motor::setRotationSpeed(float rotationSpeed) {this->rotationSpeed = rotationSpeed;}
-float Quadcopter::Motor::getThrust() const {
-//    Log::info("Motor: " + std::to_string(id));
-//    Log::info("Rpm: " + std::to_string(this->rotationSpeed * 30.0f / 3.14f));
-//    Log::info("Thrust: " + std::to_string(this->rotationSpeed * this->rotationSpeed2Thrust) + "\n");
-    return this->rotationSpeed * this->rotationSpeed2Thrust;
-}
+float Quadcopter::Motor::getThrust() const {return this->rotationSpeed * this->rotationSpeed2Thrust;}
 
 
 } // namespace age

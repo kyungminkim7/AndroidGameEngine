@@ -1,9 +1,9 @@
 #pragma once
 
+#include "GameObject.h"
+
 #include <set>
 #include <vector>
-
-#include "GameObject.h"
 
 namespace age {
 

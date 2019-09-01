@@ -31,7 +31,7 @@ struct Ray {
  */
 class Game {
 public:
-    Game(JNIEnv *env, jobject javaActivityObject);
+    Game(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject);
     virtual ~Game();
 
     virtual void onCreate();
@@ -41,10 +41,10 @@ public:
     virtual void onStop();
     virtual void onDestroy();
 
-    virtual void onWindowSizeChanged(int width, int height);
-    
+    virtual void onWindowChanged(int width, int height, int displayRotation);
+
     virtual void onUpdate(std::chrono::duration<float> updateDuration);
-    void render();
+    virtual void render();
 
     virtual bool onTouchDownEvent(float x, float y);
     virtual bool onTouchMoveEvent(float x, float y);
@@ -54,14 +54,29 @@ public:
 
 protected:
     JNIEnv* getJNIEnv();
+    jobject getJavaApplicationContext();
     jobject getJavaActivityObject();
 
     void setSkybox(std::unique_ptr<Skybox> skybox);
     
     void addToWorldList(std::shared_ptr<GameObject> gameObject);
+
+    ///
+    /// Registers a GameObject with the physics engine. This is automatically called for game
+    /// objects that are registered to the world list through Game::addToWorldList(). This must be
+    /// called or any objects that have not been registered to the world list but want to have
+    /// physics along with GameObject::updateFromPhysics() after every Game::onUpdate().
+    /// \param gameObject
+    ///
+    void registerPhysics(GameObject *gameObject);
     
     virtual void onGameObjectTouched(GameObject *gameObject, const glm::vec3 &touchPoint,
                                      const glm::vec3 &touchDirection, const glm::vec3 &touchNormal);
+
+    void renderShadowMapSetup();
+    void renderShadowMap();
+    void renderWorldSetup();
+    void renderWorld();
 
     CameraType* getCam();
     LightDirectional* getDirectionalLight();
@@ -71,6 +86,7 @@ private:
     Ray getTouchRay(const glm::vec2 &windowTouchPosition);
 
     JavaVM *javaVM;
+    jobject javaApplicationContext;
     jobject javaActivityObject;
 
     ShaderProgram shadowMapShader;

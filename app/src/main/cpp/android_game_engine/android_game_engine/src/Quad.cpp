@@ -46,7 +46,7 @@ namespace age {
 Quad::Quad(const std::set<std::string> &diffuseTextureFilepaths,
            const std::set<std::string> &specularTextureFilepaths,
            const glm::vec2 &numTextureRepeat)
-        : GameObject() {
+           : GameObject() {
     std::vector<Texture2D> diffuseTextures, specularTextures;
     
     for (const auto& filepath : diffuseTextureFilepaths) {
@@ -62,7 +62,8 @@ Quad::Quad(const std::set<std::string> &diffuseTextureFilepaths,
 
 Quad::Quad(const std::vector<age::Texture2D> &diffuseTextures,
            const std::vector<age::Texture2D> &specularTextures,
-           const glm::vec2 &numTextureRepeat){
+           const glm::vec2 &numTextureRepeat)
+           : GameObject() {
     this->init(diffuseTextures, specularTextures, numTextureRepeat);
 }
            

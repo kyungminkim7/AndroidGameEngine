@@ -9,7 +9,7 @@
 
 namespace age {
 
-Game::Game(JNIEnv *env, jobject javaActivityObject) :
+Game::Game(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject) :
                shadowMapShader("shaders/ShadowMap.vert", "shaders/ShadowMap.frag"),
                defaultShader("shaders/Default.vert", "shaders/Default.frag"),
                skyboxShader("shaders/Skybox.vert", "shaders/Skybox.frag"),
@@ -17,15 +17,20 @@ Game::Game(JNIEnv *env, jobject javaActivityObject) :
                physics(new PhysicsEngine(&this->physicsDebugShader)),
                drawDebugPhysics(false) {
     if (env->GetJavaVM(&this->javaVM) != JNI_OK) throw JNIError("Failed to obtain Java VM.");
+    this->javaApplicationContext = env->NewGlobalRef(javaApplicationContext);
     this->javaActivityObject = env->NewGlobalRef(javaActivityObject);
 
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &this->shadowMapTextureUnit);
     this->shadowMapTextureUnit -= 1;
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 }
 
 Game::~Game() {
     auto env = this->getJNIEnv();
     env->DeleteGlobalRef(this->javaActivityObject);
+    env->DeleteGlobalRef(this->javaApplicationContext);
 };
 
 JNIEnv* Game::getJNIEnv() {
@@ -36,14 +41,10 @@ JNIEnv* Game::getJNIEnv() {
     return env;
 }
 
+jobject Game::getJavaApplicationContext() {return this->javaApplicationContext;}
 jobject Game::getJavaActivityObject() {return this->javaActivityObject;}
 
 void Game::onCreate() {
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_CULL_FACE);
-
     // Setup cam
     this->cam = std::make_unique<CameraType>(45.0f,
                                              static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
@@ -66,7 +67,7 @@ void Game::onPause() {}
 void Game::onStop() {}
 void Game::onDestroy() {}
 
-void Game::onWindowSizeChanged(int width, int height) {
+void Game::onWindowChanged(int width, int height, int displayRotation) {
     this->cam->setAspectRatioWidthToHeight(static_cast<float>(width) / height);
 }
 
@@ -84,37 +85,47 @@ void Game::onUpdate(std::chrono::duration<float> updateDuration) {
 }
 
 void Game::render() {
-    // Render world scene to shadow map from the light's perspective to calculate depth map
+    this->renderShadowMapSetup();
+    this->renderShadowMap();
+
+    this->renderWorldSetup();
+    this->renderWorld();
+}
+
+void Game::renderShadowMapSetup() {
     glViewport(0, 0, this->shadowMap->getWidth(), this->shadowMap->getHeight());
     this->shadowMap->bindFramebuffer();
 
     glCullFace(GL_FRONT);
     glClear(GL_DEPTH_BUFFER_BIT);
+}
 
-    auto lightSpace = this->directionalLight->getProjectionMatrix() *
-            this->directionalLight->getViewMatrix();
-
+void Game::renderShadowMap() {
     this->shadowMapShader.use();
-    this->shadowMapShader.setUniform("lightSpace", lightSpace);
+    this->shadowMapShader.setUniform("lightSpace", this->directionalLight->getProjectionMatrix() *
+                                                   this->directionalLight->getViewMatrix());
 
     for (auto &gameObject : this->worldList) {
         gameObject->render(&this->shadowMapShader);
     }
+}
 
-    // Render world scene with shadow mapping
+void Game::renderWorldSetup() {
     glViewport(0, 0, ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight());
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glCullFace(GL_BACK);
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
 
+void Game::renderWorld() {
     auto projection = this->cam->getProjectionMatrix();
     auto view = this->cam->getViewMatrix();
     auto projectionView = projection * view;
 
     this->defaultShader.use();
-    this->defaultShader.setUniform("lightSpace", lightSpace);
+    this->defaultShader.setUniform("lightSpace", this->directionalLight->getProjectionMatrix() *
+                                                 this->directionalLight->getViewMatrix());
     this->defaultShader.setUniform("projection_view", projectionView);
     this->defaultShader.setUniform("viewPosition", this->cam->getPosition());
 
@@ -164,11 +175,15 @@ void Game::setSkybox(std::unique_ptr<age::Skybox> skybox) {
 }
 
 void Game::addToWorldList(std::shared_ptr<age::GameObject> gameObject) {
+    this->registerPhysics(gameObject.get());
+
+    this->worldList.push_back(std::move(gameObject));
+}
+
+void Game::registerPhysics(age::GameObject *gameObject) {
     if (gameObject->getPhysicsBody()) {
         this->physics->addRigidBody(gameObject->getPhysicsBody());
     }
-
-    this->worldList.push_back(std::move(gameObject));
 }
 
 void Game::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
