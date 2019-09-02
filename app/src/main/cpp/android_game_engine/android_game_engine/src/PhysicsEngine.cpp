@@ -27,6 +27,10 @@ void PhysicsEngine::onUpdate(std::chrono::duration<float> updateDuration) {
     this->dynamicsWorld->stepSimulation(updateDuration.count(), 10);
 }
 
+void PhysicsEngine::setGravity(const glm::vec3 &gravity) {
+    this->dynamicsWorld->setGravity({gravity.x, gravity.y, gravity.z});
+}
+
 void PhysicsEngine::addRigidBody(PhysicsRigidBody *body) {
     this->dynamicsWorld->addRigidBody(reinterpret_cast<btRigidBody*>(body->getNativeBody()));
 }

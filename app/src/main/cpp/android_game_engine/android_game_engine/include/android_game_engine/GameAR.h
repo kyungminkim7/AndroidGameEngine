@@ -46,6 +46,7 @@ protected:
 private:
     void updateCamera();
     void updatePlanes();
+    void updateDirectionalLight();
 
     ShaderProgram arCameraBackgroundShader;
     ShaderProgram arPlaneShader;

@@ -57,6 +57,8 @@ protected:
     jobject getJavaApplicationContext();
     jobject getJavaActivityObject();
 
+    void setGravity(const glm::vec3 &gravity);
+
     void setSkybox(std::unique_ptr<Skybox> skybox);
     
     void addToWorldList(std::shared_ptr<GameObject> gameObject);

@@ -42,8 +42,8 @@ float calculateShadow(vec3 lightDirection);
 void main() {
     Lighting baseLighting = calculateBaseLight(directionalLight.direction,
                                                directionalLight.lighting);
-	gl_FragColor = vec4(baseLighting.ambient + (1.0 - calculateShadow(directionalLight.direction))
-                        * (baseLighting.diffuse + baseLighting.specular), 1.0);
+	gl_FragColor = vec4(baseLighting.ambient + (1.0 - calculateShadow(directionalLight.direction)) *
+                        (baseLighting.diffuse + baseLighting.specular), 1.0);
 }
 
 Lighting calculateBaseLight(vec3 lightDirection, Lighting lighting) {

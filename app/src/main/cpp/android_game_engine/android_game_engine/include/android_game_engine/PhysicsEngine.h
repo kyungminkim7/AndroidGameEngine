@@ -37,7 +37,9 @@ public:
     explicit PhysicsEngine(ShaderProgram *debugShader);
     
     void onUpdate(std::chrono::duration<float> updateDuration);
-    
+
+    void setGravity(const glm::vec3 &gravity);
+
     ///
     /// Add a rigid body for physics simulation and collision detection
     /// \param body

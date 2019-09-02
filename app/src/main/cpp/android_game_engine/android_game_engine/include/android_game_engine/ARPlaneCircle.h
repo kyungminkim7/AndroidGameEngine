@@ -18,7 +18,7 @@ public:
 
     void render(ShaderProgram *shader) override;
 
-    void setDiameter(float diameter);
+    void setDimensions(const glm::vec2 &dimensions);
     void setColor(const glm::vec3 &color);
 
 private:

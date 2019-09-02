@@ -54,8 +54,8 @@ void Game::onCreate() {
     const auto lightLimit = 50.0f;
     this->directionalLight = std::make_unique<LightDirectional>(glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.8f),
                                                                 -lightLimit, lightLimit, -lightLimit, lightLimit, 10.0f, 200.0f);
-    this->directionalLight->setPosition({25.0f, 10.0f, 25.0f});
-    this->directionalLight->setLookAtPoint({-5.0f, -5.0f, 0.0f});
+    this->directionalLight->setPosition({0.0f, 0.0f, 25.0f});
+    this->directionalLight->setLookAtPoint({0.0f, 0.0f, 0.0f});
 
     auto shadowMapDimension = 2048u;
     this->shadowMap = std::make_unique<ShadowMap>(shadowMapDimension, shadowMapDimension);
@@ -166,13 +166,11 @@ bool Game::onTouchDownEvent(float x, float y) {
 bool Game::onTouchMoveEvent(float x, float y) {return true;}
 bool Game::onTouchUpEvent(float x, float y) {return true;}
 
-void Game::enablePhysicsDebugDrawer(bool enable) {
-    this->drawDebugPhysics = enable;
-}
+void Game::enablePhysicsDebugDrawer(bool enable) {this->drawDebugPhysics = enable;}
 
-void Game::setSkybox(std::unique_ptr<age::Skybox> skybox) {
-    this->skybox = std::move(skybox);
-}
+void Game::setGravity(const glm::vec3 &gravity) {this->physics->setGravity(gravity);}
+
+void Game::setSkybox(std::unique_ptr<age::Skybox> skybox) {this->skybox = std::move(skybox);}
 
 void Game::addToWorldList(std::shared_ptr<age::GameObject> gameObject) {
     this->registerPhysics(gameObject.get());

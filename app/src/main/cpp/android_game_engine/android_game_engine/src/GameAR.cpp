@@ -1,9 +1,27 @@
 #include <android_game_engine/GameAR.h>
 
+#include <glm/gtx/string_cast.hpp>
+
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
 #include <android_game_engine/ARPlaneCircle.h>
+
+namespace {
+const auto T_game_android = glm::rotate(glm::mat4(1.0f),
+                                        glm::radians(-90.0f),
+                                        {0.0f, 1.0f, 0.0f}) *
+                            glm::rotate(glm::mat4(1.0f),
+                                        glm::radians(-90.0f),
+                                        {0.0f, 0.0f, 1.0f});
+
+const auto R_ar_game = static_cast<glm::mat3>(glm::rotate(glm::mat4(1.0f),
+                                                          glm::radians(90.0f),
+                                                          {0.0f, 0.0f, 1.0f}) *
+                                              glm::rotate(glm::mat4(1.0f),
+                                                          glm::radians(90.0f),
+                                                          {0.0f, 1.0f, 0.0f}));
+} // namespace
 
 namespace age {
 
@@ -65,6 +83,13 @@ void GameAR::onResume() {
     if (ArSession_resume(this->arSession) != AR_SUCCESS) {
         throw ARError("Failed to resume AR session.");
     }
+
+    // Enable environmental HDR lighting
+    ArConfig *config = nullptr;
+    ArConfig_create(this->arSession, &config);
+    ArConfig_setLightEstimationMode(this->arSession, config, AR_LIGHT_ESTIMATION_MODE_ENVIRONMENTAL_HDR);
+    ArSession_configure(this->arSession, config);
+    ArConfig_destroy(config);
 }
 
 void GameAR::onPause() {
@@ -99,6 +124,7 @@ void GameAR::onUpdate(std::chrono::duration<float> updateDuration) {
     if (this->arCameraTrackingState != AR_TRACKING_STATE_TRACKING) return;
 
     this->updatePlanes();
+    this->updateDirectionalLight();
 }
 
 void GameAR::updateCamera() {
@@ -122,17 +148,9 @@ void GameAR::updateCamera() {
 
     ArCamera_release(cam);
 
+    camPose = T_game_android * camPose;
     this->getCam()->setPosition(camPose[3]);
-    this->getCam()->setOrientation(camPose);
-
-//    auto position = this->getCam()->getPosition();
-//    auto look = this->getCam()->getOrientationX();
-//    Log::info("Cam position: " + std::to_string(position.x) + ", " + std::to_string(position.y) + ", " + std::to_string(position.z));
-//    Log::info("Cam look: " + std::to_string(look.x) + ", " + std::to_string(look.y) + ", " + std::to_string(look.z));
-
-    // Convert from OpenGL camera frame
-    this->getCam()->rotate(glm::radians(90.0f), this->getCam()->getOrientationZ());
-    this->getCam()->rotate(glm::radians(90.0f), this->getCam()->getOrientationY());
+    this->getCam()->setOrientation(static_cast<glm::mat3>(camPose) * R_ar_game);
 }
 
 void GameAR::updatePlanes() {
@@ -174,20 +192,17 @@ void GameAR::updatePlanes() {
                 ArPlane_getExtentX(this->arSession, ArAsPlane(plane), &width);
                 ArPlane_getExtentZ(this->arSession, ArAsPlane(plane), &length);
 
-                // Adjust the next available plane in the plane pool to reflect the extracted data
+                // Activate next available plane in plane pool
                 auto planeCircle = this->arPlanePool[this->numActivePlanes++].get();
                 if (this->numActivePlanes > prevNumActivePlanes) {
                     this->registerPhysics(planeCircle);
                 }
 
+                // Configure plane to reflect extracted AR data
+                planePose = T_game_android * planePose;
                 planeCircle->setPosition(planePose[3]);
-                planeCircle->setOrientation(planePose);
-
-                // Convert from OpenGL frame
-                planeCircle->rotate(glm::radians(90.0f), planeCircle->getOrientationZ());
-                planeCircle->rotate(glm::radians(90.0f), planeCircle->getOrientationY());
-
-                planeCircle->setDiameter(std::min(width, length));
+                planeCircle->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
+                planeCircle->setDimensions({length, width});
             }
         }
 
@@ -200,6 +215,34 @@ void GameAR::updatePlanes() {
     }
 
     ArTrackableList_destroy(planeList);
+}
+
+void GameAR::updateDirectionalLight() {
+    ArLightEstimate* lightEstimate;
+    ArLightEstimate_create(this->arSession, &lightEstimate);
+    ArFrame_getLightEstimate(this->arSession, this->arFrame, lightEstimate);
+
+    ArLightEstimateState lightEstimateState;
+    ArLightEstimate_getState(this->arSession, lightEstimate, &lightEstimateState);
+
+    if (lightEstimateState == AR_LIGHT_ESTIMATE_STATE_VALID) {
+        glm::vec3 lightDirection;
+        ArLightEstimate_getEnvironmentalHdrMainLightDirection(this->arSession, lightEstimate,
+                                                              glm::value_ptr(lightDirection));
+        lightDirection = static_cast<glm::mat3>(T_game_android) * -lightDirection;
+        if (lightDirection.z < 0.0f) {
+            this->getDirectionalLight()->setLookAtDirection(lightDirection);
+        }
+
+        glm::vec3 lightColor;
+        ArLightEstimate_getEnvironmentalHdrMainLightIntensity(this->arSession, lightEstimate,
+                                                              glm::value_ptr(lightColor));
+        this->getDirectionalLight()->setAmbient(lightColor * 0.3f);
+        this->getDirectionalLight()->setDiffuse(lightColor);
+        this->getDirectionalLight()->setSpecular(lightColor * 0.8f);
+    }
+
+    ArLightEstimate_destroy(lightEstimate);
 }
 
 void GameAR::render() {

@@ -126,6 +126,10 @@ void GameObject::setScale(const glm::vec3& scale) {
     }
 }
 
+void GameObject::setCollisionShapeScale(const glm::vec3 &scale) {
+    this->physicsBody->setScale(scale);
+}
+
 void GameObject::setDamping(float linearDamping, float angularDamping) {
     this->physicsBody->setDamping(linearDamping, angularDamping);
 }

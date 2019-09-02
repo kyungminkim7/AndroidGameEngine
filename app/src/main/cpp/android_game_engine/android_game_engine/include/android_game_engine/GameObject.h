@@ -150,6 +150,7 @@ public:
     glm::vec3 getAngularVelocity() const;
 
 protected:
+    void setCollisionShapeScale(const glm::vec3 &scale);
     void setCollisionShape(std::unique_ptr<btCollisionShape> collisionShape);
     void setUnscaledDimensions(const glm::vec3 &dimensions);
     

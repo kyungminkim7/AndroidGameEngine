@@ -128,8 +128,10 @@ void ARPlaneCircle::render(age::ShaderProgram *shader) {
                    GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0));
 }
 
-void ARPlaneCircle::setDiameter(float diameter){
+void ARPlaneCircle::setDimensions(const glm::vec2 &dimensions) {
+    auto diameter = std::min(dimensions.x, dimensions.y);
     this->setScale({diameter, diameter, 1.0f});
+    this->setCollisionShapeScale({dimensions.x, dimensions.y, 1.0});
 
     // Update vertex texture coordinates
     auto textureCoordinates = this->generateTextureCoordinates(diameter);
