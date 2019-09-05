@@ -142,6 +142,10 @@ void ARPlaneCircle::setDimensions(const glm::vec2 &dimensions) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void ARPlaneCircle::setCollisionDiameter(float diameter) {
+    this->setCollisionShapeScale({diameter, diameter, 1.0f});
+}
+
 void ARPlaneCircle::setColor(const glm::vec3 &color) {this->color = color;}
 
 } // namespace age

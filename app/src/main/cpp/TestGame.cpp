@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 
+#include <glm/gtx/string_cast.hpp>
 #include <glm/trigonometric.hpp>
 
 #include <android_game_engine/ARPlaneCircle.h>
@@ -34,27 +35,27 @@ TestGame::TestGame(JNIEnv *env, jobject javaApplicationContext, jobject javaActi
 
 void TestGame::onCreate() {
     BaseGameType::onCreate();
-    this->enablePhysicsDebugDrawer(true);
+//    this->enablePhysicsDebugDrawer(true);
 
 //    this->getCam()->setPosition({-10.0f, 5.0f, 7.0f});
 //    this->getCam()->setLookAtPoint({2.0f, 0.0f, 1.0f});
-//
+//    this->getCam()->setPosition({-1.0f, 0.0f, 1.0f});
+//    this->getCam()->setLookAtPoint({1.0f, 0.0f, 0.0f});
+
 //    {
-        this->obj1 = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
-        obj1->setLabel("obj1");
+//        this->obj1 = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
+//        obj1->setLabel("obj1");
 //        obj1->setPosition({4.0f, 3.0f, 5.0f});
-        obj1->setScale(glm::vec3(2.0f));
+//        obj1->setScale(glm::vec3(2.0f));
 //        obj1->setMass(1.0f);
-        this->addToWorldList(obj1);
+//        this->addToWorldList(obj1);
 //    }
-//
+
 //    {
 //        const auto scale = 50.0f;
-////        std::shared_ptr<Box> floor(new Box({Texture2D("images/wood.png")},
-////                                           {Texture2D(glm::vec3(1.0f))},
-////                                           glm::vec2(scale)));
-//
-//        std::shared_ptr<ARPlaneCircle> floor(new ARPlaneCircle(Texture2D("images/wood.png")));
+//        std::shared_ptr<Box> floor(new Box({Texture2D("images/wood.png")},
+//                                           {Texture2D(glm::vec3(1.0f))},
+//                                           glm::vec2(scale)));
 //
 //        floor->setLabel("Floor");
 //        floor->setScale(glm::vec3{scale, scale, 0.2f});
@@ -63,9 +64,9 @@ void TestGame::onCreate() {
 //        floor->setFriction(1.0f);
 //        this->addToWorldList(floor);
 //    }
-
-    {
-        // Create UAV
+//
+//    {
+//        // Create UAV
 //        Quadcopter::Parameters params;
 //        params.mass = 1.0f;
 //
@@ -97,12 +98,12 @@ void TestGame::onCreate() {
 //        this->uav->setDamping(0.25f, 0.05f);
 //
 //        this->addToWorldList(this->uav);
-
+//
 //        auto env = this->getJNIEnv();
 //        auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
 //        auto callback = env->GetMethodID(activityClass, "myCallback", "()V");
 //        env->CallVoidMethod(this->getJavaActivityObject(), callback);
-    }
+//    }
 }
 
 void TestGame::onRollThrustInput(float roll, float thrust) {
@@ -115,11 +116,23 @@ void TestGame::onYawPitchInput(float yaw, float pitch) {
 
 void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
                                    const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
-//    gameObject->applyCentralForce(touchDirection * 400.0f);
-    this->obj1->setOrientation(glm::mat3(1.0f));
-    this->obj1->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.0f));
-    this->obj1->clearForces();
-    this->obj1->applyCentralForce({0.0f, -1.0f, 0.0f});
+//    this->uav->setPosition({0.0f, 0.0f, 1.0f});
+//    this->uav->setOrientation(glm::mat3(1.0f));
+//    this->uav->clearForces();
+//    this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
+
+    Log::info("Touched: " + glm::to_string(touchPoint));
+    Log::info("Light position: " + glm::to_string(this->getDirectionalLight()->getPosition()));
+    Log::info("Light look at direction: " + glm::to_string(this->getDirectionalLight()->getLookAtDirection()));
+    Log::info("Window dimensions: " + std::to_string(ManagerWindowing::getWindowWidth()) + ", " + std::to_string(ManagerWindowing::getWindowHeight()));
+
+    auto obj = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
+    obj->setScale(glm::vec3(2.0f));
+    obj->setMass(1.0f);
+    obj->setOrientation(glm::mat3(1.0f));
+    obj->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.2f));
+    obj->applyCentralForce({0.0f, -1.0f, 0.0f});
+    this->addToWorldList(std::move(obj));
 }
 
 } // namespace age

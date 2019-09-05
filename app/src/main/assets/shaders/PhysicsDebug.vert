@@ -2,7 +2,10 @@
 
 in vec3 aPosition;
 
-uniform mat4 projection_view;
+layout (std140) uniform ProjectionViewUB {
+    mat4 projection_view;
+};
+
 uniform vec3 origin;
 uniform vec3 basis;
 

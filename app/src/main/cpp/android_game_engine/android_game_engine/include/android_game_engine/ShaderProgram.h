@@ -7,6 +7,8 @@
 
 namespace age {
 
+class UniformBuffer;
+
 ///
 /// \brief Manages loading, compiling, linking and working with shader programs.
 ///
@@ -53,6 +55,13 @@ public:
     void setUniform(const std::string &name, const glm::mat3 &m);
     void setUniform(const std::string &name, const glm::mat4 &m);
     ///@}
+
+    ///
+    /// \brief setUniformBlockBinding Links the uniform block of this shader to the binding point
+    ///                               of the specified ubo.
+    /// \param ubo Uniform Buffer Object to link against.
+    ///
+    void setUniformBlockBinding(const UniformBuffer &ubo);
     
 private:
     unsigned int id;

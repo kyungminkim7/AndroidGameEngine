@@ -14,15 +14,27 @@ Game::Game(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObje
                defaultShader("shaders/Default.vert", "shaders/Default.frag"),
                skyboxShader("shaders/Skybox.vert", "shaders/Skybox.frag"),
                physicsDebugShader("shaders/PhysicsDebug.vert", "shaders/PhysicsDebug.frag"),
+               projectionViewUbo("ProjectionViewUB", sizeof(glm::mat4)),
+               lightSpaceUbo("LightSpaceUB", sizeof(glm::mat4)),
                physics(new PhysicsEngine(&this->physicsDebugShader)),
                drawDebugPhysics(false) {
+    // Obtain and save JNI environment variables
     if (env->GetJavaVM(&this->javaVM) != JNI_OK) throw JNIError("Failed to obtain Java VM.");
     this->javaApplicationContext = env->NewGlobalRef(javaApplicationContext);
     this->javaActivityObject = env->NewGlobalRef(javaActivityObject);
 
+    // Link shaders to necessary UBOs
+    this->defaultShader.setUniformBlockBinding(this->projectionViewUbo);
+    this->physicsDebugShader.setUniformBlockBinding(this->projectionViewUbo);
+
+    this->defaultShader.setUniformBlockBinding(this->lightSpaceUbo);
+    this->shadowMapShader.setUniformBlockBinding(this->lightSpaceUbo);
+
+    // Shadow depth map texture
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &this->shadowMapTextureUnit);
     this->shadowMapTextureUnit -= 1;
 
+    // OpenGL settings
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 }
@@ -51,13 +63,15 @@ void Game::onCreate() {
                                              0.1f, 500.0f);
 
     // Setup light and shadows
-    const auto lightLimit = 50.0f;
+    const auto lightLimit = 10.0f;
     this->directionalLight = std::make_unique<LightDirectional>(glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.8f),
-                                                                -lightLimit, lightLimit, -lightLimit, lightLimit, 10.0f, 200.0f);
-    this->directionalLight->setPosition({0.0f, 0.0f, 25.0f});
+                                                                -lightLimit, lightLimit, -lightLimit, lightLimit,
+                                                                0.1f, lightLimit * 2.0f);
+    this->directionalLight->setPosition({0.0f, 0.0f, lightLimit});
+    this->directionalLight->setNormalDirection({1.0f, 1.0f, 1.0f});
     this->directionalLight->setLookAtPoint({0.0f, 0.0f, 0.0f});
 
-    auto shadowMapDimension = 2048u;
+    const auto shadowMapDimension = 2048u;
     this->shadowMap = std::make_unique<ShadowMap>(shadowMapDimension, shadowMapDimension);
 }
 
@@ -85,11 +99,22 @@ void Game::onUpdate(std::chrono::duration<float> updateDuration) {
 }
 
 void Game::render() {
+    this->updateUBOs();
+
     this->renderShadowMapSetup();
     this->renderShadowMap();
 
     this->renderWorldSetup();
     this->renderWorld();
+}
+
+void Game::updateUBOs() {
+    const auto projectionView = this->cam->getProjectionMatrix() * this->cam->getViewMatrix();
+    this->projectionViewUbo.bufferSubData(0, sizeof(glm::mat4), glm::value_ptr(projectionView));
+
+    const auto lightSpace = this->directionalLight->getProjectionMatrix() *
+            this->directionalLight->getViewMatrix();
+    this->lightSpaceUbo.bufferSubData(0, sizeof(glm::mat4), glm::value_ptr(lightSpace));
 }
 
 void Game::renderShadowMapSetup() {
@@ -102,9 +127,6 @@ void Game::renderShadowMapSetup() {
 
 void Game::renderShadowMap() {
     this->shadowMapShader.use();
-    this->shadowMapShader.setUniform("lightSpace", this->directionalLight->getProjectionMatrix() *
-                                                   this->directionalLight->getViewMatrix());
-
     for (auto &gameObject : this->worldList) {
         gameObject->render(&this->shadowMapShader);
     }
@@ -119,14 +141,7 @@ void Game::renderWorldSetup() {
 }
 
 void Game::renderWorld() {
-    auto projection = this->cam->getProjectionMatrix();
-    auto view = this->cam->getViewMatrix();
-    auto projectionView = projection * view;
-
     this->defaultShader.use();
-    this->defaultShader.setUniform("lightSpace", this->directionalLight->getProjectionMatrix() *
-                                                 this->directionalLight->getViewMatrix());
-    this->defaultShader.setUniform("projection_view", projectionView);
     this->defaultShader.setUniform("viewPosition", this->cam->getPosition());
 
     // Set shadow properties
@@ -143,16 +158,16 @@ void Game::renderWorld() {
     // Render physics debugging attributes
     if (this->drawDebugPhysics) {
         this->physicsDebugShader.use();
-        this->physicsDebugShader.setUniform("projection_view", projectionView);
         this->physics->renderDebug();
     }
 
     // Render skybox
     if (this->skybox != nullptr) {
         glDepthFunc(GL_LEQUAL);
+        auto view = this->cam->getViewMatrix();
         view[3] = glm::vec4(0.0f);
         this->skyboxShader.use();
-        this->skyboxShader.setUniform("projection_view", projection * view);
+        this->skyboxShader.setUniform("projection_view", this->cam->getProjectionMatrix() * view);
         this->skybox->render(&this->defaultShader);
         glDepthFunc(GL_LESS);
     }
@@ -176,6 +191,10 @@ void Game::addToWorldList(std::shared_ptr<age::GameObject> gameObject) {
     this->registerPhysics(gameObject.get());
 
     this->worldList.push_back(std::move(gameObject));
+}
+
+void Game::bindToProjectionViewUBO(age::ShaderProgram *shaderProgram) {
+    shaderProgram->setUniformBlockBinding(this->projectionViewUbo);
 }
 
 void Game::registerPhysics(age::GameObject *gameObject) {

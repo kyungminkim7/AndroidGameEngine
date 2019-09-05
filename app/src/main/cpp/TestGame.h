@@ -33,7 +33,6 @@ protected:
     
 private:
     std::shared_ptr<Quadcopter> uav;
-    std::shared_ptr<GameObject> obj1;
 };
 
 } // namespace age

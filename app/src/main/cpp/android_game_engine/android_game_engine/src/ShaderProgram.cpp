@@ -13,6 +13,7 @@
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerAssets.h>
+#include <android_game_engine/UniformBuffer.h>
 
 namespace {
 ///
@@ -183,4 +184,11 @@ void ShaderProgram::setUniform(const std::string &name, const glm::mat3 &m) {
 void ShaderProgram::setUniform(const std::string &name, const glm::mat4 &m) {
     glUniformMatrix4fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, glm::value_ptr(m));
 }
+
+void ShaderProgram::setUniformBlockBinding(const UniformBuffer &ubo) {
+    glUniformBlockBinding(this->id,
+                          glGetUniformBlockIndex(this->id, ubo.getUniformBlockName().c_str()),
+                          ubo.getBindingPoint());
+}
+
 } // namespace age

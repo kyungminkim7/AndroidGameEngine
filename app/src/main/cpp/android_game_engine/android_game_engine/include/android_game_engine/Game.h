@@ -14,6 +14,7 @@
 #include "ShaderProgram.h"
 #include "ShadowMap.h"
 #include "Skybox.h"
+#include "UniformBuffer.h"
 
 namespace age {
 
@@ -63,6 +64,8 @@ protected:
     
     void addToWorldList(std::shared_ptr<GameObject> gameObject);
 
+    void bindToProjectionViewUBO(ShaderProgram *shaderProgram);
+
     ///
     /// Registers a GameObject with the physics engine. This is automatically called for game
     /// objects that are registered to the world list through Game::addToWorldList(). This must be
@@ -77,6 +80,7 @@ protected:
     virtual void onGameObjectTouched(GameObject *gameObject, const glm::vec3 &touchPoint,
                                      const glm::vec3 &touchDirection, const glm::vec3 &touchNormal);
 
+    virtual void updateUBOs();
     void renderShadowMapSetup();
     void renderShadowMap();
     void renderWorldSetup();
@@ -97,6 +101,9 @@ private:
     ShaderProgram defaultShader;
     ShaderProgram skyboxShader;
     ShaderProgram physicsDebugShader;
+
+    UniformBuffer projectionViewUbo;
+    UniformBuffer lightSpaceUbo;
 
     int shadowMapTextureUnit; // Shadow map is placed as the last texture unit to deconflict with game object material textures
     

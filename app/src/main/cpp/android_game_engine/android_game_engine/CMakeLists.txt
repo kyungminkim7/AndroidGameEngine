@@ -40,6 +40,7 @@ add_library(${PROJECT_NAME} STATIC
         src/ShadowMap.cpp
         src/Skybox.cpp
         src/Texture2D.cpp
+        src/UniformBuffer.cpp
         src/Utilities.cpp
         src/VertexArray.cpp)
 

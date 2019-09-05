@@ -7,7 +7,10 @@ in float aOpacity;
 out vec2 vTextureCoordinate;
 out float vOpacity;
 
-uniform mat4 projection_view;
+layout (std140) uniform ProjectionViewUB {
+    mat4 projection_view;
+};
+
 uniform mat4 model;
 
 void main() {

@@ -2,7 +2,10 @@
 
 in vec3 aPosition;
 
-uniform mat4 lightSpace;
+layout (std140) uniform LightSpaceUB {
+    mat4 lightSpace;
+};
+
 uniform mat4 model;
 
 void main() {

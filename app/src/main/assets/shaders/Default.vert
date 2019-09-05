@@ -9,10 +9,16 @@ out vec3 vNormal;
 out vec2 vTextureCoordinate;
 out vec4 vPositionLightSpace;
 
-uniform mat4 projection_view;
+layout (std140) uniform ProjectionViewUB {
+   mat4 projection_view;
+};
+
+layout (std140) uniform LightSpaceUB {
+   mat4 lightSpace;
+};
+
 uniform mat4 model;
 uniform mat3 normal;
-uniform mat4 lightSpace;
 
 void main() {
    gl_Position = projection_view * model * vec4(aPosition, 1.0);
