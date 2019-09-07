@@ -10,11 +10,10 @@
 
 namespace age {
 
-class ARPlaneCircle : public GameObject {
+class ARPlane : public GameObject {
 public:
-    explicit ARPlaneCircle(const Texture2D &texture,
-                           unsigned int numVertices=25);
-    ~ARPlaneCircle();
+    explicit ARPlane(const Texture2D &texture);
+    ~ARPlane();
 
     void render(ShaderProgram *shader) override;
 
@@ -24,7 +23,7 @@ public:
     void setColor(const glm::vec3 &color);
 
 private:
-    std::vector<glm::vec2> generateTextureCoordinates(float scale);
+    std::vector<glm::vec2> generateTextureCoordinates(const glm::vec2 &dimensions);
 
     unsigned int vao;
     unsigned int vbo;
@@ -33,7 +32,6 @@ private:
 
     unsigned int numIndices;
 
-    unsigned int numVertices;
     glm::vec3 color;
 
     unsigned int textureCoordinatesOffset;

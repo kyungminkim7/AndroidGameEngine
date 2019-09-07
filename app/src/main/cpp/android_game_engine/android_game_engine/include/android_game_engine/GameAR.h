@@ -13,7 +13,7 @@
 
 namespace age {
 
-class ARPlaneCircle;
+class ARPlane;
 
 class GameAR : public Game {
 public:
@@ -71,7 +71,7 @@ private:
     ARCameraBackground arCameraBackground;
     ArTrackingState arCameraTrackingState;
 
-    std::vector<std::shared_ptr<ARPlaneCircle>> arPlanePool;
+    std::vector<std::shared_ptr<ARPlane>> arPlanePool;
     int numActivePlanes = 0;
 };
 

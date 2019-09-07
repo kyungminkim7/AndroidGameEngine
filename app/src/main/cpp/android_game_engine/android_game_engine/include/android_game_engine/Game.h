@@ -65,6 +65,7 @@ protected:
     void addToWorldList(std::shared_ptr<GameObject> gameObject);
 
     void bindToProjectionViewUBO(ShaderProgram *shaderProgram);
+    void bindToLightSpaceUBO(ShaderProgram *shaderProgram);
 
     ///
     /// Registers a GameObject with the physics engine. This is automatically called for game
@@ -85,6 +86,8 @@ protected:
     void renderShadowMap();
     void renderWorldSetup();
     void renderWorld();
+
+    void bindShadowMap(ShaderProgram *shaderProgram);
 
     CameraType* getCam();
     LightDirectional* getDirectionalLight();

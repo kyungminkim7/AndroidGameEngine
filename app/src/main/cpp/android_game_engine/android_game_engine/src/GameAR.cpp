@@ -5,7 +5,7 @@
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
-#include <android_game_engine/ARPlaneCircle.h>
+#include <android_game_engine/ARPlane.h>
 
 namespace {
 const auto T_game_android = glm::rotate(glm::mat4(1.0f),
@@ -31,6 +31,7 @@ GameAR::GameAR(JNIEnv *env, jobject javaApplicationContext, jobject javaActivity
     arPlaneShader("shaders/ARPlane.vert", "shaders/ARPlane.frag") {
 
     this->bindToProjectionViewUBO(&this->arPlaneShader);
+    this->bindToLightSpaceUBO(&this->arPlaneShader);
 
     // Enable blending for transparent plane indicators
     glEnable(GL_BLEND);
@@ -167,26 +168,26 @@ void GameAR::updatePlanes() {
     ArTrackableList_getSize(this->arSession, planeList, &numPlanes);
 
     while (this->arPlanePool.size() < numPlanes) {
-        this->arPlanePool.emplace_back(std::make_shared<ARPlaneCircle>(Texture2D("images/trigrid.png")));
+        this->arPlanePool.emplace_back(std::make_shared<ARPlane>(Texture2D("images/trigrid.png")));
     }
     auto prevNumActivePlanes = this->numActivePlanes;
     this->numActivePlanes = 0;
     auto floorIndex = 0;
 
     for (auto i = 0; i < numPlanes; ++i) {
-        ArTrackable *plane = nullptr;
-        ArTrackableList_acquireItem(this->arSession, planeList, i, &plane);
+        ArTrackable *arPlane = nullptr;
+        ArTrackableList_acquireItem(this->arSession, planeList, i, &arPlane);
 
         ArPlane *subsumePlane = nullptr;
-        ArPlane_acquireSubsumedBy(this->arSession, ArAsPlane(plane), &subsumePlane);
+        ArPlane_acquireSubsumedBy(this->arSession, ArAsPlane(arPlane), &subsumePlane);
         if (!subsumePlane) {
             ArTrackingState trackingState;
-            ArTrackable_getTrackingState(this->arSession, plane, &trackingState);
+            ArTrackable_getTrackingState(this->arSession, arPlane, &trackingState);
             if (trackingState == ArTrackingState::AR_TRACKING_STATE_TRACKING) {
                 // Found a unique plane, extract the pose and dimensions
                 ArPose *pose;
                 ArPose_create(this->arSession, nullptr, &pose);
-                ArPlane_getCenterPose(this->arSession, ArAsPlane(plane), pose);
+                ArPlane_getCenterPose(this->arSession, ArAsPlane(arPlane), pose);
 
                 glm::mat4 planePose;
                 ArPose_getMatrix(this->arSession, pose, glm::value_ptr(planePose));
@@ -194,30 +195,30 @@ void GameAR::updatePlanes() {
                 ArPose_destroy(pose);
 
                 float width, length;
-                ArPlane_getExtentX(this->arSession, ArAsPlane(plane), &width);
-                ArPlane_getExtentZ(this->arSession, ArAsPlane(plane), &length);
+                ArPlane_getExtentX(this->arSession, ArAsPlane(arPlane), &width);
+                ArPlane_getExtentZ(this->arSession, ArAsPlane(arPlane), &length);
 
                 // Activate next available plane in plane pool
-                auto planeCircle = this->arPlanePool[this->numActivePlanes++].get();
+                auto plane = this->arPlanePool[this->numActivePlanes++].get();
                 if (this->numActivePlanes > prevNumActivePlanes) {
-                    this->registerPhysics(planeCircle);
+                    this->registerPhysics(plane);
                 }
 
                 // Configure plane to reflect extracted AR data
                 planePose = T_game_android * planePose;
-                planeCircle->setPosition(planePose[3]);
-                planeCircle->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
-                planeCircle->setDimensions({length, width});
+                plane->setPosition(planePose[3]);
+                plane->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
+                plane->setDimensions({length, width});
 
                 // Designate lowest plane as the floor
-                if (planeCircle->getPosition().z < this->arPlanePool[floorIndex]->getPosition().z) {
+                if (plane->getPosition().z < this->arPlanePool[floorIndex]->getPosition().z) {
                     floorIndex = this->numActivePlanes - 1;
                 }
             }
         }
 
         ArTrackable_release(ArAsTrackable(subsumePlane));
-        ArTrackable_release(plane);
+        ArTrackable_release(arPlane);
     }
 
     // Expand the floor's collision bounds
@@ -290,6 +291,8 @@ void GameAR::render() {
     // Render planes
     glDepthMask(GL_FALSE);
     this->arPlaneShader.use();
+    this->bindShadowMap(&this->arPlaneShader);
+
     for (auto i = 0u; i < this->numActivePlanes; ++i) {
         this->arPlanePool[i]->render(&this->arPlaneShader);
     }

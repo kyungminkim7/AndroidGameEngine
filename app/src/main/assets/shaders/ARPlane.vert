@@ -6,15 +6,23 @@ in float aOpacity;
 
 out vec2 vTextureCoordinate;
 out float vOpacity;
+out vec4 vPositionLightSpace;
 
 layout (std140) uniform ProjectionViewUB {
     mat4 projection_view;
 };
 
+layout (std140) uniform LightSpaceUB {
+    mat4 lightSpace;
+};
+
 uniform mat4 model;
 
 void main() {
-    gl_Position = projection_view * model * vec4(aPosition, 1.0);
+    vec4 worldPosition = model * vec4(aPosition, 1.0);
+
+    gl_Position = projection_view * worldPosition;
     vTextureCoordinate = aTextureCoordinate;
     vOpacity = aOpacity;
+    vPositionLightSpace = lightSpace * worldPosition;
 }

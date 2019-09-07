@@ -7,7 +7,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/trigonometric.hpp>
 
-#include <android_game_engine/ARPlaneCircle.h>
+#include <android_game_engine/ARPlane.h>
 #include <android_game_engine/Box.h>
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
@@ -35,7 +35,7 @@ TestGame::TestGame(JNIEnv *env, jobject javaApplicationContext, jobject javaActi
 
 void TestGame::onCreate() {
     BaseGameType::onCreate();
-//    this->enablePhysicsDebugDrawer(true);
+    this->enablePhysicsDebugDrawer(true);
 
 //    this->getCam()->setPosition({-10.0f, 5.0f, 7.0f});
 //    this->getCam()->setLookAtPoint({2.0f, 0.0f, 1.0f});

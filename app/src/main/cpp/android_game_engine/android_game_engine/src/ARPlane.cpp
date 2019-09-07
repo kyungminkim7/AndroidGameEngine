@@ -1,7 +1,8 @@
-#include <android_game_engine/ARPlaneCircle.h>
+#include <android_game_engine/ARPlane.h>
 
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <glm/mat2x2.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
 #include <android_game_engine/ShaderProgram.h>
@@ -16,30 +17,29 @@ constexpr auto opacityStride = sizeof(float);
 
 namespace age {
 
-ARPlaneCircle::ARPlaneCircle(const Texture2D &texture,
-                             unsigned int numVertices)
-                             : GameObject(),
-                             texture(texture) ,numVertices(numVertices), color(glm::vec3(1.0f)) {
+ARPlane::ARPlane(const Texture2D &texture) : GameObject(),
+    texture(texture), color(glm::vec3(1.0f)) {
+    const auto numVertices = 5;
+
     // Generate vertex data
-    std::vector<glm::vec3> positions;
-    std::vector<float> opacities(this->numVertices + 1, 1.0f);
-    std::vector<glm::uvec3> indices;
+    const std::vector<glm::vec3> positions {
+        {0.0f, 0.0f, 0.0f},
+        {0.5f, -0.5f,  0.0f},
+        {0.5f,  0.5f,  0.0f},
+        {-0.5f,  0.5f,  0.0f},
+        {-0.5f, -0.5f,  0.0f}
+    };
 
-    positions.reserve(this->numVertices + 1);
-    indices.reserve(this->numVertices);
+    std::vector<float> opacities {1.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
-    // 1st vertex is the center
-    positions.push_back(glm::vec3(0.0f));
+    std::vector<glm::uvec3> indices {
+        {0u, 1u, 2u},
+        {0u, 2u, 3u},
+        {0u, 3u, 4u},
+        {0u, 4u, 1u}
+    };
 
-    for (auto i = 1u; i < this->numVertices + 1; ++i) {
-        auto angle = glm::radians(360.0f / this->numVertices) * (i - 1);
-        positions.emplace_back(glm::rotateZ(glm::vec3(0.5f, 0.0f, 0.0f), angle));
-
-        auto lastIndex = (i + 1) % (numVertices + 1);
-        indices.emplace_back(glm::uvec3(0u, i, lastIndex ? lastIndex : 1u));
-    }
-
-    auto textureCoordinates = this->generateTextureCoordinates(1.0f);
+    auto textureCoordinates = this->generateTextureCoordinates(glm::vec2(1.0f));
 
     // Load vertex data onto GPU
     const auto positionsSize_bytes = positions.size() * positionStride;
@@ -95,28 +95,30 @@ ARPlaneCircle::ARPlaneCircle(const Texture2D &texture,
     this->setUnscaledDimensions({1.0f, 1.0f, thickness});
 }
 
-std::vector<glm::vec2> ARPlaneCircle::generateTextureCoordinates(float scale) {
-    std::vector<glm::vec2> textureCoordinates;
-    textureCoordinates.reserve(this->numVertices + 1);
+std::vector<glm::vec2> ARPlane::generateTextureCoordinates(const glm::vec2 &dimensions) {
+    std::vector<glm::vec2> textureCoordinates {
+        {0.0f, 0.0f},
+        {0.5f, -0.5f},
+        {-0.5f, -0.5f},
+        {-0.5f, 0.5f},
+        {0.5f, 0.5f}
+    };
 
-    textureCoordinates.push_back(glm::vec2(0.5f));
-    for (auto i = 1u; i < this->numVertices + 1; ++i) {
-        auto angle = glm::radians(360.0f / this->numVertices) * (i - 1);
-        textureCoordinates.emplace_back((glm::vec2(0.5f) +
-                                         glm::mat2({0.0f, -1.0f}, {-1.0f, 0.0f}) * glm::rotate(glm::vec2(0.5f * scale, 0.0f), angle)));
-    }
+    std::for_each(textureCoordinates.begin(), textureCoordinates.end(),
+                  [&dimensions](auto &tc){return glm::vec2(0.5f) + tc * dimensions;});
 
     return textureCoordinates;
 }
 
-ARPlaneCircle::~ARPlaneCircle() {
+ARPlane::~ARPlane() {
     glDeleteVertexArrays(1, &this->vao);
     glDeleteBuffers(1, &this->vbo);
     glDeleteBuffers(1, &this->ebo);
 }
 
-void ARPlaneCircle::render(age::ShaderProgram *shader) {
+void ARPlane::render(age::ShaderProgram *shader) {
     shader->setUniform("model", this->getModelMatrix());
+    shader->setUniform("normal", this->getNormalDirection());
 
     shader->setUniform("color", this->color);
     glActiveTexture(GL_TEXTURE0);
@@ -128,13 +130,11 @@ void ARPlaneCircle::render(age::ShaderProgram *shader) {
                    GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0));
 }
 
-void ARPlaneCircle::setDimensions(const glm::vec2 &dimensions) {
-    auto diameter = std::min(dimensions.x, dimensions.y);
-    this->setScale({diameter, diameter, 1.0f});
-    this->setCollisionShapeScale({dimensions.x, dimensions.y, 1.0});
+void ARPlane::setDimensions(const glm::vec2 &dimensions) {
+    this->setScale({dimensions.x, dimensions.y, 1.0});
 
     // Update vertex texture coordinates
-    auto textureCoordinates = this->generateTextureCoordinates(diameter);
+    auto textureCoordinates = this->generateTextureCoordinates(dimensions);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     glBufferSubData(GL_ARRAY_BUFFER, this->textureCoordinatesOffset,
                     textureCoordinates.size() * textureCoordinatesStride,
@@ -142,10 +142,10 @@ void ARPlaneCircle::setDimensions(const glm::vec2 &dimensions) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void ARPlaneCircle::setCollisionDiameter(float diameter) {
+void ARPlane::setCollisionDiameter(float diameter) {
     this->setCollisionShapeScale({diameter, diameter, 1.0f});
 }
 
-void ARPlaneCircle::setColor(const glm::vec3 &color) {this->color = color;}
+void ARPlane::setColor(const glm::vec3 &color) {this->color = color;}
 
 } // namespace age

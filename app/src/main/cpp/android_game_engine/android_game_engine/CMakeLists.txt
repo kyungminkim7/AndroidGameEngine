@@ -10,7 +10,7 @@ set_target_properties(arcore PROPERTIES IMPORTED_LOCATION
 
 add_library(${PROJECT_NAME} STATIC
         src/ARCameraBackground.cpp
-        src/ARPlaneCircle.cpp
+        src/ARPlane.cpp
         src/Asset.cpp
         src/Box.cpp
         src/Camera.cpp

@@ -67,7 +67,7 @@ void Game::onCreate() {
     this->directionalLight = std::make_unique<LightDirectional>(glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.8f),
                                                                 -lightLimit, lightLimit, -lightLimit, lightLimit,
                                                                 0.1f, lightLimit * 2.0f);
-    this->directionalLight->setPosition({0.0f, 0.0f, lightLimit});
+    this->directionalLight->setPosition({0.0f, 0.0f, lightLimit * 1.5f});
     this->directionalLight->setNormalDirection({1.0f, 1.0f, 1.0f});
     this->directionalLight->setLookAtPoint({0.0f, 0.0f, 0.0f});
 
@@ -145,10 +145,7 @@ void Game::renderWorld() {
     this->defaultShader.setUniform("viewPosition", this->cam->getPosition());
 
     // Set shadow properties
-    glActiveTexture(GL_TEXTURE0 + this->shadowMapTextureUnit);
-    this->shadowMap->bindDepthMap();
-    this->defaultShader.setUniform("shadowMap", this->shadowMapTextureUnit);
-
+    this->bindShadowMap(&this->defaultShader);
     this->directionalLight->render(&this->defaultShader);
 
     for (auto &gameObject : this->worldList) {
@@ -173,6 +170,12 @@ void Game::renderWorld() {
     }
 }
 
+void Game::bindShadowMap(age::ShaderProgram *shaderProgram) {
+    glActiveTexture(GL_TEXTURE0 + this->shadowMapTextureUnit);
+    this->shadowMap->bindDepthMap();
+    shaderProgram->setUniform("shadowMap", this->shadowMapTextureUnit);
+}
+
 bool Game::onTouchDownEvent(float x, float y) {
     this->raycastTouch({x, y}, 1000.0f);
     return true;
@@ -195,6 +198,10 @@ void Game::addToWorldList(std::shared_ptr<age::GameObject> gameObject) {
 
 void Game::bindToProjectionViewUBO(age::ShaderProgram *shaderProgram) {
     shaderProgram->setUniformBlockBinding(this->projectionViewUbo);
+}
+
+void Game::bindToLightSpaceUBO(age::ShaderProgram *shaderProgram) {
+    shaderProgram->setUniformBlockBinding(this->lightSpaceUbo);
 }
 
 void Game::registerPhysics(age::GameObject *gameObject) {
