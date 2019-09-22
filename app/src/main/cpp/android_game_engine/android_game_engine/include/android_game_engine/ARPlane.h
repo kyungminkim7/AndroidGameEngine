@@ -35,6 +35,8 @@ private:
     glm::vec3 color;
 
     unsigned int textureCoordinatesOffset;
+
+    bool visible = true;
 };
 
 } // namespace age

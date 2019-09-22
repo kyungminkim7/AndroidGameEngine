@@ -131,7 +131,7 @@ const std::vector<glm::uvec3> indices {
 };
 
 Quadcopter::Quadcopter(const std::string &modelFilepath, const Parameters &params)
-    : GameObject(), mode(Mode::ACRO), maxRoll(params.maxRoll), maxPitch(params.maxPitch),
+    : GameObject(modelFilepath), mode(Mode::ACRO), maxRoll(params.maxRoll), maxPitch(params.maxPitch),
     maxRollRate(params.maxRollRate), maxPitchRate(params.maxPitchRate), maxYawRate(params.maxYawRate),
     maxThrust(params.maxThrust),
     rollController(params.angle_kp, params.angle_ki, params.angle_kd),

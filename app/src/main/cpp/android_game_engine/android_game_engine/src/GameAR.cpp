@@ -128,8 +128,11 @@ void GameAR::onUpdate(std::chrono::duration<float> updateDuration) {
 
     if (this->arCameraTrackingState != AR_TRACKING_STATE_TRACKING) return;
 
-    this->updatePlanes();
     this->updateDirectionalLight();
+
+    if (this->state == State::DISCOVER_ENVIRONMENT_PLANES) {
+        this->updatePlanes();
+    }
 }
 
 void GameAR::updateCamera() {
@@ -169,6 +172,7 @@ void GameAR::updatePlanes() {
 
     while (this->arPlanePool.size() < numPlanes) {
         this->arPlanePool.emplace_back(std::make_shared<ARPlane>(Texture2D("images/trigrid.png")));
+        this->arPlanePool.back()->setFriction(1.0f);
     }
     auto prevNumActivePlanes = this->numActivePlanes;
     this->numActivePlanes = 0;
@@ -223,6 +227,14 @@ void GameAR::updatePlanes() {
 
         ArTrackable_release(ArAsTrackable(subsumePlane));
         ArTrackable_release(arPlane);
+    }
+
+    // Signal to Java activity that a plane was found
+    if (prevNumActivePlanes == 0 && this->numActivePlanes > 0) {
+        auto env = this->getJNIEnv();
+        auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
+        auto callback = env->GetMethodID(activityClass, "arPlaneFound", "()V");
+        env->CallVoidMethod(this->getJavaActivityObject(), callback);
     }
 
     // Expand the floor's collision bounds
@@ -303,10 +315,6 @@ void GameAR::render() {
     glDepthMask(GL_TRUE);
 }
 
-void GameAR::setStateRender(age::GameAR::StateRender stateRender) {
-    this->stateRender = stateRender;
-}
-
 bool GameAR::onTouchDownEvent(float x, float y) {
     return Game::onTouchDownEvent(x, y) && this->stateOnTouchDownEvent(x, y);
 }
@@ -318,6 +326,8 @@ bool GameAR::onTouchMoveEvent(float x, float y) {
 bool GameAR::onTouchUpEvent(float x, float y) {
     return Game::onTouchUpEvent(x, y) && this->stateOnTouchUpEvent(x, y);
 }
+
+void GameAR::setState(age::GameAR::State state) {this->state = state;}
 
 void GameAR::setStateOnTouchDownEvent(age::GameAR::StateOnTouch stateOnTouchDownEvent) {
     this->stateOnTouchDownEvent = stateOnTouchDownEvent;

@@ -31,7 +31,7 @@ ARPlane::ARPlane(const Texture2D &texture) : GameObject(),
         {-0.5f, -0.5f,  thickness}
     };
 
-    std::vector<float> opacities {1.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+    std::vector<float> opacities {0.5f, 0.0f, 0.0f, 0.0f, 0.0f};
 
     std::vector<glm::uvec3> indices {
         {0u, 1u, 2u},

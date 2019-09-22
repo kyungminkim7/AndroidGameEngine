@@ -34,10 +34,11 @@ public:
     bool onTouchUpEvent(float x, float y) override;
 
 protected:
-    using StateRender = std::function<void()>;
+    enum class State {DISCOVER_ENVIRONMENT_PLANES, GAMEPLAY};
+
     using StateOnTouch = std::function<bool(float, float)>;
 
-    void setStateRender(StateRender stateRender);
+    void setState(State state);
 
     void setStateOnTouchDownEvent(StateOnTouch stateOnTouchDownEvent);
     void setStateOnTouchMoveEvent(StateOnTouch stateOnTouchMoveEvent);
@@ -55,10 +56,8 @@ private:
     /// AR Games will have at least 2 states:
     ///     1. Discovering the environment setting up the playing environment
     ///     2. Gameplay
-    /// This will involve different render, and touch callback schemes.
+    /// This will involve different touch callback schemes.
     ///@{
-    StateRender stateRender;
-
     StateOnTouch stateOnTouchDownEvent = [](float, float){return true;};
     StateOnTouch stateOnTouchMoveEvent = [](float, float){return true;};
     StateOnTouch stateOnTouchUpEvent = [](float, float){return true;};
@@ -73,6 +72,8 @@ private:
 
     std::vector<std::shared_ptr<ARPlane>> arPlanePool;
     int numActivePlanes = 0;
+
+    State state = State::DISCOVER_ENVIRONMENT_PLANES;
 };
 
 } // namespace age

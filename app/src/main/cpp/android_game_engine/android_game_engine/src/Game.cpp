@@ -196,6 +196,14 @@ void Game::addToWorldList(std::shared_ptr<age::GameObject> gameObject) {
     this->worldList.push_back(std::move(gameObject));
 }
 
+void Game::clearWorldList() {
+    for (auto& gameObject : this->worldList) {
+        this->unregisterPhysics(gameObject.get());
+    }
+
+    this->worldList.clear();
+}
+
 void Game::bindToProjectionViewUBO(age::ShaderProgram *shaderProgram) {
     shaderProgram->setUniformBlockBinding(this->projectionViewUbo);
 }

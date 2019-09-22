@@ -63,6 +63,7 @@ protected:
     void setSkybox(std::unique_ptr<Skybox> skybox);
     
     void addToWorldList(std::shared_ptr<GameObject> gameObject);
+    void clearWorldList();
 
     void bindToProjectionViewUBO(ShaderProgram *shaderProgram);
     void bindToLightSpaceUBO(ShaderProgram *shaderProgram);

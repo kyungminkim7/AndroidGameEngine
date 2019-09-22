@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -34,6 +35,8 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
     private native void onRollThrustInputJNI(float roll, float thrust);
     private native void onYawPitchInputJNI(float yaw, float pitch);
+
+    private native void onResetUAVJNI();
     ///@}
 
     /// \name Game Engine Functions
@@ -62,14 +65,23 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     private GLSurfaceView glSurfaceView;
     private Joystick rollThrustJoystick;
     private Joystick yawPitchJoystick;
+    private Button resetButton;
 
     private Handler arPlaneFoundHandler;
-
     private Runnable arPlaneFoundRunnable = ()->{
         Snackbar foundSnackbar = Snackbar.make(GameActivity.this.findViewById(android.R.id.content),
-                                         "Found surfaces 2!",
+                                         "Continue scanning the environment to detect more surfaces or touch a surface to place your UAV.",
                                                Snackbar.LENGTH_INDEFINITE);
-        foundSnackbar.getView().setBackgroundColor(0xbf323232);
+        foundSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
+        foundSnackbar.show();
+    };
+
+    private Handler uavCreatedHandler;
+    private Runnable uavCreatedRunnable = ()->{
+        Snackbar foundSnackbar = Snackbar.make(GameActivity.this.findViewById(android.R.id.content),
+                "Use the joysticks to control your UAV.",
+                Snackbar.LENGTH_SHORT);
+        foundSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
         foundSnackbar.show();
     };
 
@@ -107,8 +119,10 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
         this.rollThrustJoystick = findViewById(R.id.rollThrustJoystick);
         this.yawPitchJoystick = findViewById(R.id.yawPitchJoystick);
+        this.resetButton = findViewById(R.id.resetButton);
 
         this.arPlaneFoundHandler = new Handler();
+        this.uavCreatedHandler = new Handler();
     }
 
     @Override
@@ -126,11 +140,11 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
             return;
         }
 
-//        Snackbar loadingSnackbar = Snackbar.make(this.findViewById(android.R.id.content),
-//                                           "Searching for surfaces. Move camera slowly...",
-//                                                 Snackbar.LENGTH_INDEFINITE);
-//        loadingSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
-//        loadingSnackbar.show();
+        Snackbar loadingSnackbar = Snackbar.make(this.findViewById(android.R.id.content),
+                                           "Searching for surfaces. Move camera slowly to scan the environment...",
+                                                 Snackbar.LENGTH_INDEFINITE);
+        loadingSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
+        loadingSnackbar.show();
 
         this.onResumeJNI();
         this.glSurfaceView.onResume();
@@ -222,6 +236,13 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
                 return result;
             }
         });
+
+        this.resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                glSurfaceView.queueEvent(()->onResetUAVJNI());
+            }
+        });
     }
 
     @Override
@@ -239,7 +260,6 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
         }
     }
 
-    private void myCallback() {
-//        this.arPlaneFoundHandler.post(this.arPlaneFoundRunnable);
-    }
+    private void arPlaneFound() {this.arPlaneFoundHandler.post(this.arPlaneFoundRunnable);}
+    private void uavCreated() {this.uavCreatedHandler.post(this.uavCreatedRunnable);}
 }

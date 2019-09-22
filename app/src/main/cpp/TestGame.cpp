@@ -30,12 +30,16 @@ JNI_METHOD_DEFINITION(void, onYawPitchInputJNI)(JNIEnv *env, jobject gameActivit
     reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onYawPitchInput(yaw, pitch);
 }
 
+JNI_METHOD_DEFINITION(void, onResetUAVJNI)(JNIEnv *env, jobject gameActivity) {
+    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onResetUAV();
+}
+
 TestGame::TestGame(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject)
     : BaseGameType(env, javaApplicationContext, javaActivityObject) {}
 
 void TestGame::onCreate() {
     BaseGameType::onCreate();
-    this->enablePhysicsDebugDrawer(true);
+//    this->enablePhysicsDebugDrawer(true);
 
 //    this->getCam()->setPosition({-10.0f, 5.0f, 7.0f});
 //    this->getCam()->setLookAtPoint({2.0f, 0.0f, 1.0f});
@@ -107,11 +111,27 @@ void TestGame::onCreate() {
 }
 
 void TestGame::onRollThrustInput(float roll, float thrust) {
-//    this->uav->onRollThrustInput({roll, thrust});
+    if (this->uav != nullptr) {
+        this->uav->onRollThrustInput({roll, thrust});
+    }
 }
 
 void TestGame::onYawPitchInput(float yaw, float pitch) {
-//    this->uav->onYawPitchInput({yaw, pitch});
+    if (this->uav != nullptr) {
+        this->uav->onYawPitchInput({yaw, pitch});
+    }
+}
+
+void TestGame::onResetUAV() {
+    this->clearWorldList();
+    this->uav = nullptr;
+
+    this->setState(GameAR::State::DISCOVER_ENVIRONMENT_PLANES);
+
+    auto env = this->getJNIEnv();
+    auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
+    auto callback = env->GetMethodID(activityClass, "arPlaneFound", "()V");
+    env->CallVoidMethod(this->getJavaActivityObject(), callback);
 }
 
 void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
@@ -121,18 +141,58 @@ void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 
 //    this->uav->clearForces();
 //    this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
 
-    Log::info("Touched: " + glm::to_string(touchPoint));
-    Log::info("Light position: " + glm::to_string(this->getDirectionalLight()->getPosition()));
-    Log::info("Light look at direction: " + glm::to_string(this->getDirectionalLight()->getLookAtDirection()));
-    Log::info("Window dimensions: " + std::to_string(ManagerWindowing::getWindowWidth()) + ", " + std::to_string(ManagerWindowing::getWindowHeight()));
+//    auto obj = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
+//    obj->setScale(glm::vec3(2.0f));
+//    obj->setMass(1.0f);
+//    obj->setOrientation(glm::mat3(1.0f));
+//    obj->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.2f));
+//    obj->applyCentralForce({0.0f, -1.0f, 0.0f});
+//    this->addToWorldList(std::move(obj));
 
-    auto obj = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
-    obj->setScale(glm::vec3(2.0f));
-    obj->setMass(1.0f);
-    obj->setOrientation(glm::mat3(1.0f));
-    obj->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.2f));
-    obj->applyCentralForce({0.0f, -1.0f, 0.0f});
-    this->addToWorldList(std::move(obj));
+    if (this->uav == nullptr) {
+        // Create UAV
+        Quadcopter::Parameters params;
+        params.mass = 1.0f;
+
+        params.maxRoll = glm::radians(35.0f);
+        params.maxPitch = glm::radians(35.0f);
+
+        params.maxRollRate = glm::radians(360.0f);
+        params.maxPitchRate = glm::radians(360.0f);
+        params.maxYawRate = glm::radians(120.0f);
+        params.maxThrust = 15.0f;
+
+        params.controlRates2MotorRotationSpeed = 150.0f;
+
+        params.angle_kp = 2.5f;
+        params.angle_ki = 0.0f;
+        params.angle_kd = 0.8f;
+
+        params.angleRate_kp = 2.0f;
+        params.angleRate_ki = 0.0f;
+        params.angleRate_kd = 0.0f;
+
+        params.motorRotationSpeed2Thrust = 2.0E-3f;
+
+        this->uav = std::make_shared<Quadcopter>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds", params);
+        this->uav->setLabel("UAV");
+//        this->uav->setScale(glm::vec3(2.0f));
+        this->uav->setScale({0.07f, 0.07f, 0.02f});
+        this->uav->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.2f));
+        this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
+
+        this->uav->setMode(Quadcopter::Mode::ANGLE);
+        this->uav->setDamping(0.25f, 0.05f);
+
+        this->addToWorldList(this->uav);
+
+        this->setState(GameAR::State::GAMEPLAY);
+
+        auto env = this->getJNIEnv();
+        auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
+        auto callback = env->GetMethodID(activityClass, "uavCreated", "()V");
+        env->CallVoidMethod(this->getJavaActivityObject(), callback);
+    }
 }
 
 } // namespace age
