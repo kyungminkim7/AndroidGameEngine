@@ -20,14 +20,15 @@ namespace age {
 ARPlane::ARPlane(const Texture2D &texture) : GameObject(),
     texture(texture), color(glm::vec3(1.0f)) {
     const auto numVertices = 5;
+    const auto thickness = 0.1f;
 
     // Generate vertex data
     const std::vector<glm::vec3> positions {
-        {0.0f, 0.0f, 0.0f},
-        {0.5f, -0.5f,  0.0f},
-        {0.5f,  0.5f,  0.0f},
-        {-0.5f,  0.5f,  0.0f},
-        {-0.5f, -0.5f,  0.0f}
+        {0.0f, 0.0f, thickness},
+        {0.5f, -0.5f,  thickness},
+        {0.5f,  0.5f,  thickness},
+        {-0.5f,  0.5f,  thickness},
+        {-0.5f, -0.5f,  thickness}
     };
 
     std::vector<float> opacities {1.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -90,7 +91,6 @@ ARPlane::ARPlane(const Texture2D &texture) : GameObject(),
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // Create collision shape
-    const auto thickness = 0.01f;
     this->setCollisionShape(std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, thickness)));
     this->setUnscaledDimensions({1.0f, 1.0f, thickness});
 }

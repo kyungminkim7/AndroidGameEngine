@@ -205,10 +205,14 @@ void GameAR::updatePlanes() {
                 }
 
                 // Configure plane to reflect extracted AR data
-                planePose = T_game_android * planePose;
-                plane->setPosition(planePose[3]);
-                plane->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
                 plane->setDimensions({length, width});
+                planePose = T_game_android * planePose;
+
+                plane->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
+
+                const auto thicknessOffset =  plane->getOrientation() *
+                                              glm::vec3(0.0f, 0.0f, plane->getScaledDimensions().z * 0.5f);
+                plane->setPosition(static_cast<glm::vec3>(planePose[3]) - thicknessOffset);
 
                 // Designate lowest plane as the floor
                 if (plane->getPosition().z < this->arPlanePool[floorIndex]->getPosition().z) {
