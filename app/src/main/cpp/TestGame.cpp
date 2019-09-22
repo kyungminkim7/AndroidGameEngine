@@ -41,10 +41,8 @@ void TestGame::onCreate() {
     BaseGameType::onCreate();
 //    this->enablePhysicsDebugDrawer(true);
 
-//    this->getCam()->setPosition({-10.0f, 5.0f, 7.0f});
-//    this->getCam()->setLookAtPoint({2.0f, 0.0f, 1.0f});
-//    this->getCam()->setPosition({-1.0f, 0.0f, 1.0f});
-//    this->getCam()->setLookAtPoint({1.0f, 0.0f, 0.0f});
+//    this->getCam()->setPosition({-0.5f, 0.0f, 1.0f});
+//    this->getCam()->setLookAtPoint({0.5f, 0.0f, 0.7f});
 
 //    {
 //        this->obj1 = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
@@ -68,9 +66,9 @@ void TestGame::onCreate() {
 //        floor->setFriction(1.0f);
 //        this->addToWorldList(floor);
 //    }
-//
-//    {
-//        // Create UAV
+
+    {
+        // Create UAV
 //        Quadcopter::Parameters params;
 //        params.mass = 1.0f;
 //
@@ -101,13 +99,42 @@ void TestGame::onCreate() {
 //        this->uav->setMode(Quadcopter::Mode::ANGLE);
 //        this->uav->setDamping(0.25f, 0.05f);
 //
-//        this->addToWorldList(this->uav);
+//        Quadcopter::Parameters params;
+//        params.mass = 1.0f;
 //
-//        auto env = this->getJNIEnv();
-//        auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
-//        auto callback = env->GetMethodID(activityClass, "myCallback", "()V");
-//        env->CallVoidMethod(this->getJavaActivityObject(), callback);
-//    }
+//        params.maxRoll = glm::radians(35.0f);
+//        params.maxPitch = glm::radians(35.0f);
+//
+//        params.maxRollRate = glm::radians(360.0f);
+//        params.maxPitchRate = glm::radians(360.0f);
+//        params.maxYawRate = glm::radians(120.0f);
+//        params.maxThrust = 10.0f;
+//
+//        params.controlRates2MotorRotationSpeed = 150.0f;
+//
+//        params.angle_kp = 2.6f;
+//        params.angle_ki = 0.0f;
+//        params.angle_kd = 0.85f;
+//
+//        params.angleRate_kp = 2.0f;
+//        params.angleRate_ki = 0.0f;
+//        params.angleRate_kd = 0.0f;
+//
+//        params.motorRotationSpeed2Thrust = 2.0E-3f;
+//
+//        this->uav = std::make_shared<Quadcopter>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds", params);
+//        this->uav->setLabel("UAV");
+//        this->uav->setScale({0.2f, 0.2f, 0.05f});
+////        this->uav->setScale({0.12f, 0.12, 0.05f});
+//        this->uav->setMode(Quadcopter::Mode::ANGLE);
+//        this->uav->setPosition(glm::vec3(0.0f, 0.0f, 0.2f));
+//        this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
+//
+//        this->uav->setMode(Quadcopter::Mode::ANGLE);
+//        this->uav->setDamping(0.25f, 0.05f);
+//
+//        this->addToWorldList(this->uav);
+    }
 }
 
 void TestGame::onRollThrustInput(float roll, float thrust) {
@@ -136,7 +163,7 @@ void TestGame::onResetUAV() {
 
 void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
                                    const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
-//    this->uav->setPosition({0.0f, 0.0f, 1.0f});
+//    this->uav->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.2f));
 //    this->uav->setOrientation(glm::mat3(1.0f));
 //    this->uav->clearForces();
 //    this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
@@ -160,13 +187,13 @@ void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 
         params.maxRollRate = glm::radians(360.0f);
         params.maxPitchRate = glm::radians(360.0f);
         params.maxYawRate = glm::radians(120.0f);
-        params.maxThrust = 15.0f;
+        params.maxThrust = 10.0f;
 
         params.controlRates2MotorRotationSpeed = 150.0f;
 
-        params.angle_kp = 2.5f;
+        params.angle_kp = 2.6f;
         params.angle_ki = 0.0f;
-        params.angle_kd = 0.8f;
+        params.angle_kd = 0.85f;
 
         params.angleRate_kp = 2.0f;
         params.angleRate_ki = 0.0f;
@@ -176,10 +203,14 @@ void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 
 
         this->uav = std::make_shared<Quadcopter>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds", params);
         this->uav->setLabel("UAV");
-//        this->uav->setScale(glm::vec3(2.0f));
-        this->uav->setScale({0.07f, 0.07f, 0.02f});
+        this->uav->setScale({0.2, 0.2, 0.05f});
+        this->uav->setMode(Quadcopter::Mode::ANGLE);
         this->uav->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.2f));
         this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
+
+        // Face the uav in the same direction as the camera
+        auto lookAtDirection = this->getCam()->getLookAtDirection();
+        this->uav->setLookAtDirection({lookAtDirection.x, lookAtDirection.y, 0.2f});
 
         this->uav->setMode(Quadcopter::Mode::ANGLE);
         this->uav->setDamping(0.25f, 0.05f);
