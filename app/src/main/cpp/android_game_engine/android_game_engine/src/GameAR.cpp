@@ -130,7 +130,7 @@ void GameAR::onUpdate(std::chrono::duration<float> updateDuration) {
 
     this->updateDirectionalLight();
 
-    if (this->state == State::DISCOVER_ENVIRONMENT_PLANES) {
+    if (this->state == State::TRACK_PLANES) {
         this->updatePlanes();
     }
 }
@@ -170,13 +170,13 @@ void GameAR::updatePlanes() {
     int32_t numPlanes = 0;
     ArTrackableList_getSize(this->arSession, planeList, &numPlanes);
 
-    while (this->arPlanePool.size() < numPlanes) {
-        this->arPlanePool.emplace_back(std::make_shared<ARPlane>(Texture2D("images/trigrid.png")));
-        this->arPlanePool.back()->setFriction(1.0f);
-    }
-    auto prevNumActivePlanes = this->numActivePlanes;
-    this->numActivePlanes = 0;
-    auto floorIndex = 0;
+//    while (this->arPlanePool.size() < numPlanes) {
+//        this->arPlanePool.emplace_back(std::make_shared<ARPlane>(Texture2D("images/trigrid.png")));
+//        this->arPlanePool.back()->setFriction(1.0f);
+//    }
+//    auto prevNumActivePlanes = this->numActivePlanes;
+//    this->numActivePlanes = 0;
+//    this->floorPlaneIndex = 0;
 
     for (auto i = 0; i < numPlanes; ++i) {
         ArTrackable *arPlane = nullptr;
@@ -203,25 +203,50 @@ void GameAR::updatePlanes() {
                 ArPlane_getExtentZ(this->arSession, ArAsPlane(arPlane), &length);
 
                 // Activate next available plane in plane pool
-                auto plane = this->arPlanePool[this->numActivePlanes++].get();
-                if (this->numActivePlanes > prevNumActivePlanes) {
-                    this->registerPhysics(plane);
-                }
+//                auto plane = this->arPlanePool[this->numActivePlanes++].get();
+//                if (this->numActivePlanes > prevNumActivePlanes) {
+//                    this->registerPhysics(plane);
+//                }
 
                 // Configure plane to reflect extracted AR data
-                plane->setDimensions({length, width});
+//                plane->setDimensions({length, width});
                 planePose = T_game_android * planePose;
 
-                plane->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
+                if (this->floor == nullptr) {
+                    this->floor = std::make_shared<ARPlane>(Texture2D("images/trigrid.png"));
+                    this->registerPhysics(this->floor.get());
 
-                const auto thicknessOffset =  plane->getOrientation() *
-                                              glm::vec3(0.0f, 0.0f, plane->getScaledDimensions().z * 0.5f);
-                plane->setPosition(static_cast<glm::vec3>(planePose[3]) - thicknessOffset);
+                    this->floor->setPosition(planePose[3]);
+                    this->floor->translate({0.0f, 0.0f, 1.0f});
 
-                // Designate lowest plane as the floor
-                if (plane->getPosition().z < this->arPlanePool[floorIndex]->getPosition().z) {
-                    floorIndex = this->numActivePlanes - 1;
+                    // Signal to Java activity that a plane was found
+                    auto env = this->getJNIEnv();
+                    auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
+                    auto callback = env->GetMethodID(activityClass, "arPlaneFound", "()V");
+                    env->CallVoidMethod(this->getJavaActivityObject(), callback);
                 }
+
+                if (planePose[3].z < this->floor->getPosition().z) {
+                    this->floor->setDimensions({length, width});
+
+                    Log::info("Z: "  + std::to_string(this->floor->getScaledDimensions().z));
+                    this->floor->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
+                    this->floor->setPosition(planePose[3]);
+                    this->floor->translateInLocalFrame(glm::vec3(0.0f, 0.0f, -this->floor->getScaledDimensions().z * 0.5f));
+
+                    this->floor->setCollisionDiameter(50.0f);
+                }
+
+//                plane->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
+//
+//                const auto thicknessOffset =  plane->getOrientation() *
+//                                              glm::vec3(0.0f, 0.0f, plane->getScaledDimensions().z * 0.5f);
+//                plane->setPosition(static_cast<glm::vec3>(planePose[3]) - thicknessOffset);
+//
+//                // Designate lowest plane as the floor
+//                if (plane->getPosition().z < this->arPlanePool[this->floorPlaneIndex]->getPosition().z) {
+//                    this->floorPlaneIndex = this->numActivePlanes - 1;
+//                }
             }
         }
 
@@ -229,22 +254,22 @@ void GameAR::updatePlanes() {
         ArTrackable_release(arPlane);
     }
 
-    // Signal to Java activity that a plane was found
-    if (prevNumActivePlanes == 0 && this->numActivePlanes > 0) {
-        auto env = this->getJNIEnv();
-        auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
-        auto callback = env->GetMethodID(activityClass, "arPlaneFound", "()V");
-        env->CallVoidMethod(this->getJavaActivityObject(), callback);
-    }
+//    // Signal to Java activity that a plane was found
+//    if (prevNumActivePlanes == 0 && this->numActivePlanes > 0) {
+//        auto env = this->getJNIEnv();
+//        auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
+//        auto callback = env->GetMethodID(activityClass, "arPlaneFound", "()V");
+//        env->CallVoidMethod(this->getJavaActivityObject(), callback);
+//    }
 
     // Expand the floor's collision bounds
-    if (this->numActivePlanes > 0) {
-        this->arPlanePool[floorIndex]->setCollisionDiameter(50.0f);
-    }
+//    if (this->numActivePlanes > 0) {
+//        this->arPlanePool[this->floorPlaneIndex]->setCollisionDiameter(50.0f);
+//    }
 
-    for (auto i = this->numActivePlanes; i < prevNumActivePlanes; ++i) {
-        this->unregisterPhysics(this->arPlanePool[i].get());
-    }
+//    for (auto i = this->numActivePlanes; i < prevNumActivePlanes; ++i) {
+//        this->unregisterPhysics(this->arPlanePool[i].get());
+//    }
 
     ArTrackableList_destroy(planeList);
 }
@@ -305,14 +330,17 @@ void GameAR::render() {
     this->renderWorld();
 
     // Render planes
-    glDepthMask(GL_FALSE);
-    this->arPlaneShader.use();
-    this->bindShadowMap(&this->arPlaneShader);
+    if (this->floor != nullptr) {
+        glDepthMask(GL_FALSE);
+        this->arPlaneShader.use();
+        this->bindShadowMap(&this->arPlaneShader);
+        this->floor->render(&this->arPlaneShader);
 
-    for (auto i = 0u; i < this->numActivePlanes; ++i) {
-        this->arPlanePool[i]->render(&this->arPlaneShader);
+//        for (auto i = 0u; i < this->numActivePlanes; ++i) {
+//            this->arPlanePool[i]->render(&this->arPlaneShader);
+//        }
+        glDepthMask(GL_TRUE);
     }
-    glDepthMask(GL_TRUE);
 }
 
 bool GameAR::onTouchDownEvent(float x, float y) {

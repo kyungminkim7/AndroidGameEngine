@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 
+#include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/trigonometric.hpp>
 
@@ -40,6 +41,7 @@ TestGame::TestGame(JNIEnv *env, jobject javaApplicationContext, jobject javaActi
 void TestGame::onCreate() {
     BaseGameType::onCreate();
 //    this->enablePhysicsDebugDrawer(true);
+    this->getDirectionalLight()->setLookAtDirection({1.0f, 1.0f, -3.0f});
 
 //    this->getCam()->setPosition({-0.5f, 0.0f, 1.0f});
 //    this->getCam()->setLookAtPoint({0.5f, 0.0f, 0.7f});
@@ -123,25 +125,41 @@ void TestGame::onCreate() {
 
         params.motorRotationSpeed2Thrust = 2.0E-3f;
 
-        this->uav = std::make_shared<Quadcopter>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds", params);
-        this->uav->setLabel("UAV");
-        this->uav->setScale({0.2, 0.2, 0.05f});
-        this->uav->setMode(Quadcopter::Mode::ANGLE);
-        this->uav->setDamping(0.25f, 0.05f);
+//        this->uavCache = std::make_shared<Quadcopter>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds", params);
+        this->uavCache = std::make_shared<Quadcopter>("models/parrot_drone/parrot.3ds", params);
+        this->uavCache->setLabel("UAV");
+//        this->uavCache->setScale({0.2f, 0.2f, 0.05f});
+
+        auto dimensions = this->uavCache->getScaledDimensions();
+        this->uavCache->setScale({0.2f / dimensions.x, 0.2f / dimensions.y, 0.05f / dimensions.z});
+
+        this->uavCache->setMode(Quadcopter::Mode::ANGLE);
+        this->uavCache->setDamping(0.25f, 0.05f);
+
+
+        this->random = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
+        this->random->setScale(glm::vec3(2.0f));
+        this->random->setMass(1.0f);
     }
 }
 
 void TestGame::onRollThrustInput(float roll, float thrust) {
-    this->uav->onRollThrustInput({roll, thrust});
+    if (this->uav != nullptr) {
+        this->uav->onRollThrustInput({roll, thrust});
+    }
 }
 
 void TestGame::onYawPitchInput(float yaw, float pitch) {
-    this->uav->onYawPitchInput({yaw, pitch});
+    if (this->uav != nullptr) {
+        this->uav->onYawPitchInput({yaw, pitch});
+    }
 }
 
 void TestGame::onResetUAV() {
+    this->uav = nullptr;
+
     this->clearWorldList();
-    this->setState(GameAR::State::DISCOVER_ENVIRONMENT_PLANES);
+    this->setState(GameAR::State::TRACK_PLANES);
 
     auto env = this->getJNIEnv();
     auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
@@ -164,21 +182,33 @@ void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 
 //    obj->applyCentralForce({0.0f, -1.0f, 0.0f});
 //    this->addToWorldList(std::move(obj));
 
-    this->uav->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.025f));
-    this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
+    // Set UAV position
+    if (this->uav == nullptr) {
+        this->uav = this->uavCache;
+        this->uav->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.05f));
+        this->uav->setOrientation(glm::mat3(1.0f));
+        auto lookAtDirection = this->getCam()->getLookAtDirection();
+        lookAtDirection.z = 0.025f;
+        this->uav->setLookAtDirection(lookAtDirection);
+        this->uav->clearForces();
+        this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
+        this->addToWorldList(this->uav);
 
-    // Face the uav in the same direction as the camera
-    auto lookAtDirection = this->getCam()->getLookAtDirection();
-    this->uav->setLookAtDirection({lookAtDirection.x, lookAtDirection.y, 0.025f});
+        auto positionOffset = glm::normalize(glm::vec3(lookAtDirection.x, lookAtDirection.z, 0.0f));
+        positionOffset = glm::rotateZ(positionOffset * 0.5f, glm::radians(20.0f));
+        positionOffset.z = 1.0f;
+        this->random->setPosition(touchPoint + positionOffset);
+        this->random->rotate(glm::radians(45.0f), {1.0f, 0.0f, 1.0f});
+        this->random->applyCentralForce({0.0f, 0.0f, -1.0f});
+        this->addToWorldList(this->random);
 
-    this->addToWorldList(this->uav);
+        this->setState(GameAR::State::GAMEPLAY);
 
-    this->setState(GameAR::State::GAMEPLAY);
-
-    auto env = this->getJNIEnv();
-    auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
-    auto callback = env->GetMethodID(activityClass, "uavCreated", "()V");
-    env->CallVoidMethod(this->getJavaActivityObject(), callback);
+        auto env = this->getJNIEnv();
+        auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
+        auto callback = env->GetMethodID(activityClass, "uavCreated", "()V");
+        env->CallVoidMethod(this->getJavaActivityObject(), callback);
+    }
 }
 
 } // namespace age

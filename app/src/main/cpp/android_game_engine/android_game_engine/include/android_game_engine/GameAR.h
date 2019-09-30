@@ -34,7 +34,7 @@ public:
     bool onTouchUpEvent(float x, float y) override;
 
 protected:
-    enum class State {DISCOVER_ENVIRONMENT_PLANES, GAMEPLAY};
+    enum class State {TRACK_PLANES, GAMEPLAY};
 
     using StateOnTouch = std::function<bool(float, float)>;
 
@@ -70,10 +70,12 @@ private:
     ARCameraBackground arCameraBackground;
     ArTrackingState arCameraTrackingState;
 
-    std::vector<std::shared_ptr<ARPlane>> arPlanePool;
-    int numActivePlanes = 0;
+//    std::vector<std::shared_ptr<ARPlane>> arPlanePool;
+//    int numActivePlanes = 0;
+//    int floorPlaneIndex;
+    std::shared_ptr<ARPlane> floor;
 
-    State state = State::DISCOVER_ENVIRONMENT_PLANES;
+    State state = State::TRACK_PLANES;
 };
 
 } // namespace age
