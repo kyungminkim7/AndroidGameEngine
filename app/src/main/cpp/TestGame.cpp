@@ -115,27 +115,21 @@ void TestGame::onCreate() {
 
         params.controlRates2MotorRotationSpeed = 150.0f;
 
-        params.angle_kp = 2.6f;
+        params.angle_kp = 0.8f;
         params.angle_ki = 0.0f;
-        params.angle_kd = 0.85f;
+        params.angle_kd = 0.2f;
 
-        params.angleRate_kp = 2.0f;
+        params.angleRate_kp = 1.0f;
         params.angleRate_ki = 0.0f;
         params.angleRate_kd = 0.0f;
 
         params.motorRotationSpeed2Thrust = 2.0E-3f;
 
-//        this->uavCache = std::make_shared<Quadcopter>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds", params);
-        this->uavCache = std::make_shared<Quadcopter>("models/parrot_drone/parrot.3ds", params);
+        this->uavCache = std::make_shared<Quadcopter>("models/parrot/drone.3ds", params);
         this->uavCache->setLabel("UAV");
-//        this->uavCache->setScale({0.2f, 0.2f, 0.05f});
-
-        auto dimensions = this->uavCache->getScaledDimensions();
-        this->uavCache->setScale({0.2f / dimensions.x, 0.2f / dimensions.y, 0.05f / dimensions.z});
 
         this->uavCache->setMode(Quadcopter::Mode::ANGLE);
         this->uavCache->setDamping(0.25f, 0.05f);
-
 
         this->random = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
         this->random->setScale(glm::vec3(2.0f));
@@ -169,18 +163,14 @@ void TestGame::onResetUAV() {
 
 void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
                                    const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
+//    if (this->uav == nullptr) {
+//        this->uav = this->uavCache;
+//        this->addToWorldList(this->uav);
+//    }
 //    this->uav->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.2f));
 //    this->uav->setOrientation(glm::mat3(1.0f));
 //    this->uav->clearForces();
 //    this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
-
-//    auto obj = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
-//    obj->setScale(glm::vec3(2.0f));
-//    obj->setMass(1.0f);
-//    obj->setOrientation(glm::mat3(1.0f));
-//    obj->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.2f));
-//    obj->applyCentralForce({0.0f, -1.0f, 0.0f});
-//    this->addToWorldList(std::move(obj));
 
     // Set UAV position
     if (this->uav == nullptr) {
