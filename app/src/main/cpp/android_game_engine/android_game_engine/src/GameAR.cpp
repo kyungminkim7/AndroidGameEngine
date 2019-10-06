@@ -236,6 +236,8 @@ void GameAR::updatePlanes() {
                     this->floor->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
                     this->floor->setPosition(planePose[3]);
                     this->floor->translateInLocalFrame(glm::vec3(0.0f, 0.0f, -this->floor->getScaledDimensions().z * 0.5f));
+
+                    this->floor->setCollisionDiameter(50.0f);
                 }
 
 //                plane->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
@@ -366,6 +368,7 @@ void GameAR::setState(age::GameAR::State state) {
         switch (state) {
             case State::TRACK_PLANES:
                 this->floor->setDimensions(this->floorDimensions);
+                this->floor->setCollisionDiameter(50.0f);
                 break;
 
             case State::GAMEPLAY:
