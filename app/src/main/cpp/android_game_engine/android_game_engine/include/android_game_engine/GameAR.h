@@ -51,6 +51,7 @@ private:
 
     ShaderProgram arCameraBackgroundShader;
     ShaderProgram arPlaneShader;
+    ShaderProgram arPlaneShadowedShader;
 
     /// \name State
     /// AR Games will have at least 2 states:
@@ -74,6 +75,7 @@ private:
 //    int numActivePlanes = 0;
 //    int floorPlaneIndex;
     std::shared_ptr<ARPlane> floor;
+    glm::vec2 floorDimensions;
 
     State state = State::TRACK_PLANES;
 };

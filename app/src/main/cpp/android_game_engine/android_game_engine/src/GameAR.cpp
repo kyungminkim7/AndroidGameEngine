@@ -28,10 +28,13 @@ namespace age {
 GameAR::GameAR(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject) :
     Game(env, javaApplicationContext, javaActivityObject),
     arCameraBackgroundShader("shaders/ARCameraBackground.vert", "shaders/ARCameraBackground.frag"),
-    arPlaneShader("shaders/ARPlane.vert", "shaders/ARPlane.frag") {
+    arPlaneShader("shaders/ARPlane.vert", "shaders/ARPlane.frag"),
+    arPlaneShadowedShader("shaders/ARPlaneShadowed.vert", "shaders/ARPlaneShadowed.frag") {
 
     this->bindToProjectionViewUBO(&this->arPlaneShader);
-    this->bindToLightSpaceUBO(&this->arPlaneShader);
+
+    this->bindToProjectionViewUBO(&this->arPlaneShadowedShader);
+    this->bindToLightSpaceUBO(&this->arPlaneShadowedShader);
 
     // Enable blending for transparent plane indicators
     glEnable(GL_BLEND);
@@ -233,8 +236,6 @@ void GameAR::updatePlanes() {
                     this->floor->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
                     this->floor->setPosition(planePose[3]);
                     this->floor->translateInLocalFrame(glm::vec3(0.0f, 0.0f, -this->floor->getScaledDimensions().z * 0.5f));
-
-                    this->floor->setCollisionDiameter(50.0f);
                 }
 
 //                plane->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
@@ -331,13 +332,16 @@ void GameAR::render() {
 
     // Render planes
     if (this->floor != nullptr) {
+        auto floorShader = (this->state == State::TRACK_PLANES) ?
+                &this->arPlaneShader : &this->arPlaneShadowedShader;
+
         glDepthMask(GL_FALSE);
-        this->arPlaneShader.use();
-        this->bindShadowMap(&this->arPlaneShader);
-        this->floor->render(&this->arPlaneShader);
+        floorShader->use();
+        this->bindShadowMap(floorShader);
+        this->floor->render(floorShader);
 
 //        for (auto i = 0u; i < this->numActivePlanes; ++i) {
-//            this->arPlanePool[i]->render(&this->arPlaneShader);
+//            this->arPlanePool[i]->render(&this->arPlaneShadowedShader);
 //        }
         glDepthMask(GL_TRUE);
     }
@@ -355,7 +359,22 @@ bool GameAR::onTouchUpEvent(float x, float y) {
     return Game::onTouchUpEvent(x, y) && this->stateOnTouchUpEvent(x, y);
 }
 
-void GameAR::setState(age::GameAR::State state) {this->state = state;}
+void GameAR::setState(age::GameAR::State state) {
+    this->state = state;
+
+    if (this->floor != nullptr) {
+        switch (state) {
+            case State::TRACK_PLANES:
+                this->floor->setDimensions(this->floorDimensions);
+                break;
+
+            case State::GAMEPLAY:
+                this->floorDimensions = this->floor->getScaledDimensions();
+                this->floor->setDimensions(glm::vec2(50.0f));
+                break;
+        }
+    }
+}
 
 void GameAR::setStateOnTouchDownEvent(age::GameAR::StateOnTouch stateOnTouchDownEvent) {
     this->stateOnTouchDownEvent = stateOnTouchDownEvent;

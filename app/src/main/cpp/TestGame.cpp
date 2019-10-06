@@ -47,15 +47,6 @@ void TestGame::onCreate() {
 //    this->getCam()->setLookAtPoint({0.5f, 0.0f, 0.7f});
 
 //    {
-//        this->obj1 = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
-//        obj1->setLabel("obj1");
-//        obj1->setPosition({4.0f, 3.0f, 5.0f});
-//        obj1->setScale(glm::vec3(2.0f));
-//        obj1->setMass(1.0f);
-//        this->addToWorldList(obj1);
-//    }
-
-//    {
 //        const auto scale = 50.0f;
 //        std::shared_ptr<Box> floor(new Box({Texture2D("images/wood.png")},
 //                                           {Texture2D(glm::vec3(1.0f))},
@@ -70,37 +61,6 @@ void TestGame::onCreate() {
 //    }
 
     {
-        // Create UAV
-//        Quadcopter::Parameters params;
-//        params.mass = 1.0f;
-//
-//        params.maxRoll = glm::radians(35.0f);
-//        params.maxPitch = glm::radians(35.0f);
-//
-//        params.maxRollRate = glm::radians(360.0f);
-//        params.maxPitchRate = glm::radians(360.0f);
-//        params.maxYawRate = glm::radians(120.0f);
-//        params.maxThrust = 15.0f;
-//
-//        params.controlRates2MotorRotationSpeed = 150.0f;
-//
-//        params.angle_kp = 2.5f;
-//        params.angle_ki = 0.0f;
-//        params.angle_kd = 0.8f;
-//
-//        params.angleRate_kp = 2.0f;
-//        params.angleRate_ki = 0.0f;
-//        params.angleRate_kd = 0.0f;
-//
-//        params.motorRotationSpeed2Thrust = 2.0E-3f;
-//
-//        this->uav = std::make_shared<Quadcopter>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds", params);
-//        this->uav->setLabel("UAV");
-//        this->uav->setScale({0.363f, 0.363f, 0.053f});
-//        this->uav->setPosition({0.0f, 0.0f, 3.0f});
-//        this->uav->setMode(Quadcopter::Mode::ANGLE);
-//        this->uav->setDamping(0.25f, 0.05f);
-
         // Create UAV
         Quadcopter::Parameters params;
         params.mass = 1.0f;

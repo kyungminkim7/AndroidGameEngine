@@ -20,19 +20,16 @@ public:
     void setDimensions(const glm::vec2 &dimensions);
     void setCollisionDiameter(float diameter);
 
-    void setColor(const glm::vec3 &color);
-
 private:
-    std::vector<glm::vec2> generateTextureCoordinates(const glm::vec2 &dimensions);
+    std::vector<glm::vec2> generateTextureCoordinates(float scale);
 
     unsigned int vao;
     unsigned int vbo;
     unsigned int ebo;
     Texture2D texture;
 
+    unsigned int numVertices;
     unsigned int numIndices;
-
-    glm::vec3 color;
 
     unsigned int textureCoordinatesOffset;
 

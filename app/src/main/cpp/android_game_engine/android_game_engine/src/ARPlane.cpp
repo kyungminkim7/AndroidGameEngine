@@ -18,29 +18,29 @@ constexpr auto opacityStride = sizeof(float);
 namespace age {
 
 ARPlane::ARPlane(const Texture2D &texture) : GameObject(),
-    texture(texture), color(glm::vec3(1.0f)) {
-    const auto numVertices = 5;
+    texture(texture), numVertices(11u) {
     const auto thickness = 0.5f;
 
     // Generate vertex data
-    const std::vector<glm::vec3> positions {
-        {0.0f, 0.0f, thickness * 0.5f},
-        {0.5f, -0.5f,  thickness * 0.5f},
-        {0.5f,  0.5f,  thickness * 0.5f},
-        {-0.5f,  0.5f,  thickness * 0.5f},
-        {-0.5f, -0.5f,  thickness * 0.5f}
-    };
+    std::vector<glm::vec3> positions;
+    std::vector<float> opacities(this->numVertices + 1, 1.0f);
+    std::vector<glm::uvec3> indices;
 
-    std::vector<float> opacities {0.5f, 0.0f, 0.0f, 0.0f, 0.0f};
+    positions.reserve(this->numVertices + 1);
+    indices.reserve(this->numVertices);
 
-    std::vector<glm::uvec3> indices {
-        {0u, 1u, 2u},
-        {0u, 2u, 3u},
-        {0u, 3u, 4u},
-        {0u, 4u, 1u}
-    };
+    // 1st vertex is the center
+    positions.push_back(glm::vec3(0.0f, 0.0f, 0.5f * thickness));
 
-    auto textureCoordinates = this->generateTextureCoordinates(glm::vec2(1.0f));
+    for (auto i = 1u; i < this->numVertices + 1; ++i) {
+        auto angle = glm::radians(360.0f / this->numVertices) * (i - 1);
+        positions.emplace_back(glm::rotateZ(glm::vec3(0.5f, 0.0f, 0.5f * thickness), angle));
+
+        auto lastIndex = (i + 1) % (numVertices + 1);
+        indices.emplace_back(glm::uvec3(0u, i, lastIndex ? lastIndex : 1u));
+    }
+
+    auto textureCoordinates = this->generateTextureCoordinates(1.0f);
 
     // Load vertex data onto GPU
     const auto positionsSize_bytes = positions.size() * positionStride;
@@ -95,17 +95,16 @@ ARPlane::ARPlane(const Texture2D &texture) : GameObject(),
     this->setUnscaledDimensions({1.0f, 1.0f, thickness});
 }
 
-std::vector<glm::vec2> ARPlane::generateTextureCoordinates(const glm::vec2 &dimensions) {
-    std::vector<glm::vec2> textureCoordinates {
-        {0.0f, 0.0f},
-        {0.5f, -0.5f},
-        {-0.5f, -0.5f},
-        {-0.5f, 0.5f},
-        {0.5f, 0.5f}
-    };
+std::vector<glm::vec2> ARPlane::generateTextureCoordinates(float scale) {
+    std::vector<glm::vec2> textureCoordinates;
+    textureCoordinates.reserve(this->numVertices + 1);
 
-    std::for_each(textureCoordinates.begin(), textureCoordinates.end(),
-                  [&dimensions](auto &tc){return glm::vec2(0.5f) + tc * dimensions;});
+    textureCoordinates.push_back(glm::vec2(0.5f));
+    for (auto i = 1u; i < this->numVertices + 1; ++i) {
+        auto angle = glm::radians(360.0f / this->numVertices) * (i - 1);
+        textureCoordinates.emplace_back((glm::vec2(0.5f) +
+                                         glm::mat2({0.0f, -1.0f}, {-1.0f, 0.0f}) * glm::rotate(glm::vec2(0.5f * scale, 0.0f), angle)));
+    }
 
     return textureCoordinates;
 }
@@ -120,7 +119,6 @@ void ARPlane::render(age::ShaderProgram *shader) {
     shader->setUniform("model", this->getModelMatrix());
     shader->setUniform("normal", this->getNormalDirection());
 
-    shader->setUniform("color", this->color);
     glActiveTexture(GL_TEXTURE0);
     shader->setUniform("planeTexture", 0);
     this->texture.bind();
@@ -131,10 +129,11 @@ void ARPlane::render(age::ShaderProgram *shader) {
 }
 
 void ARPlane::setDimensions(const glm::vec2 &dimensions) {
-    this->setScale({dimensions.x, dimensions.y, 1.0});
+    auto scale = std::min(dimensions.x, dimensions.y);
+    this->setScale({scale, scale, 1.0});
 
     // Update vertex texture coordinates
-    auto textureCoordinates = this->generateTextureCoordinates(dimensions);
+    auto textureCoordinates = this->generateTextureCoordinates(scale);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     glBufferSubData(GL_ARRAY_BUFFER, this->textureCoordinatesOffset,
                     textureCoordinates.size() * textureCoordinatesStride,
@@ -145,7 +144,5 @@ void ARPlane::setDimensions(const glm::vec2 &dimensions) {
 void ARPlane::setCollisionDiameter(float diameter) {
     this->setCollisionShapeScale({diameter, diameter, 1.0f});
 }
-
-void ARPlane::setColor(const glm::vec3 &color) {this->color = color;}
 
 } // namespace age
