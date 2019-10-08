@@ -91,9 +91,9 @@ void TestGame::onCreate() {
         this->uavCache->setMode(Quadcopter::Mode::ANGLE);
         this->uavCache->setDamping(0.25f, 0.05f);
 
-        this->random = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
-        this->random->setScale(glm::vec3(2.0f));
-        this->random->setMass(1.0f);
+//        this->random = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
+//        this->random->setScale(glm::vec3(2.0f));
+//        this->random->setMass(1.0f);
     }
 }
 
@@ -144,13 +144,13 @@ void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 
         this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
         this->addToWorldList(this->uav);
 
-        auto positionOffset = glm::normalize(glm::vec3(lookAtDirection.x, lookAtDirection.z, 0.0f));
-        positionOffset = glm::rotateZ(positionOffset * 0.5f, glm::radians(20.0f));
-        positionOffset.z = 1.0f;
-        this->random->setPosition(touchPoint + positionOffset);
-        this->random->rotate(glm::radians(45.0f), {1.0f, 0.0f, 1.0f});
-        this->random->applyCentralForce({0.0f, 0.0f, -1.0f});
-        this->addToWorldList(this->random);
+//        auto positionOffset = glm::normalize(glm::vec3(lookAtDirection.x, lookAtDirection.z, 0.0f));
+//        positionOffset = glm::rotateZ(positionOffset * 0.5f, glm::radians(20.0f));
+//        positionOffset.z = 1.0f;
+//        this->random->setPosition(touchPoint + positionOffset);
+//        this->random->rotate(glm::radians(45.0f), {1.0f, 0.0f, 1.0f});
+//        this->random->applyCentralForce({0.0f, 0.0f, -1.0f});
+//        this->addToWorldList(this->random);
 
         this->setState(GameAR::State::GAMEPLAY);
 

@@ -173,13 +173,8 @@ void GameAR::updatePlanes() {
     int32_t numPlanes = 0;
     ArTrackableList_getSize(this->arSession, planeList, &numPlanes);
 
-//    while (this->arPlanePool.size() < numPlanes) {
-//        this->arPlanePool.emplace_back(std::make_shared<ARPlane>(Texture2D("images/trigrid.png")));
-//        this->arPlanePool.back()->setFriction(1.0f);
-//    }
-//    auto prevNumActivePlanes = this->numActivePlanes;
-//    this->numActivePlanes = 0;
-//    this->floorPlaneIndex = 0;
+    glm::mat4 floorPose;
+    float floorWidth, floorLength;
 
     for (auto i = 0; i < numPlanes; ++i) {
         ArTrackable *arPlane = nullptr;
@@ -201,55 +196,18 @@ void GameAR::updatePlanes() {
 
                 ArPose_destroy(pose);
 
-                float width, length;
-                ArPlane_getExtentX(this->arSession, ArAsPlane(arPlane), &width);
-                ArPlane_getExtentZ(this->arSession, ArAsPlane(arPlane), &length);
+                float planeWidth, planeLength;
+                ArPlane_getExtentX(this->arSession, ArAsPlane(arPlane), &planeWidth);
+                ArPlane_getExtentZ(this->arSession, ArAsPlane(arPlane), &planeLength);
 
-                // Activate next available plane in plane pool
-//                auto plane = this->arPlanePool[this->numActivePlanes++].get();
-//                if (this->numActivePlanes > prevNumActivePlanes) {
-//                    this->registerPhysics(plane);
-//                }
-
-                // Configure plane to reflect extracted AR data
-//                plane->setDimensions({length, width});
                 planePose = T_game_android * planePose;
 
-                if (this->floor == nullptr) {
-                    this->floor = std::make_shared<ARPlane>(Texture2D("images/trigrid.png"));
-                    this->registerPhysics(this->floor.get());
-
-                    this->floor->setPosition(planePose[3]);
-                    this->floor->translate({0.0f, 0.0f, 1.0f});
-
-                    // Signal to Java activity that a plane was found
-                    auto env = this->getJNIEnv();
-                    auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
-                    auto callback = env->GetMethodID(activityClass, "arPlaneFound", "()V");
-                    env->CallVoidMethod(this->getJavaActivityObject(), callback);
+                // Choose the lowest plane as the floor
+                if (i == 0 || planePose[3].z < floorPose[3].z) {
+                    floorPose = planePose;
+                    floorWidth = planeWidth;
+                    floorLength = planeLength;
                 }
-
-                if (planePose[3].z < this->floor->getPosition().z) {
-                    this->floor->setDimensions({length, width});
-
-                    Log::info("Z: "  + std::to_string(this->floor->getScaledDimensions().z));
-                    this->floor->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
-                    this->floor->setPosition(planePose[3]);
-                    this->floor->translateInLocalFrame(glm::vec3(0.0f, 0.0f, -this->floor->getScaledDimensions().z * 0.5f));
-
-                    this->floor->setCollisionDiameter(50.0f);
-                }
-
-//                plane->setOrientation(static_cast<glm::mat3>(planePose) * R_ar_game);
-//
-//                const auto thicknessOffset =  plane->getOrientation() *
-//                                              glm::vec3(0.0f, 0.0f, plane->getScaledDimensions().z * 0.5f);
-//                plane->setPosition(static_cast<glm::vec3>(planePose[3]) - thicknessOffset);
-//
-//                // Designate lowest plane as the floor
-//                if (plane->getPosition().z < this->arPlanePool[this->floorPlaneIndex]->getPosition().z) {
-//                    this->floorPlaneIndex = this->numActivePlanes - 1;
-//                }
             }
         }
 
@@ -257,24 +215,29 @@ void GameAR::updatePlanes() {
         ArTrackable_release(arPlane);
     }
 
-//    // Signal to Java activity that a plane was found
-//    if (prevNumActivePlanes == 0 && this->numActivePlanes > 0) {
-//        auto env = this->getJNIEnv();
-//        auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
-//        auto callback = env->GetMethodID(activityClass, "arPlaneFound", "()V");
-//        env->CallVoidMethod(this->getJavaActivityObject(), callback);
-//    }
-
-    // Expand the floor's collision bounds
-//    if (this->numActivePlanes > 0) {
-//        this->arPlanePool[this->floorPlaneIndex]->setCollisionDiameter(50.0f);
-//    }
-
-//    for (auto i = this->numActivePlanes; i < prevNumActivePlanes; ++i) {
-//        this->unregisterPhysics(this->arPlanePool[i].get());
-//    }
-
     ArTrackableList_destroy(planeList);
+
+    // Update floor
+    if (numPlanes > 0) {
+        if (this->floor == nullptr) {
+            this->floor = std::make_shared<ARPlane>(Texture2D("images/trigrid.png"));
+            this->registerPhysics(this->floor.get());
+
+            // Signal to Java activity that a plane was found
+            auto env = this->getJNIEnv();
+            auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
+            auto callback = env->GetMethodID(activityClass, "arPlaneFound", "()V");
+            env->CallVoidMethod(this->getJavaActivityObject(), callback);
+        }
+
+        this->floor->setDimensions({floorLength, floorWidth});
+
+        this->floor->setOrientation(static_cast<glm::mat3>(floorPose) * R_ar_game);
+        this->floor->setPosition(floorPose[3]);
+        this->floor->translateInLocalFrame(glm::vec3(0.0f, 0.0f, -this->floor->getScaledDimensions().z * 0.5f));
+
+        this->floor->setCollisionDiameter(50.0f);
+    }
 }
 
 void GameAR::updateDirectionalLight() {
@@ -342,9 +305,6 @@ void GameAR::render() {
         this->bindShadowMap(floorShader);
         this->floor->render(floorShader);
 
-//        for (auto i = 0u; i < this->numActivePlanes; ++i) {
-//            this->arPlanePool[i]->render(&this->arPlaneShadowedShader);
-//        }
         glDepthMask(GL_TRUE);
     }
 }
