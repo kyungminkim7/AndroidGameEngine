@@ -56,7 +56,7 @@ target_link_libraries(${PROJECT_NAME}
         GLESv3
         LinearMath
         android
-        glm
+        glm_static
         lib3ds
         log
         arcore
