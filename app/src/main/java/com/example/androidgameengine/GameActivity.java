@@ -70,7 +70,7 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     private Handler arPlaneFoundHandler;
     private Runnable arPlaneFoundRunnable = ()->{
         Snackbar foundSnackbar = Snackbar.make(GameActivity.this.findViewById(android.R.id.content),
-                                         "Continue scanning the environment to update floor estimate or touch a surface to place your UAV.",
+                                         "Touch the floor to place your drone.",
                                                Snackbar.LENGTH_INDEFINITE);
         foundSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
         foundSnackbar.show();
@@ -79,8 +79,8 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     private Handler uavCreatedHandler;
     private Runnable uavCreatedRunnable = ()->{
         Snackbar foundSnackbar = Snackbar.make(GameActivity.this.findViewById(android.R.id.content),
-                "Use the joysticks to control your UAV.",
-                Snackbar.LENGTH_SHORT);
+                "Use the joysticks to control your drone. (Left: throttle/roll, Right: pitch/yaw)",
+                Snackbar.LENGTH_LONG);
         foundSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
         foundSnackbar.show();
     };
@@ -141,7 +141,7 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
         }
 
         Snackbar loadingSnackbar = Snackbar.make(this.findViewById(android.R.id.content),
-                                           "Searching for floor. Move camera slowly to scan the environment...",
+                                           "Searching for the floor. Move the camera around slowly to scan the environment...",
                                                  Snackbar.LENGTH_INDEFINITE);
         loadingSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
         loadingSnackbar.show();
