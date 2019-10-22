@@ -25,8 +25,9 @@ This is a self-contained 3D Game Engine for Android written in native C++.
     - BUILD_EXTRAS (Line 416)
     - BUILD_UNIT_TESTS (Line 461)
 8. Also in cpp/android_game_engine/bullet3/CMakeLists.txt, disable finding an OpenGL pkg by commenting out Lines 288-296.
-9. I recommend in cpp/android_game_engine/glm/CMakeLists.txt, turn the following OPTION OFF:
-    - GLM_TEST_ENABLE (Line 103)
+9. In cpp/android_game_engine/glm/CMakeLists.txt, turn the following OPTIONs OFF:
+    - BUILD_SHARED_LIBS (Line 10)
+    - GLM_TEST_ENABLE (Line 98)
 	
 ### Project Setup
 - In order to create your game, provide a subclass of the Game class in the cpp/ directory and make the necessary modifications to the CMakeLists.txt file in the same directory. An example template is shown by the TestGame.h and TestGame.cpp files.
