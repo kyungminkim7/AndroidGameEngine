@@ -2,9 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/app/src/main/cpp/android_game_engine/bullet3" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/app/src/main/cpp/android_game_engine/glm" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/app/src/main/cpp/android_game_engine/lib3ds" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/app/src/main/cpp/android_game_engine/stb" vcs="Git" />
   </component>
 </project>
