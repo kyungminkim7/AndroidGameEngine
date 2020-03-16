@@ -110,6 +110,10 @@ void TestGame::onYawPitchInput(float yaw, float pitch) {
 }
 
 void TestGame::onResetUAV() {
+    if (this->uav == nullptr) {
+        return;
+    }
+
     this->uav = nullptr;
 
     this->clearWorldList();
