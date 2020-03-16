@@ -5,12 +5,13 @@ import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -65,7 +66,7 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     private GLSurfaceView glSurfaceView;
     private Joystick rollThrustJoystick;
     private Joystick yawPitchJoystick;
-    private Button resetButton;
+    private MaterialButton resetButton;
 
     private Handler arPlaneFoundHandler;
     private Runnable arPlaneFoundRunnable = ()->{
