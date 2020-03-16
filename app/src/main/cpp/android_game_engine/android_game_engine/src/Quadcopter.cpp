@@ -59,11 +59,10 @@ void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
 
     // Calculate thrust correction to reach target altitude
     this->targetAltitude += this->altitudeChangeRate * updateDuration.count();
+    this->targetAltitude = std::max(this->floorAltitude + this->getScaledDimensions().z * 0.5f, this->targetAltitude);
     this->controlRates[3] = this->thrustController.computeCorrection(this->getPosition().z, this->targetAltitude, updateDuration)
             * this->getMass() * 9.80665f;
-    this->controlRates[3] = clip(this->controlRates[3],
-            this->floorAltitude + this->getScaledDimensions().z * 0.5f,
-            this->maxThrust);
+    this->controlRates[3] = clip(this->controlRates[3], 0.0f, this->maxThrust);
 
     // Apply correction to motors
     auto rotationSpeeds = this->controlRates2MotorRotationSpeeds * this->controlRates;
