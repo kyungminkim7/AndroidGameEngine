@@ -44,6 +44,8 @@ protected:
     void setStateOnTouchMoveEvent(StateOnTouch stateOnTouchMoveEvent);
     void setStateOnTouchUpEvent(StateOnTouch stateOnTouchUpEvent);
 
+    float getFloorAltitude() const;
+
 private:
     void updateCamera();
     void updatePlanes();

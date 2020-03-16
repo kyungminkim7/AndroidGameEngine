@@ -360,4 +360,10 @@ void GameAR::setStateOnTouchUpEvent(age::GameAR::StateOnTouch stateOnTouchUpEven
     this->stateOnTouchUpEvent = stateOnTouchUpEvent;
 }
 
+float GameAR::getFloorAltitude() const {
+    return this->floor ?
+        this->floor->getPosition().z + this->floor->getScaledDimensions().z * 0.5f :
+        0.0f;
+}
+
 } // namespace age
