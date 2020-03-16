@@ -1,4 +1,4 @@
-#include "TestGame.h"
+#include "TestGameAR.h"
 
 #include <array>
 #include <functional>
@@ -20,25 +20,25 @@ JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)
     (JNIEnv *env, jobject gameActivity, jobject gameApplicationContext,
      int windowWidth, int windowHeight, int displayRotation, jobject j_asset_manager) {
     GameEngineJNI::init(env, windowWidth, windowHeight, displayRotation, j_asset_manager);
-    GameEngineJNI::onCreate(std::make_unique<TestGame>(env, gameApplicationContext, gameActivity));
+    GameEngineJNI::onCreate(std::make_unique<TestGameAR>(env, gameApplicationContext, gameActivity));
 }
 
 JNI_METHOD_DEFINITION(void, onRollThrustInputJNI)(JNIEnv *env, jobject gameActivity, float roll, float thrust) {
-    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onRollThrustInput(roll, thrust);
+    reinterpret_cast<TestGameAR*>(GameEngineJNI::getGame())->onRollThrustInput(roll, thrust);
 }
 
 JNI_METHOD_DEFINITION(void, onYawPitchInputJNI)(JNIEnv *env, jobject gameActivity, float yaw, float pitch) {
-    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onYawPitchInput(yaw, pitch);
+    reinterpret_cast<TestGameAR*>(GameEngineJNI::getGame())->onYawPitchInput(yaw, pitch);
 }
 
 JNI_METHOD_DEFINITION(void, onResetUAVJNI)(JNIEnv *env, jobject gameActivity) {
-    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onResetUAV();
+    reinterpret_cast<TestGameAR*>(GameEngineJNI::getGame())->onResetUAV();
 }
 
-TestGame::TestGame(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject)
+TestGameAR::TestGameAR(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject)
     : BaseGameType(env, javaApplicationContext, javaActivityObject) {}
 
-void TestGame::onCreate() {
+void TestGameAR::onCreate() {
     BaseGameType::onCreate();
 //    this->enablePhysicsDebugDrawer(true);
     this->getDirectionalLight()->setLookAtDirection({1.0f, 1.0f, -3.0f});
@@ -97,19 +97,19 @@ void TestGame::onCreate() {
     }
 }
 
-void TestGame::onRollThrustInput(float roll, float thrust) {
+void TestGameAR::onRollThrustInput(float roll, float thrust) {
     if (this->uav != nullptr) {
         this->uav->onRollThrustInput({roll, thrust});
     }
 }
 
-void TestGame::onYawPitchInput(float yaw, float pitch) {
+void TestGameAR::onYawPitchInput(float yaw, float pitch) {
     if (this->uav != nullptr) {
         this->uav->onYawPitchInput({yaw, pitch});
     }
 }
 
-void TestGame::onResetUAV() {
+void TestGameAR::onResetUAV() {
     if (this->uav == nullptr) {
         return;
     }
@@ -125,8 +125,8 @@ void TestGame::onResetUAV() {
     env->CallVoidMethod(this->getJavaActivityObject(), callback);
 }
 
-void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
-                                   const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
+void TestGameAR::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
+                                     const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
 //    if (this->uav == nullptr) {
 //        this->uav = this->uavCache;
 //        this->addToWorldList(this->uav);

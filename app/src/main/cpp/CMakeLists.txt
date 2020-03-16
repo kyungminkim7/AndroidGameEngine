@@ -12,9 +12,8 @@ set(CMAKE_SHARED_LINKER_FLAGS
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_library(game SHARED
-        TestGame.cpp
-        TestGame.h)
+#add_library(game SHARED TestGame.cpp TestGame.h)
+add_library(game SHARED TestGameAR.cpp TestGameAR.h)
 
 target_include_directories(game INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
