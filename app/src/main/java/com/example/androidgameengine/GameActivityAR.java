@@ -17,7 +17,7 @@ import android.widget.Toast;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class GameActivity extends AppCompatActivity implements GLSurfaceView.Renderer {
+public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.Renderer {
     static {
         System.loadLibrary("game");
     }
@@ -60,7 +60,7 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     private native void onTouchUpEventJNI(float x, float y);
     ///@}
 
-    private static final String TAG = GameActivity.class.getSimpleName();
+    private static final String TAG = GameActivityAR.class.getSimpleName();
     private static final int SNACKBAR_COLOR = 0xbf323232;
 
     private GLSurfaceView glSurfaceView;
@@ -70,7 +70,7 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
     private Handler arPlaneFoundHandler;
     private Runnable arPlaneFoundRunnable = ()->{
-        Snackbar foundSnackbar = Snackbar.make(GameActivity.this.findViewById(android.R.id.content),
+        Snackbar foundSnackbar = Snackbar.make(GameActivityAR.this.findViewById(android.R.id.content),
                                          "Touch the floor to place your drone.",
                                                Snackbar.LENGTH_INDEFINITE);
         foundSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
@@ -79,7 +79,7 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
     private Handler uavCreatedHandler;
     private Runnable uavCreatedRunnable = ()->{
-        Snackbar foundSnackbar = Snackbar.make(GameActivity.this.findViewById(android.R.id.content),
+        Snackbar foundSnackbar = Snackbar.make(GameActivityAR.this.findViewById(android.R.id.content),
                 "Use the joysticks to control your drone. (Left: throttle/roll, Right: pitch/yaw)",
                 Snackbar.LENGTH_LONG);
         foundSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);

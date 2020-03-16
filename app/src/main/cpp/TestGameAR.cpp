@@ -8,11 +8,8 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/trigonometric.hpp>
 
-#include <android_game_engine/ARPlane.h>
 #include <android_game_engine/Box.h>
-#include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerWindowing.h>
-#include <android_game_engine/Quadcopter.h>
 
 namespace age {
 
@@ -36,10 +33,10 @@ JNI_METHOD_DEFINITION(void, onResetUAVJNI)(JNIEnv *env, jobject gameActivity) {
 }
 
 TestGameAR::TestGameAR(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject)
-    : BaseGameType(env, javaApplicationContext, javaActivityObject) {}
+    : GameAR(env, javaApplicationContext, javaActivityObject) {}
 
 void TestGameAR::onCreate() {
-    BaseGameType::onCreate();
+    GameAR::onCreate();
 //    this->enablePhysicsDebugDrawer(true);
     this->getDirectionalLight()->setLookAtDirection({1.0f, 1.0f, -3.0f});
 
@@ -60,54 +57,16 @@ void TestGameAR::onCreate() {
 //        this->addToWorldList(floor);
 //    }
 
-    {
-        // Create UAV
-        Quadcopter::Parameters params;
-        params.mass = 1.0f;
-
-        params.maxRoll = glm::radians(35.0f);
-        params.maxPitch = glm::radians(35.0f);
-
-        params.maxRollRate = glm::radians(360.0f);
-        params.maxPitchRate = glm::radians(360.0f);
-        params.maxYawRate = glm::radians(120.0f);
-        params.maxThrust = 10.0f;
-
-        params.controlRates2MotorRotationSpeed = 150.0f;
-
-        params.angle_kp = 0.8f;
-        params.angle_ki = 0.0f;
-        params.angle_kd = 0.2f;
-
-        params.angleRate_kp = 1.0f;
-        params.angleRate_ki = 0.0f;
-        params.angleRate_kd = 0.0f;
-
-        params.motorRotationSpeed2Thrust = 2.0E-3f;
-
-        this->uavCache = std::make_shared<Quadcopter>("models/parrot/drone.3ds", params);
-        this->uavCache->setLabel("UAV");
-
-        this->uavCache->setMode(Quadcopter::Mode::ANGLE);
-        this->uavCache->setDamping(0.25f, 0.05f);
-
-//        this->random = std::make_shared<GameObject>("models/X47B_UCAV_3DS/X47B_UCAV_v08.3ds");
-//        this->random->setScale(glm::vec3(2.0f));
-//        this->random->setMass(1.0f);
-    }
+    this->uavCache = std::shared_ptr<Box>(new Box({Texture2D(glm::vec3(1.0f, 0.0f, 0.0f))},
+                                                  {Texture2D(glm::vec3(1.0f))}));
+//    this->uavCache = std::make_shared<GameObject>("models/parrot/drone.3ds");
+    this->uavCache->setScale(glm::vec3(0.1f));
+    this->uavCache->setMass(1.0f);
 }
 
-void TestGameAR::onRollThrustInput(float roll, float thrust) {
-    if (this->uav != nullptr) {
-        this->uav->onRollThrustInput({roll, thrust});
-    }
-}
+void TestGameAR::onRollThrustInput(float roll, float thrust) { }
 
-void TestGameAR::onYawPitchInput(float yaw, float pitch) {
-    if (this->uav != nullptr) {
-        this->uav->onYawPitchInput({yaw, pitch});
-    }
-}
+void TestGameAR::onYawPitchInput(float yaw, float pitch) { }
 
 void TestGameAR::onResetUAV() {
     if (this->uav == nullptr) {
@@ -139,7 +98,7 @@ void TestGameAR::onGameObjectTouched(age::GameObject *gameObject, const glm::vec
     // Set UAV position
     if (this->uav == nullptr) {
         this->uav = this->uavCache;
-        this->uav->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.05f));
+        this->uav->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.5f));
         this->uav->setOrientation(glm::mat3(1.0f));
         auto lookAtDirection = this->getCam()->getLookAtDirection();
         lookAtDirection.z = 0.025f;
@@ -147,14 +106,6 @@ void TestGameAR::onGameObjectTouched(age::GameObject *gameObject, const glm::vec
         this->uav->clearForces();
         this->uav->applyCentralForce({0.0f, 0.0f, -1.0f});
         this->addToWorldList(this->uav);
-
-//        auto positionOffset = glm::normalize(glm::vec3(lookAtDirection.x, lookAtDirection.z, 0.0f));
-//        positionOffset = glm::rotateZ(positionOffset * 0.5f, glm::radians(20.0f));
-//        positionOffset.z = 1.0f;
-//        this->random->setPosition(touchPoint + positionOffset);
-//        this->random->rotate(glm::radians(45.0f), {1.0f, 0.0f, 1.0f});
-//        this->random->applyCentralForce({0.0f, 0.0f, -1.0f});
-//        this->addToWorldList(this->random);
 
         this->setState(GameAR::State::GAMEPLAY);
 

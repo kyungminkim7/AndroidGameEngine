@@ -2,11 +2,10 @@
 
 #include <android_game_engine/GameAR.h>
 
+#define GAME_AR
 #include <android_game_engine/GameEngineJNI.h>
 
 namespace age {
-
-using BaseGameType = GameAR;
 
 extern "C" {
 JNI_METHOD_DECLARATION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject gameActivity, jobject gameApplicationContext,
@@ -17,11 +16,11 @@ JNI_METHOD_DECLARATION(void, onYawPitchInputJNI)(JNIEnv *env, jobject gameActivi
 JNI_METHOD_DECLARATION(void, onResetUAVJNI)(JNIEnv *env, jobject gameActivity);
 }
 
-class Quadcopter;
+class Box;
 
-class TestGame : public BaseGameType {
+class TestGameAR : public GameAR {
 public:
-    TestGame(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject);
+    TestGameAR(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject);
 
     void onCreate() override;
 
@@ -35,8 +34,8 @@ protected:
                              const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) override;
     
 private:
-    std::shared_ptr<Quadcopter> uav = nullptr;
-    std::shared_ptr<Quadcopter> uavCache = nullptr;
+    std::shared_ptr<Box> uav = nullptr;
+    std::shared_ptr<Box> uavCache = nullptr;
 
 //    std::shared_ptr<GameObject> random = nullptr;
 };

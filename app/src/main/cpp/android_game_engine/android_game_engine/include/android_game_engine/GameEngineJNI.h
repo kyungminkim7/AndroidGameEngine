@@ -7,8 +7,13 @@
 
 #include "Game.h"
 
+#ifdef GAME_AR
+#define JNI_METHOD_DEFINITION(return_type, method_name) \
+  return_type JNICALL Java_com_example_androidgameengine_GameActivityAR_##method_name
+#else
 #define JNI_METHOD_DEFINITION(return_type, method_name) \
   return_type JNICALL Java_com_example_androidgameengine_GameActivity_##method_name
+#endif
 
 #define JNI_METHOD_DECLARATION(return_type, method_name) \
   JNIEXPORT JNI_METHOD_DEFINITION(return_type, method_name)
