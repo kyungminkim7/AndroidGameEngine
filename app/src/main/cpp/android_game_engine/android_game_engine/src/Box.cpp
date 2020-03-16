@@ -139,7 +139,7 @@ namespace age {
 
 Box::Box(const std::set<std::string> &diffuseTextureFilepaths,
          const std::set<std::string> &specularTextureFilepaths,
-         const glm::vec2 &numTextureRepeat) {
+         const glm::vec2 &numTextureRepeat) : GameObject(){
     std::vector<Texture2D> diffuseTextures, specularTextures;
     
     for (const auto& filepath : diffuseTextureFilepaths) {
@@ -155,7 +155,7 @@ Box::Box(const std::set<std::string> &diffuseTextureFilepaths,
 
 Box::Box(const std::vector<age::Texture2D> &diffuseTextures,
          const std::vector<age::Texture2D> &specularTextures,
-         const glm::vec2 &numTextureRepeat) {
+         const glm::vec2 &numTextureRepeat) : GameObject() {
     this->init(diffuseTextures, specularTextures, numTextureRepeat);
 }
 
