@@ -327,7 +327,9 @@ void GameAR::setState(age::GameAR::State state) {
     if (this->floor != nullptr) {
         switch (state) {
             case State::TRACK_PLANES:
-                this->floor->setDimensions(this->floorDimensions);
+                if (this->floorDimensions.x * this->floorDimensions.y > 0.0001f) {
+                    this->floor->setDimensions(this->floorDimensions);
+                }
                 this->floor->setCollisionDiameter(50.0f);
                 break;
 
