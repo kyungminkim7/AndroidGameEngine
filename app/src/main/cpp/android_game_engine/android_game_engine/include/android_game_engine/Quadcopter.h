@@ -23,6 +23,7 @@ public:
         float maxPitchRate;
         float maxYawRate;
         float maxThrust;
+        float maxAltitudeChangeRate;
 
         float controlRates2MotorRotationSpeed;
 
@@ -36,13 +37,20 @@ public:
         float angleRate_ki;
         float angleRate_kd;
 
+        // Thrust rate PID
+        float thrust_kp;
+        float thrust_ki;
+        float thrust_kd;
+
         // Motor attributes
         float motorRotationSpeed2Thrust;
     };
 
-    explicit Quadcopter(const std::string &modelFilepath, const Parameters &params);
+    Quadcopter(const std::string &modelFilepath, const Parameters &params);
 
     void setMode(Mode mode);
+    void setFloorAltitude(float altitude);
+    void setTargetAltitude(float altitude);
     
     void onUpdate(std::chrono::duration<float> updateDuration) override;
     
@@ -71,10 +79,14 @@ private:
     float maxPitchRate;
     float maxYawRate;
     float maxThrust;
+    float maxAltitudeChangeRate;
 
     float targetRoll = 0.0f;
     float targetPitch = 0.0f;
     float targetYawRate = 0.0f;
+    float targetAltitude = 0.0f;
+    float altitudeChangeRate = 0.0f;
+    float floorAltitude = 0.0f;
 
     glm::vec4 controlRates = glm::vec4(0.0f); ///< rpy rates, thrust
     glm::mat4 controlRates2MotorRotationSpeeds;
@@ -82,6 +94,7 @@ private:
     PID rollController;
     PID pitchController;
     PID yawRateController;
+    PID thrustController;
 
     std::array<Motor, 4> motors; ///< Motor order: front left, front right, back right, back left
 };

@@ -27,7 +27,9 @@ public:
     void setPosition(const glm::vec3 &position);
     
     void setDamping(float linearDamping, float angularDamping);
+
     void setMass(float mass);
+    float getMass() const;
     
     void setScale(const glm::vec3 &scale);
     
@@ -53,6 +55,8 @@ private:
     std::unique_ptr<btCollisionShape> collisionShape;
     std::unique_ptr<btRigidBody> body;
 };
+
+inline float PhysicsRigidBody::getMass() const {return this->body->getMass();}
 
 inline bool PhysicsRigidBody::isActive() const {return this->body->isActive();}
 

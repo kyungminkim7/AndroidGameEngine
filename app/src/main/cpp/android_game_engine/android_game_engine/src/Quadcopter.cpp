@@ -12,12 +12,13 @@ namespace age {
 
 Quadcopter::Quadcopter(const std::string &modelFilepath, const Parameters &params)
     : GameObject(modelFilepath), mode(Mode::ACRO), maxRoll(params.maxRoll), maxPitch(params.maxPitch),
-    maxRollRate(params.maxRollRate), maxPitchRate(params.maxPitchRate), maxYawRate(params.maxYawRate),
-    maxThrust(params.maxThrust),
-    rollController(params.angle_kp, params.angle_ki, params.angle_kd),
-    pitchController(params.angle_kp, params.angle_ki, params.angle_kd),
-    yawRateController(params.angleRate_kp, params.angleRate_ki, params.angleRate_kd),
-    motors{Motor(0, params.motorRotationSpeed2Thrust),
+      maxRollRate(params.maxRollRate), maxPitchRate(params.maxPitchRate), maxYawRate(params.maxYawRate),
+      maxThrust(params.maxThrust), maxAltitudeChangeRate(params.maxAltitudeChangeRate),
+      rollController(params.angle_kp, params.angle_ki, params.angle_kd),
+      pitchController(params.angle_kp, params.angle_ki, params.angle_kd),
+      yawRateController(params.angleRate_kp, params.angleRate_ki, params.angleRate_kd),
+      thrustController(params.thrust_kp, params.thrust_ki, params.thrust_kd),
+      motors{Motor(0, params.motorRotationSpeed2Thrust),
            Motor(1, params.motorRotationSpeed2Thrust),
            Motor(2, params.motorRotationSpeed2Thrust),
            Motor(3, params.motorRotationSpeed2Thrust)} {
@@ -30,21 +31,16 @@ Quadcopter::Quadcopter(const std::string &modelFilepath, const Parameters &param
 }
 
 void Quadcopter::setMode(Mode mode) { this->mode = mode; }
+void Quadcopter::setFloorAltitude(float altitude) { this->floorAltitude = altitude; }
+void Quadcopter::setTargetAltitude(float altitude) { this->targetAltitude = altitude; }
 
 void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
-    if (this->controlRates[3] < 0.001f) return;
-
     if (this->mode == Mode::ANGLE) {
         // Calculate the roll and pitch rates to achieve target angles
         glm::vec3 z_ref(0.0f, 0.0f, 1.0f);
         auto y_ref = glm::cross(z_ref, this->getOrientationX());
         auto x_ref = glm::cross(y_ref, z_ref);
         glm::mat3 R_world_ref(x_ref, y_ref, z_ref);
-
-//        auto yaw = glm::eulerAngles(glm::toQuat(this->getOrientation()))[2];
-//        auto R_world_ref = static_cast<glm::mat3>(glm::rotate(glm::mat4(1.0f),
-//                                                              yaw,
-//                                                              glm::vec3(0.0f, 0.0f, 1.0f)));
 
         auto R_ref_body = glm::transpose(R_world_ref) * this->getOrientation();
         auto rpy = glm::eulerAngles(glm::toQuat(R_ref_body));
@@ -60,6 +56,14 @@ void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
     auto yawRate = this->getAngularVelocity().z;
     this->controlRates[2] = this->yawRateController.computeCorrection(yawRate, this->targetYawRate, updateDuration);
     this->controlRates[2] = clip(this->controlRates[2], -this->maxYawRate, this->maxYawRate);
+
+    // Calculate thrust correction to reach target altitude
+    this->targetAltitude += this->altitudeChangeRate * updateDuration.count();
+    this->controlRates[3] = this->thrustController.computeCorrection(this->getPosition().z, this->targetAltitude, updateDuration)
+            * this->getMass() * 9.80665f;
+    this->controlRates[3] = clip(this->controlRates[3],
+            this->floorAltitude + this->getScaledDimensions().z * 0.5f,
+            this->maxThrust);
 
     // Apply correction to motors
     auto rotationSpeeds = this->controlRates2MotorRotationSpeeds * this->controlRates;
@@ -129,7 +133,7 @@ void Quadcopter::onRollThrustInput(const glm::vec2 &input) {
             break;
     }
 
-    this->controlRates[3] = input.y > 0.0f ? input.y * this->maxThrust : 0.0f;
+    this->altitudeChangeRate = input.y * this->maxAltitudeChangeRate;
 }
 
 void Quadcopter::onYawPitchInput(const glm::vec2 &input) {

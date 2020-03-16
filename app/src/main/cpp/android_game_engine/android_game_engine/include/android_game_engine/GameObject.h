@@ -140,11 +140,16 @@ public:
     void setMass(float mass);
     void setFriction(float friction);
     void setDamping(float linearDamping, float angularDamping);
+
+    float getMass() const;
     
     void applyCentralForce(const glm::vec3 &force);
     void applyTorque(const glm::vec3 &torque);
     void applyForce(const glm::vec3 &force, const glm::vec3 &relPos);
     void clearForces();
+
+    void setLinearVelocity(const glm::vec3 &linearVelocity);
+    void setAngularVelocity(const glm::vec3 &angularVelocity);
 
     glm::vec3 getLinearVelocity() const;
     glm::vec3 getAngularVelocity() const;
@@ -178,10 +183,13 @@ inline glm::vec3 GameObject::getOrientationZ() const {return this->model.getOrie
 inline glm::vec3 GameObject::getLookAtDirection() const {return this->model.getLookAtDirection();}
 inline glm::vec3 GameObject::getNormalDirection() const {return this->model.getNormalDirection();}
 inline glm::vec3 GameObject::getScaledDimensions() const {return this->unscaledDimensions * this->model.getScale();}
+inline float GameObject::getMass() const {return this->physicsBody->getMass();}
 inline void GameObject::applyCentralForce(const glm::vec3 &force) {this->physicsBody->applyCentralForce(force);}
 inline void GameObject::applyTorque(const glm::vec3 &torque) {this->physicsBody->applyTorque(torque);}
 inline void GameObject::applyForce(const glm::vec3 &force, const glm::vec3 &relPos) {this->physicsBody->applyForce(force, relPos);}
 inline void GameObject::clearForces() {this->physicsBody->clearForces();}
+inline void GameObject::setLinearVelocity(const glm::vec3 &linearVelocity) {this->physicsBody->setLinearVelocity(linearVelocity);}
+inline void GameObject::setAngularVelocity(const glm::vec3 &angularVelocity) {this->physicsBody->setAngularVelocity(angularVelocity);}
 inline glm::vec3 GameObject::getLinearVelocity() const {return this->physicsBody->getLinearVelocity();}
 inline glm::vec3 GameObject::getAngularVelocity() const {return this->physicsBody->getAngularVelocity();}
 
