@@ -11,6 +11,7 @@ configurations { natives }
 
 android {
     compileSdkVersion 28
+    ndkVersion "21.0.6113669"
     defaultConfig {
         applicationId "com.example.androidgameengine"
         minSdkVersion 24
