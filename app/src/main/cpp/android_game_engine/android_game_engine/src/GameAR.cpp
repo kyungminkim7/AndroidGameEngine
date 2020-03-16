@@ -186,6 +186,13 @@ void GameAR::updatePlanes() {
             ArTrackingState trackingState;
             ArTrackable_getTrackingState(this->arSession, arPlane, &trackingState);
             if (trackingState == ArTrackingState::AR_TRACKING_STATE_TRACKING) {
+                // Check that the plane is horizontal
+                ArPlaneType planeType;
+                ArPlane_getType(this->arSession, ArAsPlane(arPlane), &planeType);
+                if (planeType == AR_PLANE_VERTICAL) {
+                    continue;
+                }
+
                 // Found a unique plane, extract the pose and dimensions
                 ArPose *pose;
                 ArPose_create(this->arSession, nullptr, &pose);
