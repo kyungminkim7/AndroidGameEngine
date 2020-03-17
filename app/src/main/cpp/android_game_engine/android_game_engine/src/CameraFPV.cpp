@@ -9,7 +9,7 @@ namespace age {
 
 CameraFPV::CameraFPV(float fov_deg, float aspectRatioWidthToHeight, float nearPlane, float farPlane)
         : Camera(fov_deg, aspectRatioWidthToHeight, nearPlane, farPlane),
-        horizontalRotationAxis(0.0f, 0.0f, 1.0f), linearSpeed(25.0f),
+        horizontalRotationAxis(0.0f, 0.0f, 1.0f), linearSpeed(5.0f),
         pitchSpeed_rad(glm::radians(60.0f)), yawSpeed_rad(glm::radians(60.0f)) {}
 
 void CameraFPV::onUpdate(std::chrono::duration<float> updateDuration) {
