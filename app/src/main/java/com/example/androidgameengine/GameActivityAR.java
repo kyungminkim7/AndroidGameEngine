@@ -89,7 +89,7 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_game);
+        this.setContentView(R.layout.ar_activity_game);
 
         // Set up renderer
         this.glSurfaceView = findViewById(R.id.glSurfaceView);
