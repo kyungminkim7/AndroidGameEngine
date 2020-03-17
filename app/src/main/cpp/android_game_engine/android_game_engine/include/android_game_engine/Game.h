@@ -18,8 +18,8 @@
 
 namespace age {
 
-//using CameraType = CameraFPV;
-using CameraType = CameraChase;
+using CameraType = CameraFPV;
+//using CameraType = CameraChase;
 
 struct Ray {
     glm::vec3 origin;
