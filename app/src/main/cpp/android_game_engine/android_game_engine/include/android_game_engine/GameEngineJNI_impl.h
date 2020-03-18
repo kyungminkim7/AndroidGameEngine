@@ -4,12 +4,14 @@
 #include "ManagerAssets.h"
 #include "ManagerWindowing.h"
 
+namespace {
+
+std::unique_ptr<age::Game> game = nullptr;
+
+} // namespace age
+
 namespace age {
 namespace GameEngineJNI {
-
-std::unique_ptr<Game> game;
-
-std::chrono::system_clock::time_point lastUpdateTime;
 
 void init(JNIEnv *env, int windowWidth, int windowHeight, int displayRotation, jobject j_asset_manager) {
     ManagerWindowing::init(windowWidth, windowHeight, displayRotation);
@@ -58,6 +60,8 @@ JNI_METHOD_DEFINITION(void, onSurfaceChangedJNI)(JNIEnv *env, jobject, int width
 }
 
 JNI_METHOD_DEFINITION(void, updateJNI)(JNIEnv *env, jobject) {
+    static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
     auto currentUpdateTime = std::chrono::system_clock::now();
     auto updateDuration = currentUpdateTime - lastUpdateTime;
     lastUpdateTime = currentUpdateTime;
