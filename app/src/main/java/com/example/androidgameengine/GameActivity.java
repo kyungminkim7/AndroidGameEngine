@@ -100,8 +100,8 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
             }
         });
 
-        this.leftJoystick = findViewById(R.id.rollThrustJoystick);
-        this.rightJoystick = findViewById(R.id.yawPitchJoystick);
+        this.leftJoystick = findViewById(R.id.leftJoystick);
+        this.rightJoystick = findViewById(R.id.rightJoystick);
         this.resetButton = findViewById(R.id.resetButton);
     }
 
