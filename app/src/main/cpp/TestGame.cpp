@@ -40,7 +40,7 @@ void TestGame::onCreate() {
 //    this->enablePhysicsDebugDrawer(true);
     this->getDirectionalLight()->setLookAtDirection({1.0f, 1.0f, -3.0f});
 
-    this->getCam()->setPosition({-0.5f, 0.0f, 1.0f});
+    this->getCam()->setPosition({-3.0f, 0.0f, 1.5f});
     this->getCam()->setLookAtPoint({0.5f, 0.0f, 0.7f});
 
     // Create floor
@@ -65,7 +65,7 @@ void TestGame::onCreate() {
     for (auto i = 0u; i < numBoxes; ++i) {
         this->boxes.push_back(std::shared_ptr<Box>(new Box({Texture2D(glm::vec3(color(rand), color(rand), color(rand)))},
                                                            {Texture2D(glm::vec3(1.0f))})));
-        this->boxes.back()->setScale(glm::vec3(0.1f));
+        this->boxes.back()->setScale(glm::vec3(0.2f));
         this->boxes.back()->setMass(1.0f);
         this->addToWorldList(this->boxes.back());
     }
@@ -78,6 +78,12 @@ void TestGame::onLeftJoystickInputJNI(float x, float y) { this->getCam()->onMove
 void TestGame::onRightJoystickInputJNI(float x, float y) { this->getCam()->onRotate({x, y}); }
 
 void TestGame::onReset() {
+    for (auto& box : this->boxes) {
+        box->clearForces();
+        box->setLinearVelocity(glm::vec3(0.0f));
+        box->setAngularVelocity(glm::vec3(0.0f));
+    }
+
     this->setRandomBoxPositions();
 }
 
@@ -88,7 +94,7 @@ void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 
 
 void TestGame::setRandomBoxPositions() {
     std::mt19937 rand;
-    std::uniform_real_distribution<float> xy(-3.0f, 3.0f);
+    std::uniform_real_distribution<float> xy(-2.0f, 2.0f);
     std::uniform_real_distribution<float> z(0.0f, 3.0f);
     for (auto& box : this->boxes) {
         box->setPosition({1.0f + xy(rand), 0.0f + xy(rand), 1.0f + z(rand)});
