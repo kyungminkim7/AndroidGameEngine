@@ -1,15 +1,12 @@
 #include "TestGame.h"
 
-#include <array>
-#include <functional>
-#include <memory>
+#include <random>
 
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/trigonometric.hpp>
 
 #include <android_game_engine/Box.h>
-#include <android_game_engine/ManagerWindowing.h>
 
 namespace age {
 
@@ -46,6 +43,7 @@ void TestGame::onCreate() {
     this->getCam()->setPosition({-0.5f, 0.0f, 1.0f});
     this->getCam()->setLookAtPoint({0.5f, 0.0f, 0.7f});
 
+    // Create floor
     const auto scale = 50.0f;
     std::shared_ptr<Box> floor(new Box({Texture2D("images/wood.png")},
                                        {Texture2D(glm::vec3(1.0f))},
@@ -58,30 +56,44 @@ void TestGame::onCreate() {
     floor->setFriction(1.0f);
     this->addToWorldList(floor);
 
-    this->box = std::shared_ptr<Box>(new Box({Texture2D(glm::vec3(1.0f, 0.0f, 0.0f))},
-                                             {Texture2D(glm::vec3(1.0f))}));
-    this->box->setScale(glm::vec3(0.1f));
-    this->box->setMass(1.0f);
-    this->box->setPosition({1.0f, 0.0f, 1.0f});
-    this->box->applyCentralForce({0.0f, 0.0f, -1.0f});
-    this->addToWorldList(this->box);
+    // Create boxes
+    std::mt19937 rand;
+    std::uniform_real_distribution<float> color(0.0f, 1.0f);
+
+    constexpr auto numBoxes = 100u;
+    this->boxes.reserve(numBoxes);
+    for (auto i = 0u; i < numBoxes; ++i) {
+        this->boxes.push_back(std::shared_ptr<Box>(new Box({Texture2D(glm::vec3(color(rand), color(rand), color(rand)))},
+                                                           {Texture2D(glm::vec3(1.0f))})));
+        this->boxes.back()->setScale(glm::vec3(0.1f));
+        this->boxes.back()->setMass(1.0f);
+        this->addToWorldList(this->boxes.back());
+    }
+
+    this->setRandomBoxPositions();
 }
 
 void TestGame::onLeftJoystickInputJNI(float x, float y) { this->getCam()->onMove({x, y}); }
 
 void TestGame::onRightJoystickInputJNI(float x, float y) { this->getCam()->onRotate({x, y}); }
 
-void TestGame::onReset() { }
+void TestGame::onReset() {
+    this->setRandomBoxPositions();
+}
 
 void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
                                    const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
-    this->box->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.5f));
-    this->box->setOrientation(glm::mat3(1.0f));
-    auto lookAtDirection = this->getCam()->getLookAtDirection();
-    lookAtDirection.z = 0.025f;
-    this->box->setLookAtDirection(lookAtDirection);
-    this->box->clearForces();
-    this->box->applyCentralForce({0.0f, 0.0f, -1.0f});
+    gameObject->applyCentralForce(touchDirection * 1000.0f);
+}
+
+void TestGame::setRandomBoxPositions() {
+    std::mt19937 rand;
+    std::uniform_real_distribution<float> xy(-3.0f, 3.0f);
+    std::uniform_real_distribution<float> z(0.0f, 3.0f);
+    for (auto& box : this->boxes) {
+        box->setPosition({1.0f + xy(rand), 0.0f + xy(rand), 1.0f + z(rand)});
+        box->applyCentralForce({0.0f, 0.0f, -1.0f});
+    }
 }
 
 } // namespace age

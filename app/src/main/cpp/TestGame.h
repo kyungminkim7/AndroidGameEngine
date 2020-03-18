@@ -2,6 +2,8 @@
 
 #include <android_game_engine/Game.h>
 
+#include <memory>
+
 #include <android_game_engine/GameEngineJNI.h>
 
 namespace age {
@@ -33,7 +35,9 @@ protected:
                              const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) override;
     
 private:
-    std::shared_ptr<Box> box = nullptr;
+    void setRandomBoxPositions();
+
+    std::vector<std::shared_ptr<Box>> boxes;
 };
 
 } // namespace age
