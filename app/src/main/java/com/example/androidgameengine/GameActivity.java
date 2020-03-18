@@ -79,17 +79,21 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
         this.glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                // Save event results before passing it to glSurfaceView thread to prevent race condition
+                float x = event.getX();
+                float y = event.getY();
+
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        glSurfaceView.queueEvent(()->onTouchDownEventJNI(event.getX(), event.getY()));
+                        glSurfaceView.queueEvent(()->onTouchDownEventJNI(x, y));
                         break;
 
                     case MotionEvent.ACTION_MOVE:
-                        glSurfaceView.queueEvent(()->onTouchMoveEventJNI(event.getX(), event.getY()));
+                        glSurfaceView.queueEvent(()->onTouchMoveEventJNI(x, y));
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        glSurfaceView.queueEvent(()->onTouchUpEventJNI(event.getX(), event.getY()));
+                        glSurfaceView.queueEvent(()->onTouchUpEventJNI(x, y));
                         break;
                 }
                 return true;
