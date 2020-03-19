@@ -2,10 +2,6 @@
 
 #include <random>
 
-#include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <glm/trigonometric.hpp>
-
 #include <android_game_engine/Box.h>
 
 namespace age {
