@@ -21,9 +21,10 @@ uniform mat4 model;
 uniform mat3 normal;
 
 void main() {
-   gl_Position = projection_view * model * vec4(aPosition, 1.0);
-   vPosition = vec3(model * vec4(aPosition, 1.0));
+   vec4 worldPosition = model * vec4(aPosition, 1.0);
+   gl_Position = projection_view * worldPosition;
+   vPosition = vec3(worldPosition);
    vNormal = normalize(vec3(normal * aNormal));
    vTextureCoordinate = aTextureCoordinate;
-   vPositionLightSpace = lightSpace * vec4(vPosition, 1.0);
+   vPositionLightSpace = lightSpace * worldPosition;
 }
