@@ -15,6 +15,9 @@ public:
     explicit ARPlane(const Texture2D &texture);
     ~ARPlane();
 
+    ARPlane(ARPlane &&) = default;
+    ARPlane& operator=(ARPlane &&) = default;
+
     void render(ShaderProgram *shader) override;
 
     void setDimensions(const glm::vec2 &dimensions);

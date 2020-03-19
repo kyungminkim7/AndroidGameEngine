@@ -14,6 +14,9 @@ public:
     ARCameraBackground();
     ~ARCameraBackground();
 
+    ARCameraBackground(ARCameraBackground &&) = default;
+    ARCameraBackground& operator=(ARCameraBackground &&) = default;
+
     void onUpdate(const ArSession *arSession, const ArFrame *arFrame);
     void render(ShaderProgram *shader, int64_t arFrameTimestamp);
 

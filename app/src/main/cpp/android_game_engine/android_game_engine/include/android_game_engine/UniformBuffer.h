@@ -21,6 +21,9 @@ public:
     ///
     ~UniformBuffer();
 
+    UniformBuffer(UniformBuffer &&) = default;
+    UniformBuffer& operator=(UniformBuffer &&) = default;
+
     std::string getUniformBlockName() const;
 
     ///

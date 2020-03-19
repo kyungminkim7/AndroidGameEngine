@@ -8,7 +8,7 @@ namespace {
 
 std::unique_ptr<age::Game> game = nullptr;
 
-} // namespace age
+} // namespace
 
 namespace age {
 namespace GameEngineJNI {

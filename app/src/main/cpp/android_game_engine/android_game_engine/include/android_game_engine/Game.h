@@ -35,6 +35,9 @@ public:
     Game(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject);
     virtual ~Game();
 
+    Game(Game &&) = default;
+    Game& operator=(Game &&) = default;
+
     virtual void onCreate();
     virtual void onStart();
     virtual void onResume();

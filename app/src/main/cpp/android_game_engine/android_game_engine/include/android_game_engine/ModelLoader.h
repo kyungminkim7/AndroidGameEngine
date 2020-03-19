@@ -24,6 +24,12 @@ public:
     ///
     explicit ModelLoader(const std::string &filepath);
     virtual ~ModelLoader() = default;
+
+    ModelLoader(ModelLoader &&) = default;
+    ModelLoader& operator=(ModelLoader &&) = default;
+
+    ModelLoader(const ModelLoader &) = default;
+    ModelLoader& operator=(const ModelLoader &) = default;
     
     ///
     /// Extract mesh data from the 3D model file. The mesh data is internally cached.

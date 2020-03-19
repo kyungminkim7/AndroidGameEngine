@@ -19,6 +19,9 @@ public:
     ///
     explicit Skybox(const std::array<std::string, 6> &imageFilepaths);
     ~Skybox();
+
+    Skybox(Skybox &&) = default;
+    Skybox& operator=(Skybox &&) = default;
     
     void render(ShaderProgram *shader);
 

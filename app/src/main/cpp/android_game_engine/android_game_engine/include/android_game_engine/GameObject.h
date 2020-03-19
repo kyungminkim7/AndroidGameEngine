@@ -34,6 +34,12 @@ public:
     
     virtual ~GameObject() = default;
 
+    GameObject(GameObject &&) = default;
+    GameObject& operator=(GameObject &&) = default;
+
+    GameObject(const GameObject &) = default;
+    GameObject& operator=(const GameObject &) = default;
+
     void setLabel(const std::string &label);
     std::string getLabel() const;
     

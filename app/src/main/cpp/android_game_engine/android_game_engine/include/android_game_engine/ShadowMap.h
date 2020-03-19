@@ -11,6 +11,9 @@ public:
 
     ~ShadowMap();
 
+    ShadowMap(ShadowMap &&) = default;
+    ShadowMap& operator=(ShadowMap &&) = default;
+
     unsigned int getWidth() const;
     unsigned int getHeight() const;
 

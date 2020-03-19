@@ -18,6 +18,9 @@ namespace age {
 
         ~VertexArray();
 
+        VertexArray(VertexArray &&) = default;
+        VertexArray& operator=(VertexArray &&) = default;
+
         void render();
 
     private:

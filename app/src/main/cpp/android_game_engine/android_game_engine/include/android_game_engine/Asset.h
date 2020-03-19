@@ -15,6 +15,9 @@ public:
     ///
     explicit Asset(AAsset *asset);
     ~Asset();
+
+    Asset(Asset &&) = default;
+    Asset& operator=(Asset &&) = default;
     
     size_t getLength() const;
     size_t getRemainingLength() const;

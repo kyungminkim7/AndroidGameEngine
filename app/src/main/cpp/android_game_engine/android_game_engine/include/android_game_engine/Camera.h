@@ -24,6 +24,12 @@ public:
     Camera(float fov_deg, float aspectRatioWidthToHeight, float nearPlane, float farPlane);
     
     virtual ~Camera() = default;
+
+    Camera(Camera &&) = default;
+    Camera& operator=(Camera &&) = default;
+
+    Camera(const Camera &) = default;
+    Camera& operator=(const Camera &) = default;
     
     void setFov_deg(float fov_deg);
     float getFov_deg() const;

@@ -15,6 +15,13 @@ class ShaderProgram;
 class Light {
 public:
     Light(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular);
+    virtual ~Light() = default;
+
+    Light(Light &&) = default;
+    Light& operator=(Light &&) = default;
+
+    Light(const Light &) = default;
+    Light& operator=(const Light &) = default;
     
     void setPosition(const glm::vec3 &position);
     glm::vec3 getPosition() const;
