@@ -12,7 +12,7 @@
         android:layout_gravity="top"/>
 
     <com.example.androidgameengine.Joystick
-        android:id="@+id/rollThrustJoystick"
+        android:id="@+id/leftJoystick"
         android:layout_width="130dp"
         android:layout_height="130dp"
         android:layout_gravity="bottom|left"
@@ -22,7 +22,7 @@
         />
 
     <com.example.androidgameengine.Joystick
-        android:id="@+id/yawPitchJoystick"
+        android:id="@+id/rightJoystick"
         android:layout_width="130dp"
         android:layout_height="130dp"
         android:layout_gravity="bottom|right"

@@ -34,10 +34,10 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
                                             int windowWidth, int windowHeight, int displayRotation,
                                             AssetManager assetManager);
 
-    private native void onRollThrustInputJNI(float roll, float thrust);
-    private native void onYawPitchInputJNI(float yaw, float pitch);
+    private native void onLeftJoystickInputJNI(float roll, float thrust);
+    private native void onRightJoystickInputJNI(float yaw, float pitch);
 
-    private native void onResetUAVJNI();
+    private native void onResetJNI();
     ///@}
 
     /// \name Game Engine Functions
@@ -64,26 +64,26 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
     private static final int SNACKBAR_COLOR = 0xbf323232;
 
     private GLSurfaceView glSurfaceView;
-    private Joystick rollThrustJoystick;
-    private Joystick yawPitchJoystick;
+    private Joystick leftJoystick;
+    private Joystick rightJoystick;
     private MaterialButton resetButton;
 
-    private Handler arPlaneFoundHandler;
-    private Runnable arPlaneFoundRunnable = ()->{
-        Snackbar foundSnackbar = Snackbar.make(GameActivityAR.this.findViewById(android.R.id.content),
-                                         "Touch the floor to place your drone.",
-                                               Snackbar.LENGTH_INDEFINITE);
-        foundSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
-        foundSnackbar.show();
+    private Handler arPlaneInitializedHandler;
+    private Runnable arPlaneInitializedRunnable = ()->{
+        Snackbar snackbar = Snackbar.make(GameActivityAR.this.findViewById(android.R.id.content),
+                                    "Touch the floor to set the game.",
+                                          Snackbar.LENGTH_INDEFINITE);
+        snackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
+        snackbar.show();
     };
 
-    private Handler uavCreatedHandler;
-    private Runnable uavCreatedRunnable = ()->{
-        Snackbar foundSnackbar = Snackbar.make(GameActivityAR.this.findViewById(android.R.id.content),
-                "Use the joysticks to control your drone. (Left: throttle/roll, Right: pitch/yaw)",
-                Snackbar.LENGTH_LONG);
-        foundSnackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
-        foundSnackbar.show();
+    private Handler gameInitializedHandler;
+    private Runnable gameInitializedRunnable = ()->{
+        Snackbar snackbar = Snackbar.make(GameActivityAR.this.findViewById(android.R.id.content),
+                                    "Game initialized.",
+                                          Snackbar.LENGTH_LONG);
+        snackbar.getView().setBackgroundColor(SNACKBAR_COLOR);
+        snackbar.show();
     };
 
     @Override
@@ -122,12 +122,12 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
             }
         });
 
-        this.rollThrustJoystick = findViewById(R.id.rollThrustJoystick);
-        this.yawPitchJoystick = findViewById(R.id.yawPitchJoystick);
+        this.leftJoystick = findViewById(R.id.leftJoystick);
+        this.rightJoystick = findViewById(R.id.rightJoystick);
         this.resetButton = findViewById(R.id.resetButton);
 
-        this.arPlaneFoundHandler = new Handler();
-        this.uavCreatedHandler = new Handler();
+        this.arPlaneInitializedHandler = new Handler();
+        this.gameInitializedHandler = new Handler();
     }
 
     @Override
@@ -161,7 +161,7 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
         this.glSurfaceView.onPause();
         this.onPauseJNI();
 
-        this.arPlaneFoundHandler.removeCallbacks(this.arPlaneFoundRunnable);
+        this.arPlaneInitializedHandler.removeCallbacks(this.arPlaneInitializedRunnable);
     }
 
     @Override
@@ -200,20 +200,21 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
                                  this.getWindowManager().getDefaultDisplay().getRotation(),
                                  getAssets());
 
-        this.rollThrustJoystick.setOnTouchListener(new View.OnTouchListener() {
+        this.leftJoystick.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 boolean result = v.onTouchEvent(event);
+                float x = leftJoystick.getMeasurementX();
+                float y = leftJoystick.getMeasurementY();
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                     case MotionEvent.ACTION_MOVE:
-                        glSurfaceView.queueEvent(()->onRollThrustInputJNI(rollThrustJoystick.getMeasurementX(),
-                                                                          rollThrustJoystick.getMeasurementY()));
+                        glSurfaceView.queueEvent(()-> onLeftJoystickInputJNI(x, y));
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        glSurfaceView.queueEvent(()->onRollThrustInputJNI(0.0f, 0.0f));
+                        glSurfaceView.queueEvent(()-> onLeftJoystickInputJNI(0.0f, 0.0f));
                         break;
                 }
 
@@ -221,20 +222,21 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
             }
         });
 
-        this.yawPitchJoystick.setOnTouchListener(new View.OnTouchListener() {
+        this.rightJoystick.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 boolean result = v.onTouchEvent(event);
+                float x = rightJoystick.getMeasurementX();
+                float y = rightJoystick.getMeasurementY();
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                     case MotionEvent.ACTION_MOVE:
-                        glSurfaceView.queueEvent(()->onYawPitchInputJNI(yawPitchJoystick.getMeasurementX(),
-                                                                        yawPitchJoystick.getMeasurementY()));
+                        glSurfaceView.queueEvent(()-> onRightJoystickInputJNI(x, y));
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        glSurfaceView.queueEvent(()->onYawPitchInputJNI(0.0f, 0.0f));
+                        glSurfaceView.queueEvent(()-> onRightJoystickInputJNI(0.0f, 0.0f));
                         break;
                 }
 
@@ -245,7 +247,7 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
         this.resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                glSurfaceView.queueEvent(()->onResetUAVJNI());
+                glSurfaceView.queueEvent(()-> onResetJNI());
             }
         });
     }
@@ -265,6 +267,6 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
         }
     }
 
-    private void arPlaneFound() {this.arPlaneFoundHandler.post(this.arPlaneFoundRunnable);}
-    private void uavCreated() {this.uavCreatedHandler.post(this.uavCreatedRunnable);}
+    private void arPlaneInitialized() {this.arPlaneInitializedHandler.post(this.arPlaneInitializedRunnable);}
+    private void gameInitialized() {this.gameInitializedHandler.post(this.gameInitializedRunnable);}
 }

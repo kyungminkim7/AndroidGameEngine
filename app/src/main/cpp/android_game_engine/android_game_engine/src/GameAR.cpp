@@ -233,7 +233,7 @@ void GameAR::updatePlanes() {
             // Signal to Java activity that a plane was found
             auto env = this->getJNIEnv();
             auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
-            auto callback = env->GetMethodID(activityClass, "arPlaneFound", "()V");
+            auto callback = env->GetMethodID(activityClass, "arPlaneInitialized", "()V");
             env->CallVoidMethod(this->getJavaActivityObject(), callback);
         }
 
