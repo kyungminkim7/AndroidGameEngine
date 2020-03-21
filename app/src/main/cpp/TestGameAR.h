@@ -18,7 +18,7 @@ JNI_METHOD_DECLARATION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameA
 JNI_METHOD_DECLARATION(void, onResetJNI)(JNIEnv *env, jobject gameActivity);
 }
 
-class Box;
+class GameObject;
 
 class TestGameAR : public GameAR {
 public:
@@ -36,8 +36,8 @@ protected:
                              const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) override;
     
 private:
-    std::shared_ptr<Box> box = nullptr;
-    std::shared_ptr<Box> boxCache = nullptr;
+    std::shared_ptr<GameObject> atv = nullptr;
+    std::shared_ptr<GameObject> atvCache = nullptr;
 };
 
 } // namespace age

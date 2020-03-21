@@ -32,11 +32,9 @@ void TestGameAR::onCreate() {
 //    this->enablePhysicsDebugDrawer(true);
     this->getDirectionalLight()->setLookAtDirection({1.0f, 1.0f, -3.0f});
 
-    this->boxCache = std::shared_ptr<Box>(new Box({Texture2D(glm::vec3(1.0f, 0.0f, 0.0f))},
-                                                  {Texture2D(glm::vec3(1.0f))}));
-//    this->boxCache = std::make_shared<GameObject>("models/parrot/drone.3ds");
-    this->boxCache->setScale(glm::vec3(0.1f));
-    this->boxCache->setMass(1.0f);
+    this->atvCache = std::make_shared<GameObject>("models/atv/ATV.3DS");
+    this->atvCache->setScale(glm::vec3(0.1f));
+    this->atvCache->setMass(1.0f);
 }
 
 void TestGameAR::onLeftJoystickInput(float x, float y){ }
@@ -44,11 +42,11 @@ void TestGameAR::onLeftJoystickInput(float x, float y){ }
 void TestGameAR::onRightJoystickInput(float x, float y){ }
 
 void TestGameAR::onReset() {
-    if (this->box == nullptr) {
+    if (this->atv == nullptr) {
         return;
     }
 
-    this->box = nullptr;
+    this->atv = nullptr;
 
     this->clearWorldList();
     this->setState(GameAR::State::TRACK_PLANES);
@@ -62,21 +60,20 @@ void TestGameAR::onReset() {
 
 void TestGameAR::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
                                      const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
-    // Set UAV position
-    if (this->box == nullptr) {
-        this->box = this->boxCache;
-        this->box->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.5f));
-        this->box->setOrientation(glm::mat3(1.0f));
+    if (this->atv == nullptr) {
+        this->atv = this->atvCache;
+        this->atv->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.5f));
+        this->atv->setOrientation(glm::mat3(1.0f));
         auto lookAtDirection = this->getCam()->getLookAtDirection();
         lookAtDirection.z = 0.025f;
-        this->box->setLookAtDirection(lookAtDirection);
+        this->atv->setLookAtDirection(lookAtDirection);
 
-        this->box->clearForces();
-        this->box->setLinearVelocity(glm::vec3(0.0f));
-        this->box->setAngularVelocity(glm::vec3(0.0f));
-        this->box->applyCentralForce({0.0f, 0.0f, -1.0f});
+        this->atv->clearForces();
+        this->atv->setLinearVelocity(glm::vec3(0.0f));
+        this->atv->setAngularVelocity(glm::vec3(0.0f));
+        this->atv->applyCentralForce({0.0f, 0.0f, -1.0f});
 
-        this->addToWorldList(this->box);
+        this->addToWorldList(this->atv);
 
         this->setState(GameAR::State::GAMEPLAY);
 
