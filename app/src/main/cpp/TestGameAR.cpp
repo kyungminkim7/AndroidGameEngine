@@ -1,6 +1,7 @@
 #include "TestGameAR.h"
 
 #include <android_game_engine/Box.h>
+#include <android_game_engine/LightDirectional.h>
 
 namespace age {
 
