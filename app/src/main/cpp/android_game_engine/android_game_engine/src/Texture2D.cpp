@@ -10,6 +10,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <android_game_engine/Asset.h>
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/ManagerAssets.h>
 

@@ -73,9 +73,6 @@ private:
     ARCameraBackground arCameraBackground;
     ArTrackingState arCameraTrackingState;
 
-//    std::vector<std::shared_ptr<ARPlane>> arPlanePool;
-//    int numActivePlanes = 0;
-//    int floorPlaneIndex;
     std::shared_ptr<ARPlane> floor;
     glm::vec2 floorDimensions;
 

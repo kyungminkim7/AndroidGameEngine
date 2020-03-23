@@ -1,5 +1,7 @@
 #include <android_game_engine/PhysicsRigidBody.h>
 
+#include <android_game_engine/PhysicsMotionState.h>
+
 namespace age {
 
 PhysicsRigidBody::PhysicsRigidBody(GameObject *parentGameObject, std::unique_ptr<btCollisionShape> collisionShape)
@@ -9,6 +11,10 @@ PhysicsRigidBody::PhysicsRigidBody(GameObject *parentGameObject, std::unique_ptr
                                                                     this->collisionShape.get()))){
     this->body->setUserPointer(parentGameObject);
 }
+
+PhysicsRigidBody::~PhysicsRigidBody() = default;
+PhysicsRigidBody::PhysicsRigidBody(PhysicsRigidBody &&) noexcept = default;
+PhysicsRigidBody& PhysicsRigidBody::operator=(PhysicsRigidBody &&) noexcept = default;
 
 void* PhysicsRigidBody::getNativeBody() {return this->body.get();}
 

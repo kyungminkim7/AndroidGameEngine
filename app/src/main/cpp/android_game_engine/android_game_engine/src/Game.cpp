@@ -3,9 +3,13 @@
 #include <GLES3/gl32.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <android_game_engine/GameObject.h>
 #include <android_game_engine/Exception.h>
-#include <android_game_engine/Log.h>
+#include <android_game_engine/LightDirectional.h>
 #include <android_game_engine/ManagerWindowing.h>
+#include <android_game_engine/PhysicsEngine.h>
+#include <android_game_engine/ShadowMap.h>
+#include <android_game_engine/Skybox.h>
 
 namespace age {
 
@@ -16,6 +20,7 @@ Game::Game(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObje
                physicsDebugShader("shaders/PhysicsDebug.vert", "shaders/PhysicsDebug.frag"),
                projectionViewUbo("ProjectionViewUB", sizeof(glm::mat4)),
                lightSpaceUbo("LightSpaceUB", sizeof(glm::mat4)),
+               skybox(nullptr), cam(nullptr), directionalLight(nullptr), shadowMap(nullptr),
                physics(new PhysicsEngine(&this->physicsDebugShader)),
                drawDebugPhysics(false) {
     // Obtain and save JNI environment variables
@@ -44,6 +49,9 @@ Game::~Game() {
     env->DeleteGlobalRef(this->javaActivityObject);
     env->DeleteGlobalRef(this->javaApplicationContext);
 };
+
+Game::Game(age::Game &&) = default;
+Game& Game::operator=(age::Game &&) = default;
 
 JNIEnv* Game::getJNIEnv() {
     JNIEnv *env;

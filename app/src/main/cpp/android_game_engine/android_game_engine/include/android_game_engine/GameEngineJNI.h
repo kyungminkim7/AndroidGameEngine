@@ -5,8 +5,6 @@
 
 #include <jni.h>
 
-#include "Game.h"
-
 #ifdef GAME_AR
 #define JNI_METHOD_DEFINITION(return_type, method_name) \
   return_type JNICALL Java_com_example_androidgameengine_GameActivityAR_##method_name
@@ -23,6 +21,9 @@
 */
 
 namespace age {
+
+class Game;
+
 namespace GameEngineJNI {
 
 ///

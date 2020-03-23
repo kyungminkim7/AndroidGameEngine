@@ -10,6 +10,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
+#include <android_game_engine/Asset.h>
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/Log.h>
 #include <android_game_engine/ManagerAssets.h>

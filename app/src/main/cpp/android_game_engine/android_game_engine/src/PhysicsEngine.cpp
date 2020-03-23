@@ -4,6 +4,7 @@
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
 #include <LinearMath/btVector3.h>
 
+#include <android_game_engine/PhysicsDebugDrawer.h>
 #include <android_game_engine/PhysicsRigidBody.h>
 
 namespace age {
@@ -22,6 +23,8 @@ PhysicsEngine::PhysicsEngine(ShaderProgram *debugShader)
     this->dynamicsWorld->setDebugDrawer(this->debugDrawer.get());
     this->debugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawAabb);
 }
+
+PhysicsEngine::~PhysicsEngine() = default;
 
 void PhysicsEngine::onUpdate(std::chrono::duration<float> updateDuration) {
     this->dynamicsWorld->stepSimulation(updateDuration.count(), 10);

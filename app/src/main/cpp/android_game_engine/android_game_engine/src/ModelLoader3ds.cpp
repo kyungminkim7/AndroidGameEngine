@@ -8,6 +8,7 @@
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <android_game_engine/Asset.h>
 #include <android_game_engine/PhysicsCompoundShape.h>
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/ManagerAssets.h>

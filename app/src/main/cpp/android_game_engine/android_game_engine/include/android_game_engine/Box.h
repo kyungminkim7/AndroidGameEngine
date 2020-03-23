@@ -7,9 +7,9 @@
 
 #include <glm/vec2.hpp>
 
-#include "Texture2D.h"
-
 namespace age {
+
+class Texture2D;
 
 ///
 /// \brief 3D box object.

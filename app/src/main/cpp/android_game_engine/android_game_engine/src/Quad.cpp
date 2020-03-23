@@ -9,6 +9,7 @@
 #include <glm/vec3.hpp>
 
 #include <android_game_engine/Mesh.h>
+#include <android_game_engine/Texture2D.h>
 #include <android_game_engine/VertexArray.h>
 
 namespace {

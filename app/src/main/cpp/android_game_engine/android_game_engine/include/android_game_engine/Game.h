@@ -8,12 +8,7 @@
 
 #include "CameraChase.h"
 #include "CameraFPV.h"
-#include "GameObject.h"
-#include "LightDirectional.h"
-#include "PhysicsEngine.h"
 #include "ShaderProgram.h"
-#include "ShadowMap.h"
-#include "Skybox.h"
 #include "UniformBuffer.h"
 
 namespace age {
@@ -26,6 +21,12 @@ struct Ray {
     glm::vec3 direction;
 };
 
+class GameObject;
+class LightDirectional;
+class PhysicsEngine;
+class ShadowMap;
+class Skybox;
+
 /**
  * Users should subclass Game and then run it using GameEngine::run with the derived
  * Game class.
@@ -35,8 +36,8 @@ public:
     Game(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject);
     virtual ~Game();
 
-    Game(Game &&) = default;
-    Game& operator=(Game &&) = default;
+    Game(Game &&);
+    Game& operator=(Game &&);
 
     virtual void onCreate();
     virtual void onStart();
@@ -114,10 +115,10 @@ private:
 
     int shadowMapTextureUnit; // Shadow map is placed as the last texture unit to deconflict with game object material textures
     
-    std::unique_ptr<Skybox> skybox = nullptr;
-    std::unique_ptr<CameraType> cam = nullptr;
-    std::unique_ptr<LightDirectional> directionalLight = nullptr;
-    std::unique_ptr<ShadowMap> shadowMap = nullptr;
+    std::unique_ptr<Skybox> skybox;
+    std::unique_ptr<CameraType> cam;
+    std::unique_ptr<LightDirectional> directionalLight;
+    std::unique_ptr<ShadowMap> shadowMap;
     std::vector<std::shared_ptr<GameObject>> worldList;
     
     std::unique_ptr<PhysicsEngine> physics;

@@ -7,6 +7,8 @@
 
 namespace age {
 
+class Texture2D;
+
 ///
 /// \brief The Quad class is a Game Object that is a flat square.
 ///

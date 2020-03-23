@@ -6,6 +6,7 @@
 #include <GLES3/gl32.h>
 #include <stb_image.h>
 
+#include <android_game_engine/Asset.h>
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/ManagerAssets.h>
 #include <android_game_engine/ShaderProgram.h>

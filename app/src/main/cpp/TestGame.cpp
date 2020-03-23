@@ -3,6 +3,8 @@
 #include <random>
 
 #include <android_game_engine/Box.h>
+#include <android_game_engine/LightDirectional.h>
+#include <android_game_engine/Texture2D.h>
 
 namespace age {
 

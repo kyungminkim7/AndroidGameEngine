@@ -1,5 +1,6 @@
 #include <android_game_engine/ManagerAssets.h>
 
+#include <android_game_engine/Asset.h>
 #include <android_game_engine/Exception.h>
 
 namespace {

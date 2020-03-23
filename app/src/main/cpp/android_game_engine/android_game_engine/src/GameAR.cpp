@@ -2,10 +2,10 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-#include <android_game_engine/Exception.h>
-#include <android_game_engine/Log.h>
-#include <android_game_engine/ManagerWindowing.h>
 #include <android_game_engine/ARPlane.h>
+#include <android_game_engine/Exception.h>
+#include <android_game_engine/LightDirectional.h>
+#include <android_game_engine/ManagerWindowing.h>
 
 namespace {
 const auto T_game_android = glm::rotate(glm::mat4(1.0f),

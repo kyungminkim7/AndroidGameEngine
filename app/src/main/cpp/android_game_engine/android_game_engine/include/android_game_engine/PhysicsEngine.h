@@ -10,11 +10,10 @@
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <glm/vec3.hpp>
 
-#include <android_game_engine/PhysicsDebugDrawer.h>
-
 namespace age {
 
 class GameObject;
+class PhysicsDebugDrawer;
 class PhysicsRigidBody;
 class ShaderProgram;
 
@@ -35,6 +34,10 @@ public:
     ///                    objects and bounding boxes.
     ///
     explicit PhysicsEngine(ShaderProgram *debugShader);
+    ~PhysicsEngine();
+
+    PhysicsEngine(const PhysicsEngine&) = delete;
+    PhysicsEngine& operator=(const PhysicsEngine&) = delete;
     
     void onUpdate(std::chrono::duration<float> updateDuration);
 

@@ -8,11 +8,10 @@
 #include <glm/mat3x3.hpp>
 #include <glm/vec3.hpp>
 
-#include <android_game_engine/PhysicsMotionState.h>
-
 namespace age {
 
 class GameObject;
+class PhysicsMotionState;
 
 ///
 /// \brief Wrapper class for a rigid physics body.
@@ -20,9 +19,10 @@ class GameObject;
 class PhysicsRigidBody {
 public:
     PhysicsRigidBody(GameObject *parentGameObject, std::unique_ptr<btCollisionShape> collisionShape);
+    ~PhysicsRigidBody();
 
-    PhysicsRigidBody(PhysicsRigidBody &&) noexcept = default;
-    PhysicsRigidBody& operator=(PhysicsRigidBody &&) noexcept = default;
+    PhysicsRigidBody(PhysicsRigidBody &&) noexcept;
+    PhysicsRigidBody& operator=(PhysicsRigidBody &&) noexcept;
 
     void* getNativeBody();
     

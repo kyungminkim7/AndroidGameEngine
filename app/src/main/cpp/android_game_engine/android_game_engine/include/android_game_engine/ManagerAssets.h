@@ -12,9 +12,9 @@
 
 #include <android/asset_manager.h>
 
-#include <android_game_engine/Asset.h>
-
 namespace age {
+
+class Asset;
 
 namespace ManagerAssets {
 
