@@ -29,8 +29,8 @@ public:
     ///
     ~ShaderProgram();
     
-    ShaderProgram(ShaderProgram &&) = default;
-    ShaderProgram& operator=(ShaderProgram &&) = default;
+    ShaderProgram(ShaderProgram &&) noexcept = default;
+    ShaderProgram& operator=(ShaderProgram &&) noexcept = default;
     
     ///
     /// \brief Sets this program as the current active shader program.

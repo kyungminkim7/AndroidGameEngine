@@ -25,8 +25,8 @@ public:
     explicit ModelLoader(const std::string &filepath);
     virtual ~ModelLoader() = default;
 
-    ModelLoader(ModelLoader &&) = default;
-    ModelLoader& operator=(ModelLoader &&) = default;
+    ModelLoader(ModelLoader &&) noexcept = default;
+    ModelLoader& operator=(ModelLoader &&) noexcept = default;
 
     ModelLoader(const ModelLoader &) = default;
     ModelLoader& operator=(const ModelLoader &) = default;

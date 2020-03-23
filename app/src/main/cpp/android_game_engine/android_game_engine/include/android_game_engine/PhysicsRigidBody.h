@@ -21,8 +21,8 @@ class PhysicsRigidBody {
 public:
     PhysicsRigidBody(GameObject *parentGameObject, std::unique_ptr<btCollisionShape> collisionShape);
 
-    PhysicsRigidBody(PhysicsRigidBody &&) = default;
-    PhysicsRigidBody& operator=(PhysicsRigidBody &&) = default;
+    PhysicsRigidBody(PhysicsRigidBody &&) noexcept = default;
+    PhysicsRigidBody& operator=(PhysicsRigidBody &&) noexcept = default;
 
     void* getNativeBody();
     

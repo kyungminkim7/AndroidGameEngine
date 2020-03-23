@@ -16,8 +16,8 @@ public:
     explicit Asset(AAsset *asset);
     ~Asset();
 
-    Asset(Asset &&) = default;
-    Asset& operator=(Asset &&) = default;
+    Asset(Asset &&) noexcept = default;
+    Asset& operator=(Asset &&) noexcept = default;
     
     size_t getLength() const;
     size_t getRemainingLength() const;
