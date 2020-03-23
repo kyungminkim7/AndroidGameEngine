@@ -18,7 +18,7 @@
 #include "btDeformableBodySolver.h"
 #include "btSoftBodyInternals.h"
 #include "LinearMath/btQuickprof.h"
-static const int kMaxConjugateGradientIterations  = 200;
+static const int kMaxConjugateGradientIterations  = 50;
 btDeformableBodySolver::btDeformableBodySolver()
 : m_numNodes(0)
 , m_cg(kMaxConjugateGradientIterations)
@@ -36,7 +36,7 @@ btDeformableBodySolver::~btDeformableBodySolver()
 
 void btDeformableBodySolver::solveDeformableConstraints(btScalar solverdt)
 {
-    BT_PROFILE("solveConstraints");
+    BT_PROFILE("solveDeformableConstraints");
     if (!m_implicit)
     {
         m_objective->computeResidual(solverdt, m_residual);
@@ -226,21 +226,32 @@ void btDeformableBodySolver::reinitialize(const btAlignedObjectArray<btSoftBody 
     
     m_dt = dt;
     m_objective->reinitialize(nodeUpdated, dt);
+    updateSoftBodies();
 }
 
-void btDeformableBodySolver::setConstraints()
+void btDeformableBodySolver::setConstraints(const btContactSolverInfo& infoGlobal)
 {
     BT_PROFILE("setConstraint");
-    m_objective->setConstraints();
+    m_objective->setConstraints(infoGlobal);
 }
 
-btScalar btDeformableBodySolver::solveContactConstraints()
+btScalar btDeformableBodySolver::solveContactConstraints(btCollisionObject** deformableBodies,int numDeformableBodies, const btContactSolverInfo& infoGlobal)
 {
     BT_PROFILE("solveContactConstraints");
-    btScalar maxSquaredResidual = m_objective->m_projection.update();
+    btScalar maxSquaredResidual = m_objective->m_projection.update(deformableBodies,numDeformableBodies, infoGlobal);
     return maxSquaredResidual;
 }
 
+btScalar btDeformableBodySolver::solveSplitImpulse(const btContactSolverInfo& infoGlobal)
+{
+    BT_PROFILE("solveSplitImpulse");
+    return m_objective->m_projection.solveSplitImpulse(infoGlobal);
+}
+
+void btDeformableBodySolver::splitImpulseSetup(const btContactSolverInfo& infoGlobal)
+{
+     m_objective->m_projection.splitImpulseSetup(infoGlobal);
+}
 
 void btDeformableBodySolver::updateVelocity()
 {
@@ -251,6 +262,7 @@ void btDeformableBodySolver::updateVelocity()
         psb->m_maxSpeedSquared = 0;
         if (!psb->isActive())
         {
+            counter += psb->m_nodes.size();
             continue;
         }
         for (int j = 0; j < psb->m_nodes.size(); ++j)
@@ -275,6 +287,7 @@ void btDeformableBodySolver::updateTempPosition()
         btSoftBody* psb = m_softBodies[i];
         if (!psb->isActive())
         {
+            counter += psb->m_nodes.size();
             continue;
         }
         for (int j = 0; j < psb->m_nodes.size(); ++j)
@@ -307,6 +320,7 @@ void btDeformableBodySolver::setupDeformableSolve(bool implicit)
         btSoftBody* psb = m_softBodies[i];
         if (!psb->isActive())
         {
+            counter += psb->m_nodes.size();
             continue;
         }
         for (int j = 0; j < psb->m_nodes.size(); ++j)
@@ -321,7 +335,7 @@ void btDeformableBodySolver::setupDeformableSolve(bool implicit)
             }
             else
                 m_dv[counter] =  psb->m_nodes[j].m_v - m_backupVelocity[counter];
-            psb->m_nodes[j].m_v = m_backupVelocity[counter];
+            psb->m_nodes[j].m_v = m_backupVelocity[counter] + psb->m_nodes[j].m_vsplit;
             ++counter;
         }
     }
@@ -372,6 +386,7 @@ void btDeformableBodySolver::predictMotion(btScalar solverdt)
 
 void btDeformableBodySolver::predictDeformableMotion(btSoftBody* psb, btScalar dt)
 {
+    BT_PROFILE("btDeformableBodySolver::predictDeformableMotion");
     int i, ni;
     
     /* Update                */
@@ -410,44 +425,22 @@ void btDeformableBodySolver::predictDeformableMotion(btSoftBody* psb, btScalar d
             n.m_v *= max_v;
         }
         n.m_q = n.m_x + n.m_v * dt;
+        n.m_constrained = false;
     }
 
     /* Nodes                */
-    ATTRIBUTE_ALIGNED16(btDbvtVolume)
-    vol;
-    for (i = 0, ni = psb->m_nodes.size(); i < ni; ++i)
-    {
-        btSoftBody::Node& n = psb->m_nodes[i];
-        vol = btDbvtVolume::FromCR(n.m_q, psb->m_sst.radmrg);
-        psb->m_ndbvt.update(n.m_leaf,
-                       vol,
-                       n.m_v * psb->m_sst.velmrg,
-                       psb->m_sst.updmrg);
-    }
-
+    psb->updateNodeTree(true, true);
     if (!psb->m_fdbvt.empty())
     {
-        for (int i = 0; i < psb->m_faces.size(); ++i)
-        {
-            btSoftBody::Face& f = psb->m_faces[i];
-            const btVector3 v = (f.m_n[0]->m_v +
-                                 f.m_n[1]->m_v +
-                                 f.m_n[2]->m_v) /
-            3;
-            vol = VolumeOf(f, psb->m_sst.radmrg);
-            psb->m_fdbvt.update(f.m_leaf,
-                           vol,
-                           v * psb->m_sst.velmrg,
-                           psb->m_sst.updmrg);
-        }
+        psb->updateFaceTree(true, true);
     }
-    /* Clear contacts        */
+    /* Clear contacts */
     psb->m_nodeRigidContacts.resize(0);
     psb->m_faceRigidContacts.resize(0);
     psb->m_faceNodeContacts.resize(0);
     /* Optimize dbvt's        */
-    psb->m_ndbvt.optimizeIncremental(1);
-    psb->m_fdbvt.optimizeIncremental(1);
+//    psb->m_ndbvt.optimizeIncremental(1);
+//    psb->m_fdbvt.optimizeIncremental(1);
 }
 
 

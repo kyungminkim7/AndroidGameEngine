@@ -22,17 +22,16 @@
 #include "BulletDynamics/Featherstone/btMultiBodyConstraintSolver.h"
 #include <stdio.h>  //printf debugging
 
-#include "../CommonInterfaces/CommonRigidBodyBase.h"
+#include "../CommonInterfaces/CommonDeformableBodyBase.h"
 #include "../Utils/b3ResourcePath.h"
 
 ///The DeformableContact shows the contact between deformable objects
 
-class DeformableContact : public CommonRigidBodyBase
+class DeformableContact : public CommonDeformableBodyBase
 {
-    btAlignedObjectArray<btDeformableLagrangianForce*> m_forces;
 public:
     DeformableContact(struct GUIHelperInterface* helper)
-    : CommonRigidBodyBase(helper)
+    : CommonDeformableBodyBase(helper)
     {
     }
     virtual ~DeformableContact()
@@ -57,29 +56,22 @@ public:
         m_dynamicsWorld->stepSimulation(deltaTime, 4, internalTimeStep);
     }
     
-    virtual const btDeformableMultiBodyDynamicsWorld* getDeformableDynamicsWorld() const
-    {
-        return (btDeformableMultiBodyDynamicsWorld*)m_dynamicsWorld;
-    }
-    
-    virtual btDeformableMultiBodyDynamicsWorld* getDeformableDynamicsWorld()
-    {
-        return (btDeformableMultiBodyDynamicsWorld*)m_dynamicsWorld;
-    }
-    
     virtual void renderScene()
     {
-        CommonRigidBodyBase::renderScene();
-        btDeformableMultiBodyDynamicsWorld* deformableWorld = getDeformableDynamicsWorld();
+        CommonDeformableBodyBase::renderScene();
+        
+		
+		btDeformableMultiBodyDynamicsWorld* deformableWorld = getDeformableDynamicsWorld();
         
         for (int i = 0; i < deformableWorld->getSoftBodyArray().size(); i++)
         {
             btSoftBody* psb = (btSoftBody*)deformableWorld->getSoftBodyArray()[i];
             {
-                btSoftBodyHelpers::DrawFrame(psb, deformableWorld->getDebugDrawer());
-                btSoftBodyHelpers::Draw(psb, deformableWorld->getDebugDrawer(), deformableWorld->getDrawFlags());
+                //btSoftBodyHelpers::DrawFrame(psb, deformableWorld->getDebugDrawer());
+				btSoftBodyHelpers::Draw(psb, deformableWorld->getDebugDrawer(), fDrawFlags::Faces);// StddeformableWorld->getDrawFlags());
             }
         }
+		
     }
 };
 
@@ -105,7 +97,8 @@ void DeformableContact::initPhysics()
     btVector3 gravity = btVector3(0, -10, 0);
     m_dynamicsWorld->setGravity(gravity);
     getDeformableDynamicsWorld()->getWorldInfo().m_gravity = gravity;
-    
+    getDeformableDynamicsWorld()->getWorldInfo().m_sparsesdf.setDefaultVoxelsz(0.25);
+		getDeformableDynamicsWorld()->getWorldInfo().m_sparsesdf.Reset();
     m_guiHelper->createPhysicsDebugDrawer(m_dynamicsWorld);
     
     {
@@ -152,6 +145,7 @@ void DeformableContact::initPhysics()
         
         psb->getCollisionShape()->setMargin(0.1);
         psb->generateBendingConstraints(2);
+        psb->setSpringStiffness(10);
         psb->setTotalMass(1);
         psb->m_cfg.kKHR = 1; // collision hardness with kinematic objects
         psb->m_cfg.kCHR = 1; // collision hardness with rigid body
@@ -179,10 +173,11 @@ void DeformableContact::initPhysics()
                                                           0, true);
         psb2->getCollisionShape()->setMargin(0.1);
         psb2->generateBendingConstraints(2);
+        psb2->setSpringStiffness(10);
         psb2->setTotalMass(1);
         psb2->m_cfg.kKHR = 1; // collision hardness with kinematic objects
         psb2->m_cfg.kCHR = 1; // collision hardness with rigid body
-        psb2->m_cfg.kDF = 0;
+        psb2->m_cfg.kDF = 0.5;
         psb2->m_cfg.collisions = btSoftBody::fCollision::SDF_RD;
         psb2->m_cfg.collisions |= btSoftBody::fCollision::VF_DD;
         psb->translate(btVector3(3.5,0,0));
@@ -199,12 +194,20 @@ void DeformableContact::initPhysics()
     getDeformableDynamicsWorld()->setImplicit(false);
     getDeformableDynamicsWorld()->setLineSearch(false);
     m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
+	int numInstances = m_guiHelper->getRenderInterface()->getTotalNumInstances();
+	double rgbaColors[3][4] = { { 1, 0, 0, 1 } , { 0, 1, 0, 1 } ,{ 0, 0, 1, 1 } };
+
+	for (int i = 0; i < numInstances; i++)
+	{
+		m_guiHelper->changeInstanceFlags(i, B3_INSTANCE_DOUBLE_SIDED);
+	}
+	
 }
 
 void DeformableContact::exitPhysics()
 {
     //cleanup in the reverse order of creation/initialization
-    
+    removePickingConstraint();
     //remove the rigidbodies from the dynamics world and delete them
     int i;
     for (i = m_dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)

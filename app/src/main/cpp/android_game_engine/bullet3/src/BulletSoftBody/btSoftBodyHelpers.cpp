@@ -1500,45 +1500,27 @@ void btSoftBodyHelpers::getBarycentricWeights(const btVector3& a, const btVector
     bary = btVector4(va6*v6, vb6*v6, vc6*v6, vd6*v6);
 }
 
-void btSoftBodyHelpers::readRenderMeshFromObj(const char* file, btSoftBody* psb)
+// Given a simplex with vertices a,b,c, find the barycentric weights of p in this simplex. bary[3] = 0.
+void btSoftBodyHelpers::getBarycentricWeights(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& p, btVector4& bary)
 {
-    std::ifstream fs;
-    fs.open(file);
-    std::string line;
-    btVector3 pos;
-    while (std::getline(fs, line))
-    {
-        std::stringstream ss(line);
-        if (line[0] == 'v' && line[1] != 't' && line[1] != 'n')
-        {
-            ss.ignore();
-            for (size_t i = 0; i < 3; i++)
-                ss >> pos[i];
-            btSoftBody::Node n;
-            n.m_x = pos;
-            psb->m_renderNodes.push_back(n);
-        }
-        else if (line[0] == 'f')
-        {
-            ss.ignore();
-            int id0, id1, id2;
-            ss >> id0;
-            ss >> id1;
-            ss >> id2;
-            btSoftBody::Face f;
-            f.m_n[0] = &psb->m_renderNodes[id0-1];
-            f.m_n[1] = &psb->m_renderNodes[id1-1];
-            f.m_n[2] = &psb->m_renderNodes[id2-1];
-            psb->m_renderFaces.push_back(f);
-        }
-    }
-    fs.close();
+    btVector3 v0 = b - a, v1 = c - a, v2 = p - a;
+    btScalar d00 = btDot(v0, v0);
+    btScalar d01 = btDot(v0, v1);
+    btScalar d11 = btDot(v1, v1);
+    btScalar d20 = btDot(v2, v0);
+    btScalar d21 = btDot(v2, v1);
+    btScalar invDenom = 1.0 / (d00 * d11 - d01 * d01);
+    bary[1] = (d11 * d20 - d01 * d21) * invDenom;
+    bary[2] = (d00 * d21 - d01 * d20) * invDenom;
+    bary[0] = 1.0 - bary[1] - bary[2];
+    bary[3] = 0;
 }
 
 // Iterate through all render nodes to find the simulation tetrahedron that contains the render node and record the barycentric weights
 // If the node is not inside any tetrahedron, assign it to the tetrahedron in which the node has the least negative barycentric weight
 void btSoftBodyHelpers::interpolateBarycentricWeights(btSoftBody* psb)
 {
+    psb->m_z.resize(0);
     psb->m_renderNodesInterpolationWeights.resize(psb->m_renderNodes.size());
     psb->m_renderNodesParents.resize(psb->m_renderNodes.size());
     for (int i = 0; i < psb->m_renderNodes.size(); ++i)
@@ -1548,7 +1530,6 @@ void btSoftBodyHelpers::interpolateBarycentricWeights(btSoftBody* psb)
         btVector4 optimal_bary;
         btScalar min_bary_weight = -1e3;
         btAlignedObjectArray<const btSoftBody::Node*> optimal_parents;
-        bool found = false;
         for (int j = 0; j < psb->m_tetras.size(); ++j)
         {
             const btSoftBody::Tetra& t = psb->m_tetras[j];
@@ -1577,5 +1558,56 @@ void btSoftBodyHelpers::interpolateBarycentricWeights(btSoftBody* psb)
         }
         psb->m_renderNodesInterpolationWeights[i] = optimal_bary;
         psb->m_renderNodesParents[i] = optimal_parents;
+    }
+}
+
+
+// Iterate through all render nodes to find the simulation triangle that's closest to the node in the barycentric sense.
+void btSoftBodyHelpers::extrapolateBarycentricWeights(btSoftBody* psb)
+{
+    psb->m_renderNodesInterpolationWeights.resize(psb->m_renderNodes.size());
+    psb->m_renderNodesParents.resize(psb->m_renderNodes.size());
+    psb->m_z.resize(psb->m_renderNodes.size());
+    for (int i = 0; i < psb->m_renderNodes.size(); ++i)
+    {
+        const btVector3& p = psb->m_renderNodes[i].m_x;
+        btVector4 bary;
+        btVector4 optimal_bary;
+        btScalar min_bary_weight = -SIMD_INFINITY;
+        btAlignedObjectArray<const btSoftBody::Node*> optimal_parents;
+        btScalar dist = 0, optimal_dist = 0;
+        for (int j = 0; j < psb->m_faces.size(); ++j)
+        {
+            const btSoftBody::Face& f = psb->m_faces[j];
+            btVector3 n = btCross(f.m_n[1]->m_x - f.m_n[0]->m_x,  f.m_n[2]->m_x - f.m_n[0]->m_x);
+            btVector3 unit_n = n.normalized();
+            dist = (p-f.m_n[0]->m_x).dot(unit_n);
+            btVector3 proj_p = p - dist*unit_n;
+            getBarycentricWeights(f.m_n[0]->m_x, f.m_n[1]->m_x, f.m_n[2]->m_x, proj_p, bary);
+            btScalar new_min_bary_weight = bary[0];
+            for (int k = 1; k < 3; ++k)
+            {
+                new_min_bary_weight = btMin(new_min_bary_weight, bary[k]);
+            }
+            if (new_min_bary_weight > min_bary_weight)
+            {
+                btAlignedObjectArray<const btSoftBody::Node*> parents;
+                parents.push_back(f.m_n[0]);
+                parents.push_back(f.m_n[1]);
+                parents.push_back(f.m_n[2]);
+                optimal_parents = parents;
+                optimal_bary = bary;
+                optimal_dist = dist;
+                min_bary_weight = new_min_bary_weight;
+                // stop searching if the projected p is inside the triangle at hand
+                if (bary[0]>=0. && bary[1]>=0. && bary[2]>=0.)
+                {
+                    break;
+                }
+            }
+        }
+        psb->m_renderNodesInterpolationWeights[i] = optimal_bary;
+        psb->m_renderNodesParents[i] = optimal_parents;
+        psb->m_z[i] = optimal_dist;
     }
 }

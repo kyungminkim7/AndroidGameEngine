@@ -7,7 +7,11 @@
 //Please don't replace an existing magic number:
 //instead, only ADD a new one at the top, comment-out previous one
 
-#define SHARED_MEMORY_MAGIC_NUMBER 201909030
+#define SHARED_MEMORY_MAGIC_NUMBER 202002030
+//#define SHARED_MEMORY_MAGIC_NUMBER 202001230
+//#define SHARED_MEMORY_MAGIC_NUMBER 201911280
+//#define SHARED_MEMORY_MAGIC_NUMBER 201911180
+//#define SHARED_MEMORY_MAGIC_NUMBER 201909030
 //#define SHARED_MEMORY_MAGIC_NUMBER 201908110
 //#define SHARED_MEMORY_MAGIC_NUMBER 201908050
 //#define SHARED_MEMORY_MAGIC_NUMBER 2019060190
@@ -307,6 +311,23 @@ struct b3UserDataValue
 	const char* m_data1;
 };
 
+enum EnumUserConstraintFlags
+{
+	USER_CONSTRAINT_ADD_CONSTRAINT = 1,
+	USER_CONSTRAINT_REMOVE_CONSTRAINT = 2,
+	USER_CONSTRAINT_CHANGE_CONSTRAINT = 4,
+	USER_CONSTRAINT_CHANGE_PIVOT_IN_B = 8,
+	USER_CONSTRAINT_CHANGE_FRAME_ORN_IN_B = 16,
+	USER_CONSTRAINT_CHANGE_MAX_FORCE = 32,
+	USER_CONSTRAINT_REQUEST_INFO = 64,
+	USER_CONSTRAINT_CHANGE_GEAR_RATIO = 128,
+	USER_CONSTRAINT_CHANGE_GEAR_AUX_LINK = 256,
+	USER_CONSTRAINT_CHANGE_RELATIVE_POSITION_TARGET = 512,
+	USER_CONSTRAINT_CHANGE_ERP = 1024,
+	USER_CONSTRAINT_REQUEST_STATE = 2048,
+	USER_CONSTRAINT_ADD_SOFT_BODY_ANCHOR = 4096,
+};
+
 struct b3UserConstraint
 {
 	int m_parentBodyIndex;
@@ -367,6 +388,7 @@ struct b3DynamicsInfo
 	double m_ccdSweptSphereRadius;
 	double m_contactProcessingThreshold;
 	int m_frictionAnchor;
+	double m_collisionMargin;
 };
 
 // copied from btMultiBodyLink.h
@@ -427,6 +449,12 @@ struct b3MeshVertex
 	double x, y, z, w;
 };
 
+
+enum eMeshDataEnum
+{
+	B3_MESH_DATA_COLLISIONSHAPEINDEX=1,
+};
+
 struct b3MeshData
 {
 	int m_numVertices;
@@ -475,6 +503,7 @@ enum b3VREventType
 
 #define MAX_SDF_BODIES 512
 #define MAX_USER_DATA_KEY_LENGTH 256
+#define MAX_REQUESTED_BODIES_LENGTH 256
 
 enum b3VRButtonInfo
 {
@@ -561,6 +590,13 @@ enum b3NotificationType
 	TRANSFORM_CHANGED = 7,
 	SIMULATION_STEPPED = 8,
 	SOFTBODY_CHANGED = 9,
+};
+
+enum b3ResetSimulationFlags
+{
+	RESET_USE_DEFORMABLE_WORLD=1,
+	RESET_USE_DISCRETE_DYNAMICS_WORLD=2,
+	RESET_USE_SIMPLE_BROADPHASE=4,
 };
 
 struct b3BodyNotificationArgs
@@ -866,11 +902,14 @@ enum eCONNECT_METHOD
 	eCONNECT_GRPC = 12,
 	eCONNECT_PHYSX=13,
 	eCONNECT_SHARED_MEMORY_GUI=14,
+	eCONNECT_GRAPHICS_SERVER = 15,
+	eCONNECT_GRAPHICS_SERVER_TCP = 16,
+	eCONNECT_GRAPHICS_SERVER_MAIN_THREAD=17
 };
 
 enum eURDF_Flags
 {
-	URDF_USE_INERTIA_FROM_FILE = 2,  //sync with URDF2Bullet.h 'ConvertURDFFlags'
+	URDF_USE_INERTIA_FROM_FILE = 2,  //sync with URDFJointTypes.h 'ConvertURDFFlags'
 	URDF_USE_SELF_COLLISION = 8,     //see CUF_USE_SELF_COLLISION
 	URDF_USE_SELF_COLLISION_EXCLUDE_PARENT = 16,
 	URDF_USE_SELF_COLLISION_EXCLUDE_ALL_PARENTS = 32,
@@ -886,7 +925,11 @@ enum eURDF_Flags
 	URDF_USE_MATERIAL_COLORS_FROM_MTL = 32768,
 	URDF_USE_MATERIAL_TRANSPARANCY_FROM_MTL = 65536,
 	URDF_MAINTAIN_LINK_ORDER = 131072,
-	URDF_ENABLE_WAKEUP = 262144,
+	URDF_ENABLE_WAKEUP = 1 << 18,
+	URDF_MERGE_FIXED_LINKS = 1 << 19,
+	URDF_IGNORE_VISUAL_SHAPES = 1 << 20,
+	URDF_IGNORE_COLLISION_SHAPES = 1 << 21,
+	URDF_PRINT_URDF_INFO = 1 << 22,
 };
 
 enum eUrdfGeomTypes  //sync with UrdfParser UrdfGeomTypes
@@ -906,6 +949,7 @@ enum eUrdfCollisionFlags
 {
 	GEOM_FORCE_CONCAVE_TRIMESH = 1,
 	GEOM_CONCAVE_INTERNAL_EDGE = 2,
+	GEOM_INITIALIZE_SAT_FEATURES = URDF_INITIALIZE_SAT_FEATURES,
 };
 
 enum eUrdfVisualFlags
@@ -947,6 +991,7 @@ struct b3PhysicsSimulationParameters
 	int m_numSimulationSubSteps;
 	int m_numSolverIterations;
 	double m_warmStartingFactor;
+	double m_articulatedWarmStartingFactor;
 	int m_useRealTimeSimulation;
 	int m_useSplitImpulse;
 	double m_splitImpulsePenetrationThreshold;
@@ -970,6 +1015,8 @@ struct b3PhysicsSimulationParameters
 	int m_constraintSolverType;
 	int m_minimumSolverIslandSize;
 	int m_reportSolverAnalytics;
+	double m_sparseSdfVoxelSize;
+	int m_numNonContactInnerIterations;
 };
 
 
