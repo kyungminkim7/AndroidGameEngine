@@ -218,6 +218,11 @@ RemoteGUIHelper::~RemoteGUIHelper()
 	delete m_data;
 }
 
+bool RemoteGUIHelper::isConnected() const
+{
+	return m_data->isConnected();
+}
+
 void RemoteGUIHelper::setVisualizerFlag(int flag, int enable)
 {
 	GraphicsSharedMemoryCommand* cmd = m_data->getAvailableSharedMemoryCommand();

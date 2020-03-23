@@ -43,6 +43,7 @@ struct GUIHelperInterface
 	virtual int registerGraphicsInstance(int shapeIndex, const float* position, const float* quaternion, const float* color, const float* scaling) = 0;
 	virtual void removeAllGraphicsInstances() = 0;
 	virtual void removeGraphicsInstance(int graphicsUid) {}
+	virtual void changeInstanceFlags(int instanceUid, int flags) {}
 	virtual void changeRGBAColor(int instanceUid, const double rgbaColor[4]) {}
 	virtual void changeSpecularColor(int instanceUid, const double specularColor[3]) {}
 	virtual void changeTexture(int textureUniqueId, const unsigned char* rgbTexels, int width, int height) {}
@@ -113,6 +114,8 @@ struct GUIHelperInterface
 
 	virtual void removeUserDebugItem(int debugItemUniqueId){};
 	virtual void removeAllUserDebugItems(){};
+	virtual void removeAllUserParameters() {};
+	
 	virtual void setVisualizerFlagCallback(VisualizerFlagCallback callback) {}
 
 	//empty name stops dumping video

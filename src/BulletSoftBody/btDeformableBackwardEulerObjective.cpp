@@ -103,6 +103,7 @@ void btDeformableBackwardEulerObjective::applyForce(TVStack& force, bool setZero
         btSoftBody* psb = m_softBodies[i];
         if (!psb->isActive())
         {
+            counter += psb->m_nodes.size();
             continue;
         }
         for (int j = 0; j < psb->m_nodes.size(); ++j)
@@ -185,9 +186,9 @@ void btDeformableBackwardEulerObjective::initialGuess(TVStack& dv, const TVStack
 }
 
 //set constraints as projections
-void btDeformableBackwardEulerObjective::setConstraints()
+void btDeformableBackwardEulerObjective::setConstraints(const btContactSolverInfo& infoGlobal)
 {
-    m_projection.setConstraints();
+    m_projection.setConstraints(infoGlobal);
 }
 
 void btDeformableBackwardEulerObjective::applyDynamicFriction(TVStack& r)

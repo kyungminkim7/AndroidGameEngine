@@ -12,6 +12,8 @@ struct RemoteGUIHelper : public GUIHelperInterface
 
 	virtual ~RemoteGUIHelper();
 
+	bool isConnected() const;
+
 	virtual void setVisualizerFlag(int flag, int enable);
 
 	virtual void createRigidBodyGraphicsObject(btRigidBody* body, const btVector3& color);

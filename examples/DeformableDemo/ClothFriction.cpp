@@ -22,20 +22,22 @@
 #include "BulletDynamics/Featherstone/btMultiBodyConstraintSolver.h"
 #include <stdio.h>  //printf debugging
 
-#include "../CommonInterfaces/CommonRigidBodyBase.h"
+#include "../CommonInterfaces/CommonDeformableBodyBase.h"
 #include "../Utils/b3ResourcePath.h"
 
 ///The ClothFriction shows the use of deformable friction.
-class ClothFriction : public CommonRigidBodyBase
+class ClothFriction : public CommonDeformableBodyBase
 {
-    btAlignedObjectArray<btDeformableLagrangianForce*> m_forces;
+    btDeformableBodySolver* m_deformableBodySolver;
 public:
     ClothFriction(struct GUIHelperInterface* helper)
-    : CommonRigidBodyBase(helper)
+    : CommonDeformableBodyBase(helper),
+    m_deformableBodySolver(0)
     {
     }
     virtual ~ClothFriction()
     {
+        
     }
     void initPhysics();
     
@@ -56,29 +58,20 @@ public:
         m_dynamicsWorld->stepSimulation(deltaTime, 4, internalTimeStep);
     }
     
-    virtual const btDeformableMultiBodyDynamicsWorld* getDeformableDynamicsWorld() const
-    {
-        return (btDeformableMultiBodyDynamicsWorld*)m_dynamicsWorld;
-    }
-    
-    virtual btDeformableMultiBodyDynamicsWorld* getDeformableDynamicsWorld()
-    {
-        return (btDeformableMultiBodyDynamicsWorld*)m_dynamicsWorld;
-    }
-    
     virtual void renderScene()
     {
-        CommonRigidBodyBase::renderScene();
+        CommonDeformableBodyBase::renderScene();
         btDeformableMultiBodyDynamicsWorld* deformableWorld = getDeformableDynamicsWorld();
         
         for (int i = 0; i < deformableWorld->getSoftBodyArray().size(); i++)
         {
             btSoftBody* psb = (btSoftBody*)deformableWorld->getSoftBodyArray()[i];
             {
-                btSoftBodyHelpers::DrawFrame(psb, deformableWorld->getDebugDrawer());
-                btSoftBodyHelpers::Draw(psb, deformableWorld->getDebugDrawer(), deformableWorld->getDrawFlags());
+                //btSoftBodyHelpers::DrawFrame(psb, deformableWorld->getDebugDrawer());
+				btSoftBodyHelpers::Draw(psb, deformableWorld->getDebugDrawer(), fDrawFlags::Faces);// deformableWorld->getDrawFlags());
             }
         }
+
     }
 };
 
@@ -93,14 +86,14 @@ void ClothFriction::initPhysics()
     m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
     
     m_broadphase = new btDbvtBroadphase();
-    btDeformableBodySolver* deformableBodySolver = new btDeformableBodySolver();
+    m_deformableBodySolver = new btDeformableBodySolver();
     
     ///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
     btDeformableMultiBodyConstraintSolver* sol = new btDeformableMultiBodyConstraintSolver();
-    sol->setDeformableSolver(deformableBodySolver);
+    sol->setDeformableSolver(m_deformableBodySolver);
     m_solver = sol;
     
-    m_dynamicsWorld = new btDeformableMultiBodyDynamicsWorld(m_dispatcher, m_broadphase, sol, m_collisionConfiguration, deformableBodySolver);
+    m_dynamicsWorld = new btDeformableMultiBodyDynamicsWorld(m_dispatcher, m_broadphase, sol, m_collisionConfiguration, m_deformableBodySolver);
     btVector3 gravity = btVector3(0, -10, 0);
     m_dynamicsWorld->setGravity(gravity);
     getDeformableDynamicsWorld()->getWorldInfo().m_gravity = gravity;
@@ -154,6 +147,7 @@ void ClothFriction::initPhysics()
         psb->getCollisionShape()->setMargin(0.05);
         psb->generateBendingConstraints(2);
         psb->setTotalMass(1);
+        psb->setSpringStiffness(10);
         psb->m_cfg.kKHR = 1; // collision hardness with kinematic objects
         psb->m_cfg.kCHR = 1; // collision hardness with rigid body
         psb->m_cfg.kDF = 3;
@@ -170,7 +164,7 @@ void ClothFriction::initPhysics()
         m_forces.push_back(gravity_force);
         
         
-        h = 2;
+        h = .5;
         s = 2;
         btSoftBody* psb2 = btSoftBodyHelpers::CreatePatch(getDeformableDynamicsWorld()->getWorldInfo(), btVector3(-s, h, -s),
                                                           btVector3(+s, h, -s),
@@ -181,6 +175,7 @@ void ClothFriction::initPhysics()
         psb2->getCollisionShape()->setMargin(0.05);
         psb2->generateBendingConstraints(2);
         psb2->setTotalMass(1);
+        psb2->setSpringStiffness(10);
         psb2->m_cfg.kKHR = 1; // collision hardness with kinematic objects
         psb2->m_cfg.kCHR = 1; // collision hardness with rigid body
         psb2->m_cfg.kDF = 20;
@@ -204,7 +199,7 @@ void ClothFriction::initPhysics()
 void ClothFriction::exitPhysics()
 {
     //cleanup in the reverse order of creation/initialization
-    
+    removePickingConstraint();
     //remove the rigidbodies from the dynamics world and delete them
     int i;
     for (i = m_dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
@@ -237,6 +232,8 @@ void ClothFriction::exitPhysics()
     
     delete m_solver;
     
+    delete m_deformableBodySolver;
+
     delete m_broadphase;
     
     delete m_dispatcher;

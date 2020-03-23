@@ -24,21 +24,65 @@ class btDeformableNeoHookeanForce : public btDeformableLagrangianForce
 {
 public:
     typedef btAlignedObjectArray<btVector3> TVStack;
-    btScalar m_mu, m_lambda;
+	btScalar m_mu, m_lambda; // Lame Parameters
+	btScalar m_E, m_nu;  // Young's modulus and Poisson ratio
     btScalar m_mu_damp, m_lambda_damp;
     btDeformableNeoHookeanForce(): m_mu(1), m_lambda(1)
     {
         btScalar damping = 0.05;
         m_mu_damp = damping * m_mu;
         m_lambda_damp = damping * m_lambda;
+		updateYoungsModulusAndPoissonRatio();
     }
     
     btDeformableNeoHookeanForce(btScalar mu, btScalar lambda, btScalar damping = 0.05): m_mu(mu), m_lambda(lambda)
     {
         m_mu_damp = damping * m_mu;
         m_lambda_damp = damping * m_lambda;
+		updateYoungsModulusAndPoissonRatio();
     }
-    
+
+	void updateYoungsModulusAndPoissonRatio()
+	{
+		// conversion from Lame Parameters to Young's modulus and Poisson ratio
+		// https://en.wikipedia.org/wiki/Lam%C3%A9_parameters
+		m_E  = m_mu * (3*m_lambda + 2*m_mu)/(m_lambda + m_mu);
+		m_nu = m_lambda * 0.5 / (m_mu + m_lambda);
+	}
+
+	void updateLameParameters()
+	{
+		// conversion from Young's modulus and Poisson ratio to Lame Parameters
+		// https://en.wikipedia.org/wiki/Lam%C3%A9_parameters
+		m_mu = m_E * 0.5 / (1 + m_nu);
+		m_lambda = m_E * m_nu / ((1 + m_nu) * (1- 2*m_nu));
+	}
+
+    void setYoungsModulus(btScalar E)
+    {
+		m_E = E;
+		updateLameParameters();
+    }
+
+	void setPoissonRatio(btScalar nu)
+	{
+		m_nu = nu;
+		updateLameParameters();
+	}
+	
+	void setDamping(btScalar damping)
+	{
+		m_mu_damp = damping * m_mu;
+		m_lambda_damp = damping * m_lambda;
+	}
+
+	void setLameParameters(btScalar mu, btScalar lambda)
+	{
+		m_mu = mu;
+		m_lambda = lambda;
+		updateYoungsModulusAndPoissonRatio();
+	}
+
     virtual void addScaledForces(btScalar scale, TVStack& force)
     {
         addScaledDampingForce(scale, force);
@@ -175,25 +219,32 @@ public:
                 btSoftBody::Tetra& tetra = psb->m_tetras[j];
                 btMatrix3x3 P;
                 firstPiola(psb->m_tetraScratches[j],P);
-                
-                btMatrix3x3 U, V;
-                btVector3 sigma;
-                singularValueDecomposition(P, U, sigma, V);
+#ifdef USE_SVD
                 if (max_p > 0)
                 {
-                    sigma[0] = btMin(sigma[0], max_p);
-                    sigma[1] = btMin(sigma[1], max_p);
-                    sigma[2] = btMin(sigma[2], max_p);
-                    sigma[0] = btMax(sigma[0], -max_p);
-                    sigma[1] = btMax(sigma[1], -max_p);
-                    sigma[2] = btMax(sigma[2], -max_p);
+                    // since we want to clamp the principal stress to max_p, we only need to
+                    // calculate SVD when sigma_0^2 + sigma_1^2 + sigma_2^2 > max_p * max_p
+                    btScalar trPTP = (P[0].length2() + P[1].length2() + P[2].length2());
+                    if (trPTP > max_p * max_p)
+                    {
+                        btMatrix3x3 U, V;
+                        btVector3 sigma;
+                        singularValueDecomposition(P, U, sigma, V);
+                        sigma[0] = btMin(sigma[0], max_p);
+                        sigma[1] = btMin(sigma[1], max_p);
+                        sigma[2] = btMin(sigma[2], max_p);
+                        sigma[0] = btMax(sigma[0], -max_p);
+                        sigma[1] = btMax(sigma[1], -max_p);
+                        sigma[2] = btMax(sigma[2], -max_p);
+                        btMatrix3x3 Sigma;
+                        Sigma.setIdentity();
+                        Sigma[0][0] = sigma[0];
+                        Sigma[1][1] = sigma[1];
+                        Sigma[2][2] = sigma[2];
+                        P = U * Sigma * V.transpose();
+                    }
                 }
-                btMatrix3x3 Sigma;
-                Sigma.setIdentity();
-                Sigma[0][0] = sigma[0];
-                Sigma[1][1] = sigma[1];
-                Sigma[2][2] = sigma[2];
-                P = U * Sigma * V.transpose();
+#endif
 //                btVector3 force_on_node0 = P * (tetra.m_Dm_inverse.transpose()*grad_N_hat_1st_col);
                 btMatrix3x3 force_on_node123 = P * tetra.m_Dm_inverse.transpose();
                 btVector3 force_on_node0 = force_on_node123 * grad_N_hat_1st_col;
