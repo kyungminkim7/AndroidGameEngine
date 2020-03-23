@@ -19,8 +19,11 @@ class GameObject;
 ///
 class PhysicsRigidBody {
 public:
-    PhysicsRigidBody(GameObject *gameObject, std::unique_ptr<btCollisionShape> collisionShape);
-    
+    PhysicsRigidBody(GameObject *parentGameObject, std::unique_ptr<btCollisionShape> collisionShape);
+
+    PhysicsRigidBody(PhysicsRigidBody &&) = default;
+    PhysicsRigidBody& operator=(PhysicsRigidBody &&) = default;
+
     void* getNativeBody();
     
     void setOrientation(const glm::mat3 &orientation);

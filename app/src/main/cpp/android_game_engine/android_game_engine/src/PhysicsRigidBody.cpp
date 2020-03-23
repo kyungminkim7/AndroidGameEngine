@@ -2,12 +2,12 @@
 
 namespace age {
 
-PhysicsRigidBody::PhysicsRigidBody(GameObject *gameObject, std::unique_ptr<btCollisionShape> collisionShape)
+PhysicsRigidBody::PhysicsRigidBody(GameObject *parentGameObject, std::unique_ptr<btCollisionShape> collisionShape)
     : motionState(new PhysicsMotionState),
       collisionShape(std::move(collisionShape)),
       body(new btRigidBody(btRigidBody::btRigidBodyConstructionInfo(0.0f, this->motionState.get(),
                                                                     this->collisionShape.get()))){
-    this->body->setUserPointer(gameObject);
+    this->body->setUserPointer(parentGameObject);
 }
 
 void* PhysicsRigidBody::getNativeBody() {return this->body.get();}
