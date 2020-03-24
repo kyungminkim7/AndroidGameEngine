@@ -88,13 +88,15 @@ void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
     }
 
     // Apply motor thrust
-    auto halfDimensions = this->getScaledDimensions() / 2.0f;
-    auto orientation = this->getOrientation();
+    const auto localZ = this->getOrientationZ();
 
-    auto frontLeftForce = orientation * glm::vec3(0.0f, 0.0f, this->motors[0].getThrust());
-    auto frontRightForce = orientation * glm::vec3(0.0f, 0.0f, this->motors[1].getThrust());
-    auto backRightForce = orientation * glm::vec3(0.0f, 0.0f, this->motors[2].getThrust());
-    auto backLeftForce = orientation * glm::vec3(0.0f, 0.0f, this->motors[3].getThrust());
+    const auto frontLeftForce = localZ * this->motors[0].getThrust();
+    const auto frontRightForce = localZ * this->motors[1].getThrust();
+    const auto backRightForce = localZ * this->motors[2].getThrust();
+    const auto backLeftForce = localZ * this->motors[3].getThrust();
+
+    const auto halfDimensions = this->getScaledDimensions() / 2.0f;
+    const auto orientation = this->getOrientation();
 
     this->applyForce(frontLeftForce, orientation * glm::vec3(halfDimensions.x, halfDimensions.y, halfDimensions.z));
     this->applyForce(frontRightForce, orientation * glm::vec3(halfDimensions.x, -halfDimensions.y, halfDimensions.z));
@@ -102,20 +104,21 @@ void Quadcopter::onUpdate(std::chrono::duration<float> updateDuration) {
     this->applyForce(backLeftForce, orientation * glm::vec3(-halfDimensions.x, halfDimensions.y, halfDimensions.z));
 
     // Apply motor moments
-    auto armLength = glm::length(glm::vec3{halfDimensions.x, halfDimensions.y, 0.0f});
+    const auto armLength = glm::length(glm::vec3{halfDimensions.x, halfDimensions.y, 0.0f});
 
     for (auto i = 0u; i < this->motors.size(); ++i) {
-        auto moment = armLength * this->motors[i].getThrust();
-        this->applyTorque(orientation * glm::rotateZ(glm::vec3(moment, 0.0f, 0.0f),
-                                                     glm::radians(-45.0f - 90.0f * i)));
+        const auto moment = armLength * this->motors[i].getThrust();
+        this->applyTorque(glm::rotate(this->getLookAtDirection() * moment,
+                                      glm::radians(-45.0f - 90.0f * i),
+                                      localZ));
     }
 
-    auto yawMoment = armLength *
-            (-this->motors[0].getThrust() +
-              this->motors[1].getThrust() -
-              this->motors[2].getThrust() +
-              this->motors[3].getThrust());
-    this->applyTorque(orientation * glm::vec3(0.0f, 0.0f, yawMoment));
+    const auto yawMoment = armLength *
+                           (-this->motors[0].getThrust() +
+                            this->motors[1].getThrust() -
+                            this->motors[2].getThrust() +
+                            this->motors[3].getThrust());
+    this->applyTorque(localZ * yawMoment);
 }
 
 void Quadcopter::onRollThrustInput(const glm::vec2 &input) {
