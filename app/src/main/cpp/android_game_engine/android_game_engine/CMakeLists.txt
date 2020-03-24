@@ -42,6 +42,7 @@ add_library(${PROJECT_NAME} STATIC
         src/Texture2D.cpp
         src/UniformBuffer.cpp
         src/Utilities.cpp
+        src/Vehicle.cpp
         src/VertexArray.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
