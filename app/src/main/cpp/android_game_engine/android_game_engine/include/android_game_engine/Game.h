@@ -82,6 +82,8 @@ protected:
     void registerPhysics(GameObject *gameObject);
 
     void unregisterPhysics(GameObject *gameObject);
+
+    void* getNativePhysicsWorld();
     
     virtual void onGameObjectTouched(GameObject *gameObject, const glm::vec3 &touchPoint,
                                      const glm::vec3 &touchDirection, const glm::vec3 &touchNormal);

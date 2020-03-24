@@ -38,6 +38,8 @@ public:
 
     PhysicsEngine(const PhysicsEngine&) = delete;
     PhysicsEngine& operator=(const PhysicsEngine&) = delete;
+
+    void* getNativePhysicsWorld();
     
     void onUpdate(std::chrono::duration<float> updateDuration);
 

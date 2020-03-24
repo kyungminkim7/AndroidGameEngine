@@ -26,6 +26,8 @@ PhysicsEngine::PhysicsEngine(ShaderProgram *debugShader)
 
 PhysicsEngine::~PhysicsEngine() = default;
 
+void* PhysicsEngine::getNativePhysicsWorld(){ return this->dynamicsWorld.get(); }
+
 void PhysicsEngine::onUpdate(std::chrono::duration<float> updateDuration) {
     this->dynamicsWorld->stepSimulation(updateDuration.count(), 10);
 }
