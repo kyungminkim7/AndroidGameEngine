@@ -1,7 +1,7 @@
 #include "TestGameAR.h"
 
-#include <android_game_engine/Box.h>
 #include <android_game_engine/LightDirectional.h>
+#include <android_game_engine/Vehicle.h>
 
 namespace age {
 
@@ -12,12 +12,8 @@ JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)
     GameEngineJNI::onCreate(std::make_unique<TestGameAR>(env, gameApplicationContext, gameActivity));
 }
 
-JNI_METHOD_DEFINITION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y) {
-    reinterpret_cast<TestGameAR*>(GameEngineJNI::getGame())->onLeftJoystickInput(x, y);
-}
-
-JNI_METHOD_DEFINITION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y) {
-    reinterpret_cast<TestGameAR*>(GameEngineJNI::getGame())->onRightJoystickInput(x, y);
+JNI_METHOD_DEFINITION(void, onJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y) {
+    reinterpret_cast<TestGameAR *>(GameEngineJNI::getGame())->onJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onResetJNI)(JNIEnv *env, jobject gameActivity) {
@@ -33,14 +29,16 @@ void TestGameAR::onCreate() {
 //    this->enablePhysicsDebugDrawer(true);
     this->getDirectionalLight()->setLookAtDirection({1.0f, 1.0f, -3.0f});
 
-    this->atvCache = std::make_shared<GameObject>("models/atv/ATV.3DS");
-    this->atvCache->setScale(glm::vec3(0.1f));
+    this->atvCache = std::make_shared<Vehicle>("models/atv/ATV.3DS", 4.0f, 0.7f);
+    this->atvCache->setScale(glm::vec3(0.2f));
     this->atvCache->setMass(1.0f);
 }
 
-void TestGameAR::onLeftJoystickInput(float x, float y){ }
-
-void TestGameAR::onRightJoystickInput(float x, float y){ }
+void TestGameAR::onJoystickInput(float x, float y){
+    if (this->atv != nullptr) {
+        this->atv->onJoystickInput({x, y});
+    }
+}
 
 void TestGameAR::onReset() {
     if (this->atv == nullptr) {

@@ -13,12 +13,12 @@ extern "C" {
 JNI_METHOD_DECLARATION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject gameActivity, jobject gameApplicationContext,
                                                   int windowWidth, int windowHeight, int displayRotation,
                                                   jobject j_asset_manager);
-JNI_METHOD_DECLARATION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y);
-JNI_METHOD_DECLARATION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y);
+JNI_METHOD_DECLARATION(void, onJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y);
 JNI_METHOD_DECLARATION(void, onResetJNI)(JNIEnv *env, jobject gameActivity);
 }
 
 class GameObject;
+class Vehicle;
 
 class TestGameAR : public GameAR {
 public:
@@ -26,8 +26,7 @@ public:
 
     void onCreate() override;
 
-    void onLeftJoystickInput(float x, float y);
-    void onRightJoystickInput(float x, float y);
+    void onJoystickInput(float x, float y);
 
     void onReset();
 
@@ -36,8 +35,8 @@ protected:
                              const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) override;
     
 private:
-    std::shared_ptr<GameObject> atv = nullptr;
-    std::shared_ptr<GameObject> atvCache = nullptr;
+    std::shared_ptr<Vehicle> atv = nullptr;
+    std::shared_ptr<Vehicle> atvCache = nullptr;
 };
 
 } // namespace age

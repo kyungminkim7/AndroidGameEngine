@@ -34,8 +34,7 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
                                             int windowWidth, int windowHeight, int displayRotation,
                                             AssetManager assetManager);
 
-    private native void onLeftJoystickInputJNI(float roll, float thrust);
-    private native void onRightJoystickInputJNI(float yaw, float pitch);
+    private native void onJoystickInputJNI(float x, float y);
 
     private native void onResetJNI();
     ///@}
@@ -64,8 +63,7 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
     private static final int SNACKBAR_COLOR = 0xbf323232;
 
     private GLSurfaceView glSurfaceView;
-    private Joystick leftJoystick;
-    private Joystick rightJoystick;
+    private Joystick joystick;
     private MaterialButton resetButton;
 
     private Handler arPlaneInitializedHandler;
@@ -122,8 +120,7 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
             }
         });
 
-        this.leftJoystick = findViewById(R.id.leftJoystick);
-        this.rightJoystick = findViewById(R.id.rightJoystick);
+        this.joystick = findViewById(R.id.joystick);
         this.resetButton = findViewById(R.id.resetButton);
 
         this.arPlaneInitializedHandler = new Handler();
@@ -200,43 +197,21 @@ public class GameActivityAR extends AppCompatActivity implements GLSurfaceView.R
                                  this.getWindowManager().getDefaultDisplay().getRotation(),
                                  getAssets());
 
-        this.leftJoystick.setOnTouchListener(new View.OnTouchListener() {
+        this.joystick.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 boolean result = v.onTouchEvent(event);
-                float x = leftJoystick.getMeasurementX();
-                float y = leftJoystick.getMeasurementY();
+                float x = joystick.getMeasurementX();
+                float y = joystick.getMeasurementY();
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                     case MotionEvent.ACTION_MOVE:
-                        glSurfaceView.queueEvent(()-> onLeftJoystickInputJNI(x, y));
+                        glSurfaceView.queueEvent(()-> onJoystickInputJNI(x, y));
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        glSurfaceView.queueEvent(()-> onLeftJoystickInputJNI(0.0f, 0.0f));
-                        break;
-                }
-
-                return result;
-            }
-        });
-
-        this.rightJoystick.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                boolean result = v.onTouchEvent(event);
-                float x = rightJoystick.getMeasurementX();
-                float y = rightJoystick.getMeasurementY();
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                    case MotionEvent.ACTION_MOVE:
-                        glSurfaceView.queueEvent(()-> onRightJoystickInputJNI(x, y));
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                        glSurfaceView.queueEvent(()-> onRightJoystickInputJNI(0.0f, 0.0f));
+                        glSurfaceView.queueEvent(()-> onJoystickInputJNI(0.0f, 0.0f));
                         break;
                 }
 
