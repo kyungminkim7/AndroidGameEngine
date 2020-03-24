@@ -48,10 +48,12 @@ public class Joystick extends View {
         }
     }
 
+    // Returns a range from [-1, 1] from left to right
     public float getMeasurementX() {
         return (this.handleCenterX - this.baseCenterX) / (this.baseRadius - this.handleRadius);
     }
 
+    // Returns a range from [-1, 1] from bottom to top
     public float getMeasurementY() {
         return (this.baseCenterY - this.handleCenterY) / (this.baseRadius - this.handleRadius);
     }
