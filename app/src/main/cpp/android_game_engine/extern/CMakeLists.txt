@@ -9,6 +9,7 @@ OPTION(BUILD_BULLET2_DEMOS "Set when you want to build the Bullet 2 demos" OFF)
 OPTION(INSTALL_LIBS "Set when you want to install libraries" OFF)
 OPTION(BUILD_UNIT_TESTS "Build Unit Tests"	OFF)
 OPTION(INSTALL_CMAKE_FILES "Install generated CMake files" OFF)
+
 add_subdirectory(bullet3)
 
 target_include_directories(Bullet2FileLoader INTERFACE
@@ -53,10 +54,10 @@ target_include_directories(LinearMath INTERFACE
 
 # glm library for linear algebra
 add_subdirectory(glm)
-
-target_include_directories(glm_static INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/glm>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/glm>)
+#
+#target_include_directories(glm_static INTERFACE
+#        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/glm>
+#        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/glm>)
 
 # lib3ds library for loading 3DS model files
 add_library(lib3ds STATIC
