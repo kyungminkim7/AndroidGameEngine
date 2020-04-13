@@ -199,11 +199,11 @@ ENDIF (BUILD_SHARED_LIBS)
 IF(NOT MSVC)
     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/bullet_robotics_gui.pc.cmake
                    ${CMAKE_CURRENT_BINARY_DIR}/bullet_robotics_gui.pc @ONLY)
-  	INSTALL(
-      FILES
-      ${CMAKE_CURRENT_BINARY_DIR}/bullet_robotics_gui.pc
-      DESTINATION
-      ${PKGCONFIG_INSTALL_PREFIX}
-    )
+#  	INSTALL(
+#      FILES
+#      ${CMAKE_CURRENT_BINARY_DIR}/bullet_robotics_gui.pc
+#      DESTINATION
+#      ${PKGCONFIG_INSTALL_PREFIX}
+#    )
 ENDIF(NOT MSVC)
 
