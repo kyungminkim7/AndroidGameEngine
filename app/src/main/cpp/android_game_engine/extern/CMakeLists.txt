@@ -82,15 +82,18 @@ add_library(lib3ds STATIC
         lib3ds/src/lib3ds_util.c
         lib3ds/src/lib3ds_vector.c
         lib3ds/src/lib3ds_viewport.c
-        lib3ds/src/lib3ds.rc)
+        lib3ds/src/lib3ds.rc
+)
 
 target_include_directories(lib3ds PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib3ds/src>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/lib3ds/src>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/lib3ds/src>
+)
 
 # STB library for loading image files
 add_library(stb INTERFACE)
 
 target_include_directories(stb INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/stb>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/stb>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/stb>
+)
