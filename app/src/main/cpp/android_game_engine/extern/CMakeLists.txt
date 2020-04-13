@@ -6,6 +6,7 @@ OPTION(BUILD_CLSOCKET "Set when you want to build apps with enet TCP networking 
 OPTION(BUILD_EGL "Build OpenGL/EGL" OFF)
 OPTION(BUILD_OPENGL3_DEMOS "Set when you want to build Bullet 3 OpenGL3+ demos" OFF)
 OPTION(BUILD_BULLET2_DEMOS "Set when you want to build the Bullet 2 demos" OFF)
+OPTION(BUILD_EXTRAS "Set when you want to build the extras" OFF)
 OPTION(INSTALL_LIBS "Set when you want to install libraries" OFF)
 OPTION(BUILD_UNIT_TESTS "Build Unit Tests"	OFF)
 OPTION(INSTALL_CMAKE_FILES "Install generated CMake files" OFF)
