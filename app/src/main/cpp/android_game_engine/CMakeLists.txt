@@ -46,6 +46,8 @@ add_library(${PROJECT_NAME} STATIC
         src/VertexArray.cpp
 )
 
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
@@ -53,17 +55,17 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         EGL
-        BulletDynamics
-        BulletCollision
         GLESv3
-        LinearMath
         android
-        glm::glm
-        lib3ds
-        log
         arcore
+        bullet3::BulletDynamics
+        bullet3::BulletCollision
+        bullet3::LinearMath
+        glm::glm
+        lib3ds::lib3ds
+        log
     PRIVATE
-        stb)
+        stb::stb)
 
 target_compile_features(${PROJECT_NAME}
     PUBLIC

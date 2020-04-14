@@ -53,6 +53,15 @@ target_include_directories(LinearMath INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/bullet3/src>
 )
 
+add_library(bullet3::Bullet2FileLoader ALIAS Bullet2FileLoader)
+add_library(bullet3::Bullet3Collision ALIAS Bullet3Collision)
+add_library(bullet3::Bullet3Common ALIAS Bullet3Common)
+add_library(bullet3::BulletCollision ALIAS BulletCollision)
+add_library(bullet3::BulletDynamics ALIAS BulletDynamics)
+add_library(bullet3::BulletInverseDynamics ALIAS BulletInverseDynamics)
+add_library(bullet3::BulletSoftBody ALIAS BulletSoftBody)
+add_library(bullet3::LinearMath ALIAS LinearMath)
+
 # glm library for linear algebra
 add_subdirectory(glm)
 
@@ -82,6 +91,8 @@ add_library(lib3ds STATIC
         lib3ds/src/lib3ds.rc
 )
 
+add_library(lib3ds::lib3ds ALIAS lib3ds)
+
 target_include_directories(lib3ds PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib3ds/src>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/lib3ds/src>
@@ -89,6 +100,7 @@ target_include_directories(lib3ds PUBLIC
 
 # STB library for loading image files
 add_library(stb INTERFACE)
+add_library(stb::stb ALIAS stb)
 
 target_include_directories(stb INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/stb>

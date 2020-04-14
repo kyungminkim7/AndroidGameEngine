@@ -18,4 +18,4 @@ target_include_directories(game
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
-target_link_libraries(game PUBLIC android_game_engine)
+target_link_libraries(game PUBLIC android_game_engine::android_game_engine)
