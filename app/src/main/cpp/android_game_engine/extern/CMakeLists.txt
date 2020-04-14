@@ -55,10 +55,6 @@ target_include_directories(LinearMath INTERFACE
 
 # glm library for linear algebra
 add_subdirectory(glm)
-#
-#target_include_directories(glm_static INTERFACE
-#        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/glm>
-#        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/glm>)
 
 # lib3ds library for loading 3DS model files
 add_library(lib3ds STATIC
