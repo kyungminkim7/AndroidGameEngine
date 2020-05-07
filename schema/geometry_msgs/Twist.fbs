@@ -1,0 +1,10 @@
+include "Vector3.fbs";
+
+namespace geometry_msgs;
+
+table Twist {
+    linear:Vector3;
+    angular:Vector3;
+}
+
+root_type Twist;

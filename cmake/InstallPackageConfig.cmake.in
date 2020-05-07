@@ -1,0 +1,3 @@
+include(CMakeFindDependencyMacro)
+
+include("${CMAKE_CURRENT_LIST_DIR}/@install_package_PACKAGE@Targets.cmake")
