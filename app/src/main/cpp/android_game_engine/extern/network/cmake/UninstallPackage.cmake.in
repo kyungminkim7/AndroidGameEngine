@@ -1,0 +1,49 @@
+set(manifest "${CMAKE_BINARY_DIR}/install_manifest.txt")
+
+if(NOT EXISTS "${manifest}")
+    message(FATAL_ERROR "Cannot find install manifest: ${manifest}")
+endif()
+
+# Delete all files in install manifest
+file(STRINGS "${manifest}" installedFiles)
+
+foreach(file ${installedFiles})
+    if(EXISTS "${file}")
+        exec_program("${CMAKE_COMMAND}" ARGS "-E remove ${file}"
+            OUTPUT_VARIABLE stdout
+            RETURN_VALUE result
+        )
+
+        if("${result}" STREQUAL 0)
+            message("Removed file: ${file}")
+        else()
+            message("Failed to remove file: ${file}")
+        endif()
+    else()
+        message("${file} does not exist")
+    endif()
+endforeach()
+
+# Delete package-specific directories
+function(remove_dir dir)
+    if(EXISTS "${dir}")
+        exec_program("${CMAKE_COMMAND}" ARGS "-E remove_directory ${dir}"
+            OUTPUT_VARIABLE stdout
+            RETURN_VALUE result
+        )
+
+        if("${result}" STREQUAL 0)
+            message("Removed dir: ${dir}")
+        else()
+            message("Failed to remove dir: ${dir}")
+        endif()
+    endif()
+endfunction()
+
+# Delete cmake directory
+remove_dir("@CMAKE_INSTALL_PREFIX@/lib/cmake/@install_package_PACKAGE@")
+
+# Delete include directories
+foreach(includeDir @install_package_INCLUDE_DIRS@)
+    remove_dir("@CMAKE_INSTALL_PREFIX@/${includeDir}")
+endforeach()
