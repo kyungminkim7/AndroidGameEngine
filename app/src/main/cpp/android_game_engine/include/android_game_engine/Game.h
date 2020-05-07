@@ -1,14 +1,17 @@
 #pragma once
 
+#include "GameTemplate.h"
+
 #include <chrono>
 #include <memory>
 #include <vector>
 
-#include <jni.h>
-
 #include "CameraChase.h"
 #include "CameraFPV.h"
+#include "PhysicsEngine.h"
 #include "ShaderProgram.h"
+#include "ShadowMap.h"
+#include "Skybox.h"
 #include "UniformBuffer.h"
 
 namespace age {
@@ -23,45 +26,29 @@ struct Ray {
 
 class GameObject;
 class LightDirectional;
-class PhysicsEngine;
-class ShadowMap;
-class Skybox;
 
 /**
  * Users should subclass Game and then run it using GameEngine::run with the derived
  * Game class.
  */
-class Game {
+class Game : public GameTemplate {
 public:
     Game(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject);
-    virtual ~Game();
 
-    Game(Game &&);
-    Game& operator=(Game &&);
+    void onCreate() override;
 
-    virtual void onCreate();
-    virtual void onStart();
-    virtual void onResume();
-    virtual void onPause();
-    virtual void onStop();
-    virtual void onDestroy();
+    void onWindowChanged(int width, int height, int displayRotation) override;
 
-    virtual void onWindowChanged(int width, int height, int displayRotation);
+    void onUpdate(std::chrono::duration<float> updateDuration) override;
+    void render() override;
 
-    virtual void onUpdate(std::chrono::duration<float> updateDuration);
-    virtual void render();
-
-    virtual bool onTouchDownEvent(float x, float y);
-    virtual bool onTouchMoveEvent(float x, float y);
-    virtual bool onTouchUpEvent(float x, float y);
+    bool onTouchDownEvent(float x, float y) override;
+    bool onTouchMoveEvent(float x, float y) override;
+    bool onTouchUpEvent(float x, float y) override;
     
     void enablePhysicsDebugDrawer(bool enable);
 
 protected:
-    JNIEnv* getJNIEnv();
-    jobject getJavaApplicationContext();
-    jobject getJavaActivityObject();
-
     void setGravity(const glm::vec3 &gravity);
 
     void setSkybox(std::unique_ptr<Skybox> skybox);
@@ -100,10 +87,6 @@ protected:
 private:
     void raycastTouch(const glm::vec2 &windowTouchPosition, float length);
     Ray getTouchRay(const glm::vec2 &windowTouchPosition);
-
-    JavaVM *javaVM;
-    jobject javaApplicationContext;
-    jobject javaActivityObject;
 
     ShaderProgram shadowMapShader;
     ShaderProgram defaultShader;

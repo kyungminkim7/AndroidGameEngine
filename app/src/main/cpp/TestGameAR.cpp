@@ -13,7 +13,7 @@ JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)
 }
 
 JNI_METHOD_DEFINITION(void, onJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y) {
-    reinterpret_cast<TestGameAR *>(GameEngineJNI::getGame())->onJoystickInput(x, y);
+    reinterpret_cast<TestGameAR*>(GameEngineJNI::getGame())->onJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onResetJNI)(JNIEnv *env, jobject gameActivity) {

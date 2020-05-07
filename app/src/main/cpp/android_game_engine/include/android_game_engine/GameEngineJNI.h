@@ -8,9 +8,12 @@
 #ifdef GAME_AR
 #define JNI_METHOD_DEFINITION(return_type, method_name) \
   return_type JNICALL Java_com_example_androidgameengine_GameActivityAR_##method_name
-#else
+#elif defined(GAME)
 #define JNI_METHOD_DEFINITION(return_type, method_name) \
   return_type JNICALL Java_com_example_androidgameengine_GameActivity_##method_name
+#elif defined(MOBILE_CONTROL_STATION)
+#define JNI_METHOD_DEFINITION(return_type, method_name) \
+  return_type JNICALL Java_com_example_androidgameengine_MobileControlStationActivity_##method_name
 #endif
 
 #define JNI_METHOD_DECLARATION(return_type, method_name) \
@@ -22,7 +25,7 @@
 
 namespace age {
 
-class Game;
+class GameTemplate;
 
 namespace GameEngineJNI {
 
@@ -35,8 +38,8 @@ namespace GameEngineJNI {
 /// \param j_asset_manager Android asset manager
 ///
 void init(JNIEnv *env, int windowWidth, int windowHeight, int displayRotation, jobject j_asset_manager);
-void onCreate(std::unique_ptr<Game> game);
-Game* getGame();
+void onCreate(std::unique_ptr<GameTemplate> game);
+GameTemplate* getGame();
 
 extern "C" {
 JNI_METHOD_DECLARATION(void, onStartJNI)(JNIEnv *env, jobject);

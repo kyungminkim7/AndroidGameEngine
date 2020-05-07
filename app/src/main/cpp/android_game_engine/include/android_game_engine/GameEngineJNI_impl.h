@@ -1,12 +1,12 @@
 #include <android/asset_manager_jni.h>
 
-#include "Game.h"
+#include "GameTemplate.h"
 #include "ManagerAssets.h"
 #include "ManagerWindowing.h"
 
 namespace {
 
-std::unique_ptr<age::Game> game = nullptr;
+std::unique_ptr<age::GameTemplate> game = nullptr;
 
 } // namespace
 
@@ -18,14 +18,14 @@ void init(JNIEnv *env, int windowWidth, int windowHeight, int displayRotation, j
     ManagerAssets::init(AAssetManager_fromJava(env, j_asset_manager));
 }
 
-void onCreate(std::unique_ptr<Game> g) {
+void onCreate(std::unique_ptr<GameTemplate> g) {
     game = std::move(g);
     game->onCreate();
     game->onStart();
     game->onResume();
 }
 
-Game* getGame() {
+GameTemplate* getGame() {
     return game.get();
 }
 

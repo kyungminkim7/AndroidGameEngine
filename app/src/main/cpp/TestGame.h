@@ -4,6 +4,7 @@
 
 #include <memory>
 
+#define GAME
 #include <android_game_engine/GameEngineJNI.h>
 
 namespace age {

@@ -19,6 +19,7 @@ add_library(${PROJECT_NAME} STATIC
         src/Game.cpp
         src/GameAR.cpp
         src/GameObject.cpp
+        src/GameTemplate.cpp
         src/Light.cpp
         src/LightDirectional.cpp
         src/Log.cpp
