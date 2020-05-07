@@ -86,6 +86,9 @@ target_include_directories(lib3ds PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/lib3ds/src>
 )
 
+# network library for networking
+add_subdirectory(network)
+
 # STB library for loading image files
 add_library(stb INTERFACE)
 add_library(stb::stb ALIAS stb)
