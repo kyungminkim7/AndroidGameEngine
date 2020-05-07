@@ -5,16 +5,16 @@
 
 #include <jni.h>
 
-#ifdef GAME_AR
-#define JNI_METHOD_DEFINITION(return_type, method_name) \
-  return_type JNICALL Java_com_example_androidgameengine_GameActivityAR_##method_name
-#elif defined(GAME)
-#define JNI_METHOD_DEFINITION(return_type, method_name) \
-  return_type JNICALL Java_com_example_androidgameengine_GameActivity_##method_name
-#elif defined(MOBILE_CONTROL_STATION)
-#define JNI_METHOD_DEFINITION(return_type, method_name) \
-  return_type JNICALL Java_com_example_androidgameengine_MobileControlStationActivity_##method_name
+// Users should define JAVA_ACTIVITY in order to establish JNI comms btwn Java and C++ code
+#ifndef JAVA_ACTIVITY
+#define JAVA_ACTIVITY GameActivity
 #endif
+
+#define CONCAT(a,b,c) a ## _ ## b ## _ ## c
+#define EVAL_CONCAT(a,b,c) CONCAT(a,b,c)
+
+#define JNI_METHOD_DEFINITION(return_type, method_name) \
+  EVAL_CONCAT(return_type JNICALL Java_com_example_androidgameengine, JAVA_ACTIVITY, method_name)
 
 #define JNI_METHOD_DECLARATION(return_type, method_name) \
   JNIEXPORT JNI_METHOD_DEFINITION(return_type, method_name)

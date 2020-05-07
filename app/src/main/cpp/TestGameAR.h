@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#define GAME_AR
+#define JAVA_ACTIVITY GameActivityAR
 #include <android_game_engine/GameEngineJNI.h>
 
 namespace age {
