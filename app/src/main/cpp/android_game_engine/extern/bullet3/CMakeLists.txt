@@ -24,7 +24,7 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 #MESSAGE("CMAKE_CXX_FLAGS_DEBUG="+${CMAKE_CXX_FLAGS_DEBUG})
 
 OPTION(USE_DOUBLE_PRECISION "Use double precision"	OFF)
-OPTION(USE_GRAPHICAL_BENCHMARK "Use Graphical Benchmark" ON)
+OPTION(USE_GRAPHICAL_BENCHMARK "Use Graphical Benchmark" OFF)
 OPTION(BUILD_SHARED_LIBS "Use shared libraries" OFF)
 OPTION(USE_SOFT_BODY_MULTI_BODY_DYNAMICS_WORLD "Use btSoftMultiBodyDynamicsWorld" ON)
 
@@ -202,7 +202,7 @@ ENDIF(INTERNAL_CREATE_MSVC_RELATIVE_PATH_PROJECTFILES)
 ENDIF (WIN32)
 
 
-OPTION(BUILD_CPU_DEMOS "Build original Bullet CPU examples" ON)
+OPTION(BUILD_CPU_DEMOS "Build original Bullet CPU examples" OFF)
 
 
 
@@ -324,8 +324,8 @@ IF(BUILD_PYBULLET)
 	FIND_PACKAGE(PythonLibs ${PYTHON_VERSION_STRING} EXACT)
 ENDIF(BUILD_PYBULLET)
 
-OPTION(BUILD_ENET "Set when you want to build apps with enet UDP networking support" ON)
-OPTION(BUILD_CLSOCKET "Set when you want to build apps with enet TCP networking support" ON)
+OPTION(BUILD_ENET "Set when you want to build apps with enet UDP networking support" OFF)
+OPTION(BUILD_CLSOCKET "Set when you want to build apps with enet TCP networking support" OFF)
 
 
 IF(BUILD_PYBULLET)
@@ -369,7 +369,7 @@ IF(BUILD_PYBULLET)
 ENDIF(BUILD_PYBULLET)
 
 IF(NOT WIN32 AND NOT APPLE)
-    OPTION(BUILD_EGL "Build OpenGL/EGL" ON)
+    OPTION(BUILD_EGL "Build OpenGL/EGL" OFF)
     IF(BUILD_EGL)
         ADD_DEFINITIONS(-DBT_USE_EGL)
     ENDIF(BUILD_EGL)
@@ -384,10 +384,10 @@ IF(BUILD_BULLET3)
 
 			OPTION(BUILD_OPENGL3_DEMOS "Set when you want to build the OpenGL3+ demos" OFF)
 		ELSE()
-			OPTION(BUILD_OPENGL3_DEMOS "Set when you want to build the OpenGL3+ demos" ON)
+			OPTION(BUILD_OPENGL3_DEMOS "Set when you want to build the OpenGL3+ demos" OFF)
 		ENDIF()
 	ELSE()
-		OPTION(BUILD_OPENGL3_DEMOS "Set when you want to build Bullet 3 OpenGL3+ demos" ON)
+		OPTION(BUILD_OPENGL3_DEMOS "Set when you want to build Bullet 3 OpenGL3+ demos" OFF)
 	ENDIF()
 ELSE(BUILD_BULLET3)
 	unset(BUILD_OPENGL3_DEMOS CACHE)
@@ -401,7 +401,7 @@ ELSE()
 	ADD_DEFINITIONS(-DNO_OPENGL3)
 ENDIF(BUILD_OPENGL3_DEMOS)
 
-OPTION(BUILD_BULLET2_DEMOS "Set when you want to build the Bullet 2 demos" ON)
+OPTION(BUILD_BULLET2_DEMOS "Set when you want to build the Bullet 2 demos" OFF)
 IF(BUILD_BULLET2_DEMOS)
 
 	IF(EXISTS ${BULLET_PHYSICS_SOURCE_DIR}/examples AND IS_DIRECTORY ${BULLET_PHYSICS_SOURCE_DIR}/examples)
@@ -412,7 +412,7 @@ ENDIF(BUILD_BULLET2_DEMOS)
 
 
 
-OPTION(BUILD_EXTRAS "Set when you want to build the extras" ON)
+OPTION(BUILD_EXTRAS "Set when you want to build the extras" OFF)
 IF(BUILD_EXTRAS)
   SUBDIRS(Extras)
 ENDIF(BUILD_EXTRAS)
@@ -422,7 +422,7 @@ ENDIF(BUILD_EXTRAS)
 SUBDIRS(src)
 
 IF("${CMAKE_GENERATOR}" MATCHES "Unix Makefiles")
-	OPTION(INSTALL_LIBS "Set when you want to install libraries" ON)
+	OPTION(INSTALL_LIBS "Set when you want to install libraries" OFF)
 ELSE()
 	IF(APPLE AND FRAMEWORK)
 		OPTION(INSTALL_LIBS "Set when you want to install libraries" ON)
@@ -457,7 +457,7 @@ IF(INSTALL_LIBS)
 ENDIF()
 
 
-OPTION(BUILD_UNIT_TESTS "Build Unit Tests"	ON)
+OPTION(BUILD_UNIT_TESTS "Build Unit Tests"	OFF)
 
 IF (BUILD_UNIT_TESTS)
 	ENABLE_TESTING()
@@ -476,7 +476,7 @@ configure_file 	( ${CMAKE_CURRENT_SOURCE_DIR}/BulletConfig.cmake.in
 					${CMAKE_CURRENT_BINARY_DIR}/BulletConfig.cmake
 					@ONLY ESCAPE_QUOTES
 				)
-OPTION(INSTALL_CMAKE_FILES "Install generated CMake files" ON)
+OPTION(INSTALL_CMAKE_FILES "Install generated CMake files" OFF)
 
 IF (INSTALL_CMAKE_FILES)
 	install ( FILES ${CMAKE_CURRENT_SOURCE_DIR}/UseBullet.cmake
