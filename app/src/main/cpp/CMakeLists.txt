@@ -9,8 +9,9 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_o
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_library(${PROJECT_NAME} SHARED TestGame.cpp TestGame.h)
+#add_library(${PROJECT_NAME} SHARED TestGame.cpp TestGame.h)
 #add_library(${PROJECT_NAME} SHARED TestGameAR.cpp TestGameAR.h)
+add_library(${PROJECT_NAME} SHARED MobileControlStation.cpp MobileControlStation.h)
 
 target_include_directories(game
         INTERFACE

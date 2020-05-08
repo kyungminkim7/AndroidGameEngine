@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.opengl.GLSurfaceView
+        android:id="@+id/glSurfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top"/>
+
+    <com.example.androidgameengine.Joystick
+        android:id="@+id/leftJoystick"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_gravity="bottom|left"
+        android:layout_marginLeft="50dp"
+        android:layout_marginBottom="90dp"
+        android:alpha="0.7"
+        />
+
+    <com.example.androidgameengine.Joystick
+        android:id="@+id/rightJoystick"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="90dp"
+        android:alpha="0.7"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/resetButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:layout_marginRight="10dp"
+        android:backgroundTint="#F44336"
+        android:text="Reset" />
+
+</FrameLayout>
