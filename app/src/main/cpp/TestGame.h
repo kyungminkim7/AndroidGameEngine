@@ -26,8 +26,8 @@ public:
 
     void onCreate() override;
 
-    void onLeftJoystickInputJNI(float x, float y);
-    void onRightJoystickInputJNI(float x, float y);
+    void onLeftJoystickInput(float x, float y);
+    void onRightJoystickInput(float x, float y);
 
     void onReset();
 

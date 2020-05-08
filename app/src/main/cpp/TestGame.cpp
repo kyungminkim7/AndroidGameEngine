@@ -16,11 +16,11 @@ JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)
 }
 
 JNI_METHOD_DEFINITION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y) {
-    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onLeftJoystickInputJNI(x, y);
+    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onLeftJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y) {
-    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onRightJoystickInputJNI(x, y);
+    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onRightJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onResetJNI)(JNIEnv *env, jobject gameActivity) {
@@ -71,9 +71,9 @@ void TestGame::onCreate() {
     this->setRandomBoxPositions();
 }
 
-void TestGame::onLeftJoystickInputJNI(float x, float y) { this->getCam()->onMove({x, y}); }
+void TestGame::onLeftJoystickInput(float x, float y) { this->getCam()->onMove({x, y}); }
 
-void TestGame::onRightJoystickInputJNI(float x, float y) { this->getCam()->onRotate({x, y}); }
+void TestGame::onRightJoystickInput(float x, float y) { this->getCam()->onRotate({x, y}); }
 
 void TestGame::onReset() {
     for (auto& box : this->boxes) {
