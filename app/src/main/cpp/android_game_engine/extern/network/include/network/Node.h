@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <forward_list>
 #include <functional>
 #include <memory>
 
@@ -13,15 +14,17 @@ class TcpSubscriber;
 
 class Node {
 public:
-    std::shared_ptr<TcpPublisher> advertise(unsigned short port);
+    std::shared_ptr<TcpPublisher> advertise(unsigned short port, unsigned int msgQueueSize);
     std::shared_ptr<TcpSubscriber> subscribe(const std::string &host, unsigned short port,
+                                             unsigned int msgQueueSize,
                                              std::function<void(std::unique_ptr<uint8_t[]>)> msgReceivedHandler);
 
-    void run();
-    void runOnce();
+    void update();
 
 private:
     asio::io_context ioContext;
+    std::forward_list<std::shared_ptr<TcpPublisher>> publishers;
+    std::forward_list<std::shared_ptr<TcpSubscriber>> subscribers;
 };
 
 } // namespace ntwk
