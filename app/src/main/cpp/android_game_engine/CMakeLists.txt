@@ -65,6 +65,7 @@ target_link_libraries(${PROJECT_NAME}
         glm::glm
         lib3ds::lib3ds
         log
+        network::network
     PRIVATE
         stb::stb)
 

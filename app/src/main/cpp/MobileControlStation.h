@@ -3,9 +3,16 @@
 #include <android_game_engine/GameTemplate.h>
 
 #include <chrono>
+#include <memory>
+
+#include <network/Node.h>
+#include <network/TcpSubscriber.h>
 
 #define JAVA_ACTIVITY MobileControlStationActivity
 #include <android_game_engine/GameEngineJNI.h>
+
+#include <android_game_engine/ShaderProgram.h>
+#include "ImageMsgDisplay.h"
 
 namespace age {
 
@@ -27,10 +34,17 @@ public:
     void onUpdate(std::chrono::duration<float> updateDuration) override;
     void render() override;
 
-    void onLeftJoystickInputJNI(float x, float y);
-    void onRightJoystickInputJNI(float x, float y);
+    void onLeftJoystickInput(float x, float y);
+    void onRightJoystickInput(float x, float y);
 
     void onReset();
+
+private:
+    ShaderProgram imageMsgDisplayShader;
+
+    ntwk::Node ntwkNode;
+    std::shared_ptr<ntwk::TcpSubscriber> imgSubscriber;
+    ImageMsgDisplay imgMsgDisplay;
 };
 
 } // namespace age
