@@ -11,66 +11,12 @@ namespace sensor_msgs {
 struct Image;
 struct ImageBuilder;
 
-enum class ImageEncoding : int32_t {
-  MONO8 = 0,
-  MONO16 = 1,
-  RGB8 = 2,
-  BGR8 = 3,
-  RGBA8 = 4,
-  BGRA8 = 5,
-  BAYER_RGGB8 = 6,
-  BAYER_BGGR8 = 7,
-  BAYER_GBRG8 = 8,
-  BAYER_GRBG8 = 9,
-  MIN = MONO8,
-  MAX = BAYER_GRBG8
-};
-
-inline const ImageEncoding (&EnumValuesImageEncoding())[10] {
-  static const ImageEncoding values[] = {
-    ImageEncoding::MONO8,
-    ImageEncoding::MONO16,
-    ImageEncoding::RGB8,
-    ImageEncoding::BGR8,
-    ImageEncoding::RGBA8,
-    ImageEncoding::BGRA8,
-    ImageEncoding::BAYER_RGGB8,
-    ImageEncoding::BAYER_BGGR8,
-    ImageEncoding::BAYER_GBRG8,
-    ImageEncoding::BAYER_GRBG8
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesImageEncoding() {
-  static const char * const names[11] = {
-    "MONO8",
-    "MONO16",
-    "RGB8",
-    "BGR8",
-    "RGBA8",
-    "BGRA8",
-    "BAYER_RGGB8",
-    "BAYER_BGGR8",
-    "BAYER_GBRG8",
-    "BAYER_GRBG8",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameImageEncoding(ImageEncoding e) {
-  if (flatbuffers::IsOutRange(e, ImageEncoding::MONO8, ImageEncoding::BAYER_GRBG8)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesImageEncoding()[index];
-}
-
 struct Image FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef ImageBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_WIDTH = 4,
     VT_HEIGHT = 6,
-    VT_ENCODING = 8,
+    VT_CHANNELS = 8,
     VT_DATA = 10
   };
   uint32_t width() const {
@@ -85,11 +31,11 @@ struct Image FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool mutate_height(uint32_t _height) {
     return SetField<uint32_t>(VT_HEIGHT, _height, 0);
   }
-  sensor_msgs::ImageEncoding encoding() const {
-    return static_cast<sensor_msgs::ImageEncoding>(GetField<int32_t>(VT_ENCODING, 0));
+  uint8_t channels() const {
+    return GetField<uint8_t>(VT_CHANNELS, 0);
   }
-  bool mutate_encoding(sensor_msgs::ImageEncoding _encoding) {
-    return SetField<int32_t>(VT_ENCODING, static_cast<int32_t>(_encoding), 0);
+  bool mutate_channels(uint8_t _channels) {
+    return SetField<uint8_t>(VT_CHANNELS, _channels, 0);
   }
   const flatbuffers::Vector<uint8_t> *data() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_DATA);
@@ -101,7 +47,7 @@ struct Image FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_WIDTH) &&
            VerifyField<uint32_t>(verifier, VT_HEIGHT) &&
-           VerifyField<int32_t>(verifier, VT_ENCODING) &&
+           VerifyField<uint8_t>(verifier, VT_CHANNELS) &&
            VerifyOffset(verifier, VT_DATA) &&
            verifier.VerifyVector(data()) &&
            verifier.EndTable();
@@ -118,8 +64,8 @@ struct ImageBuilder {
   void add_height(uint32_t height) {
     fbb_.AddElement<uint32_t>(Image::VT_HEIGHT, height, 0);
   }
-  void add_encoding(sensor_msgs::ImageEncoding encoding) {
-    fbb_.AddElement<int32_t>(Image::VT_ENCODING, static_cast<int32_t>(encoding), 0);
+  void add_channels(uint8_t channels) {
+    fbb_.AddElement<uint8_t>(Image::VT_CHANNELS, channels, 0);
   }
   void add_data(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data) {
     fbb_.AddOffset(Image::VT_DATA, data);
@@ -139,13 +85,13 @@ inline flatbuffers::Offset<Image> CreateImage(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t width = 0,
     uint32_t height = 0,
-    sensor_msgs::ImageEncoding encoding = sensor_msgs::ImageEncoding::MONO8,
+    uint8_t channels = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data = 0) {
   ImageBuilder builder_(_fbb);
   builder_.add_data(data);
-  builder_.add_encoding(encoding);
   builder_.add_height(height);
   builder_.add_width(width);
+  builder_.add_channels(channels);
   return builder_.Finish();
 }
 
@@ -153,14 +99,14 @@ inline flatbuffers::Offset<Image> CreateImageDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t width = 0,
     uint32_t height = 0,
-    sensor_msgs::ImageEncoding encoding = sensor_msgs::ImageEncoding::MONO8,
+    uint8_t channels = 0,
     const std::vector<uint8_t> *data = nullptr) {
   auto data__ = data ? _fbb.CreateVector<uint8_t>(*data) : 0;
   return sensor_msgs::CreateImage(
       _fbb,
       width,
       height,
-      encoding,
+      channels,
       data__);
 }
 

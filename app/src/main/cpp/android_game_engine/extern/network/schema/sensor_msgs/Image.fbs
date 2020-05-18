@@ -1,19 +1,9 @@
 namespace sensor_msgs;
 
-enum ImageEncoding:int32 {
-    MONO8, MONO16,
-    RGB8, BGR8,
-    RGBA8, BGRA8,
-    BAYER_RGGB8,
-    BAYER_BGGR8,
-    BAYER_GBRG8,
-    BAYER_GRBG8
-}
-
 table Image {
     width:uint32;
     height:uint32;
-    encoding:ImageEncoding;
+    channels:uint8;
     data:[uint8];
 }
 

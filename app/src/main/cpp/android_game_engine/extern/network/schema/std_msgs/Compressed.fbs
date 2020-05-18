@@ -1,0 +1,8 @@
+namespace std_msgs;
+
+table Compressed {
+    uncompressedDataSize:uint32;
+    compressedData:[uint8];
+}
+
+root_type Compressed;

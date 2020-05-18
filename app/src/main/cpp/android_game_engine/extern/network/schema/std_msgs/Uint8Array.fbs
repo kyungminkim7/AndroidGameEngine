@@ -1,0 +1,7 @@
+namespace std_msgs;
+
+table Uint8Array {
+    data:[uint8];
+}
+
+root_type Uint8Array;

@@ -9,6 +9,7 @@ add_subdirectory(extern)
 
 # Create targets and set properties
 add_library(${PROJECT_NAME}
+    "src/Compression.cpp"
     "src/Node.cpp"
     "src/TcpPublisher.cpp"
     "src/TcpSubscriber.cpp"
@@ -25,9 +26,13 @@ target_include_directories(${PROJECT_NAME}
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-    asio::asio
-    flatbuffers
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+        asio::asio
+        flatbuffers
+    PRIVATE
+        turbojpeg-static
+        zlibstatic
 )
 
 target_compile_features(${PROJECT_NAME}
