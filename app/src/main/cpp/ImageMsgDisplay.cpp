@@ -46,7 +46,7 @@ ImageMsgDisplay::ImageMsgDisplay() {
 
     glBufferData(GL_ARRAY_BUFFER,
             positionsSize_bytes + textureCoordinatesSize_bytes,
-            nullptr, GL_DYNAMIC_DRAW);
+            nullptr, GL_STATIC_DRAW);
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, positionsSize_bytes, positions.data());
     glBufferSubData(GL_ARRAY_BUFFER,
@@ -114,11 +114,17 @@ void ImageMsgDisplay::bufferImage(const uint8_t imgMsgBuffer[]) {
             {1.0f, 1.0f}
         };
 
+        // Update texture coordinates
         glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
         glBufferSubData(GL_ARRAY_BUFFER,
                 positionsSize_bytes, textureCoordinatesSize_bytes,
                 textureCoordinates.data());
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        // Update texture size
+        glBindTexture(GL_TEXTURE_2D, this->texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->width, this->height, 0,
+                format, GL_UNSIGNED_BYTE, nullptr);
     }
 
     // Extract img data
@@ -134,32 +140,8 @@ void ImageMsgDisplay::bufferImage(const uint8_t imgMsgBuffer[]) {
 
     // Update texture
     glBindTexture(GL_TEXTURE_2D, this->texture);
-
-    while (glGetError() != GL_NO_ERROR){}
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, imgData.get());
-
-    switch (glGetError()) {
-        case GL_INVALID_ENUM:
-            Log::info("Invalid enum");
-            break;
-
-        case GL_INVALID_VALUE:
-            Log::info("Invalid value");
-            break;
-
-        case GL_INVALID_OPERATION:
-            Log::info("Invalid operation");
-            break;
-
-        case GL_NO_ERROR:
-            Log::info("No error");
-            break;
-
-        default:
-            Log::info("Other");
-            break;
-    }
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height,
+            format, GL_UNSIGNED_BYTE, imgData.get());
 }
 
 void ImageMsgDisplay::render(ShaderProgram *shader) {

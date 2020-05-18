@@ -33,7 +33,7 @@ MobileControlStation::MobileControlStation(JNIEnv *env, jobject javaApplicationC
     glViewport(0, 0, ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight());
 
     const std::string robotIp = "192.168.1.110";
-    this->imgSubscriber = this->ntwkNode.subscribe(robotIp, 50000, [this](auto imgMsgBuffer){
+    this->imgSubscriber = this->ntwkNode.subscribe(robotIp, 50000, 1, [this](auto imgMsgBuffer){
         this->imgMsgDisplay.bufferImage(imgMsgBuffer.get());
     });
 
@@ -52,7 +52,7 @@ void MobileControlStation::onWindowChanged(int width, int height, int displayRot
 void MobileControlStation::onUpdate(std::chrono::duration<float> updateDuration) {
     GameTemplate::onUpdate(updateDuration);
 
-    this->ntwkNode.runOnce();
+    this->ntwkNode.update();
 }
 
 void MobileControlStation::render() {
