@@ -2,7 +2,6 @@
 
 #include <libjpeg-turbo/turbojpeg.h>
 #include <std_msgs/Compressed_generated.h>
-#include <sensor_msgs/Image_generated.h>
 #include <std_msgs/Uint8Array_generated.h>
 #include <zlib/zlib.h>
 
@@ -82,12 +81,8 @@ std::unique_ptr<uint8_t[]> decodeMsg(uint8_t compressedMsgBuffer[]) {
 
 namespace jpeg {
 
-std::shared_ptr<flatbuffers::DetachedBuffer> encodeMsg(const flatbuffers::DetachedBuffer *msg) {
-    auto imgMsg = sensor_msgs::GetImage(msg->data());
-    auto width = imgMsg->width();
-    auto height = imgMsg->height();
-    auto channels = imgMsg->channels();
-
+std::shared_ptr<flatbuffers::DetachedBuffer> encodeMsg(unsigned int width, unsigned int height,
+                                                       uint8_t channels, const uint8_t data[]) {
     int format;
     switch (channels) {
     case 1:
@@ -120,7 +115,7 @@ std::shared_ptr<flatbuffers::DetachedBuffer> encodeMsg(const flatbuffers::Detach
     auto jpeg = std::make_unique<uint8_t[]>(jpegSize);
     auto pJpeg = jpeg.get();
 
-    auto result = tjCompress2(compressor, imgMsg->data()->data(), width, 0, height, format,
+    auto result = tjCompress2(compressor, data, width, 0, height, format,
                               &pJpeg, &jpegSize, subsample, quality,
                               TJFLAG_FASTDCT | TJFLAG_NOREALLOC);
     tjDestroy(compressor);

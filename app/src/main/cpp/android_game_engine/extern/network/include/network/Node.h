@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 #include <forward_list>
 #include <functional>
@@ -20,7 +21,7 @@ class TcpSubscriber;
 
 class Node {
 public:
-    Node();
+    explicit Node(unsigned short fps = 60);
     ~Node();
 
     std::shared_ptr<TcpPublisher> advertise(unsigned short port,
@@ -36,9 +37,13 @@ public:
                                              Compression Compression=Compression::NONE);
 
     void update();
+    void sleep();
 
 private:
     asio::io_context ioContext;
+    std::chrono::duration<float> period;
+    std::chrono::system_clock::time_point lastUpdateTime;
+    bool lastUpdateTimeInitialized = false;
 
     std::forward_list<std::shared_ptr<TcpPublisher>> publishers;
     std::mutex publishersMutex;
