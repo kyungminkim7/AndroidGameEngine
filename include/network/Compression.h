@@ -20,7 +20,8 @@ std::unique_ptr<uint8_t[]> decodeMsg(uint8_t compressedMsgBuffer[]);
 
 namespace jpeg {
 
-std::shared_ptr<flatbuffers::DetachedBuffer> encodeMsg(const flatbuffers::DetachedBuffer *msg);
+std::shared_ptr<flatbuffers::DetachedBuffer> encodeMsg(unsigned int width, unsigned int height,
+                                                       uint8_t channels, const uint8_t data[]);
 std::unique_ptr<Image> decodeMsg(const uint8_t jpegMsgBuffer[]);
 
 

@@ -5,7 +5,8 @@
 
 namespace ntwk {
 
-Node::Node() : running(true), updateThread([this]{
+Node::Node(unsigned short fps) : period(1.0f / static_cast<float>(fps)), running(true), updateThread([this]{
+    auto lastThreadUpdateTime = std::chrono::system_clock::now();
     while (this->running.load()) {
         {
             std::lock_guard<std::mutex> guard(this->publishersMutex);
@@ -20,6 +21,14 @@ Node::Node() : running(true), updateThread([this]{
                 s->update();
             }
         }
+
+        // Sleep
+        const auto currentTime = std::chrono::system_clock::now();
+        const auto timeElapsed = currentTime - lastThreadUpdateTime;
+        if (timeElapsed < this->period) {
+            std::this_thread::sleep_for(this->period - timeElapsed);
+        }
+        lastThreadUpdateTime = currentTime;
     }
 }) { }
 
@@ -68,6 +77,20 @@ std::shared_ptr<TcpSubscriber> Node::subscribe(const std::string &host, unsigned
 void Node::update() {
     this->ioContext.poll();
     this->ioContext.restart();
+}
+
+void Node::sleep() {
+    if (this->lastUpdateTimeInitialized) {
+        const auto currentTime = std::chrono::system_clock::now();
+        const auto timeElapsed = currentTime - this->lastUpdateTime;
+        if (timeElapsed < this->period) {
+            std::this_thread::sleep_for(this->period - timeElapsed);
+        }
+        this->lastUpdateTime = currentTime;
+    } else {
+        this->lastUpdateTime = std::chrono::system_clock::now();
+        this->lastUpdateTimeInitialized = true;
+    }
 }
 
 } // namespace ntwk

@@ -40,7 +40,7 @@ TcpSubscriber::TcpSubscriber(asio::io_context &ioContext,
                              const std::string &host, unsigned short port,
                              MsgReceivedHandler msgReceivedHandler,
                              unsigned int msgQueueSize, Compression compression) :
-    socket(ioContext), endpoint(make_address(host), port),
+    ioContext(ioContext), socket(ioContext), endpoint(make_address(host), port),
     msgReceivedHandler(std::move(msgReceivedHandler)),
     msgQueueSize(msgQueueSize), compression(compression) {}
 
@@ -48,7 +48,7 @@ TcpSubscriber::TcpSubscriber(asio::io_context &ioContext,
                              const std::string &host, unsigned short port,
                              ImageMsgReceivedHandler imgMsgReceivedHandler,
                              unsigned int msgQueueSize, Compression compression) :
-    socket(ioContext), endpoint(make_address(host), port),
+    ioContext(ioContext), socket(ioContext), endpoint(make_address(host), port),
     imgMsgReceivedHandler(std::move(imgMsgReceivedHandler)),
     msgQueueSize(msgQueueSize), compression(compression) {}
 
@@ -75,27 +75,23 @@ void TcpSubscriber::update() {
         }
     }
 
-    // Keep msg queue size in check
-    {
-        std::lock_guard<std::mutex> guard(this->msgQueueMutex);
-        while (this->msgQueue.size() > this->msgQueueSize) {
-            this->msgQueue.pop();
-        }
-    }
-}
-
-bool TcpSubscriber::handleNextAvailableMsg() {
     std::unique_ptr<uint8_t[]> msg;
 
     // Get next msg in queue
     {
         std::lock_guard<std::mutex> guard(this->msgQueueMutex);
+
+        if (this->msgQueue.empty()) {
+            return;
+        }
+
         msg = std::move(this->msgQueue.front());
         this->msgQueue.pop();
     }
 
-    std::unique_ptr<Image> img = nullptr;
     if (this->imgMsgReceivedHandler) { // Handle image msgs
+        std::unique_ptr<Image> img = nullptr;
+
         switch (this->compression) {
         case Compression::JPEG:
             img = jpeg::decodeMsg(msg.get());
@@ -116,24 +112,30 @@ bool TcpSubscriber::handleNextAvailableMsg() {
         }
 
         if (img == nullptr) {
-            return false;
+            std::lock_guard<std::mutex> guard(this->socketMutex);
+            this->socket.close();
+            return;
         }
 
-        this->imgMsgReceivedHandler(std::move(img));
+        asio::post(this->ioContext, [imgMsgReceivedHandler=this->imgMsgReceivedHandler, img=std::move(img)]() mutable {
+            imgMsgReceivedHandler(std::move(img));
+        });
 
     } else { // Handle normal msgs
         if (this->compression == Compression::ZLIB) {
             msg = zlib::decodeMsg(msg.get());
 
             if (msg == nullptr) {
-                return false;
+                std::lock_guard<std::mutex> guard(this->socketMutex);
+                this->socket.close();
+                return;
             }
         }
 
-        this->msgReceivedHandler(std::move(msg));
+        asio::post(this->ioContext, [msgReceivedHandler=this->msgReceivedHandler, msg=std::move(msg)]() mutable {
+            msgReceivedHandler(std::move(msg));
+        });
     }
-
-    return true;
 }
 
 void TcpSubscriber::receiveMsgHeader(std::shared_ptr<TcpSubscriber> subscriber,
@@ -196,18 +198,15 @@ void TcpSubscriber::receiveMsg(std::shared_ptr<TcpSubscriber> subscriber,
         {
             std::lock_guard<std::mutex> guard(subscriber->msgQueueMutex);
             subscriber->msgQueue.emplace(std::move(msg));
+            while (subscriber->msgQueue.size() > subscriber->msgQueueSize) {
+                subscriber->msgQueue.pop();
+            }
         }
 
-        // Process the next available msg
-        if (subscriber->handleNextAvailableMsg()) {
-            // Acknowledge successful reception of the msg
-            sendMsgControl(std::move(subscriber),
-                           std::make_unique<std_msgs::MessageControl>(std_msgs::MessageControl::ACK),
-                           0u);
-        } else {
-            std::lock_guard<std::mutex> guard(subscriber->socketMutex);
-            subscriber->socket.close();
-        }
+        // Acknowledge msg reception
+        sendMsgControl(std::move(subscriber),
+                       std::make_unique<std_msgs::MessageControl>(std_msgs::MessageControl::ACK),
+                       0u);
     });
 }
 
