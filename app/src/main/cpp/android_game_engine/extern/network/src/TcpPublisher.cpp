@@ -37,17 +37,17 @@ void TcpPublisher::listenForConnections() {
 
         {
             std::lock_guard<std::mutex> guard(publisher->socketsMutex);
-            publisher->connectedSockets.emplace_back(std::make_pair(std::move(socket), true));
+            publisher->connectedSockets.emplace_back(std::move(socket));
         }
 
         publisher->listenForConnections();
     });
 }
 
-void TcpPublisher::removeSocket(Socket *socket) {
+void TcpPublisher::removeSocket(tcp::socket *socket) {
     std::lock_guard<std::mutex> guard(this->socketsMutex);
     for (auto iter = this->connectedSockets.cbegin(); iter != this->connectedSockets.cend(); ) {
-        if (iter->first.get() == socket->first.get()) {
+        if (iter->get() == socket) {
             iter = this->connectedSockets.erase(iter);
             return;
         } else {
@@ -112,20 +112,17 @@ void TcpPublisher::update() {
 
     std::lock_guard<std::mutex> guard(this->socketsMutex);
     for (auto &socket : this->connectedSockets) {
-        if (socket.second.load()) {
-            socket.second.store(false);
-            sendMsgHeader(shared_from_this(), &socket, msgHeader, msg, 0u);
-        }
+        this->sendMsgHeader(shared_from_this(), socket.get(), msgHeader, msg, 0u);
     }
 }
 
-void TcpPublisher::sendMsgHeader(std::shared_ptr<ntwk::TcpPublisher> publisher, Socket *socket,
+void TcpPublisher::sendMsgHeader(std::shared_ptr<ntwk::TcpPublisher> publisher, tcp::socket *socket,
                                  std::shared_ptr<const std_msgs::Header> msgHeader,
                                  std::shared_ptr<const flatbuffers::DetachedBuffer> msg,
                                  unsigned int totalMsgHeaderBytesTransferred) {
     // Publish msg header
     auto pMsgHeader = reinterpret_cast<const uint8_t*>(msgHeader.get());
-    asio::async_write(*socket->first, asio::buffer(pMsgHeader + totalMsgHeaderBytesTransferred,
+    asio::async_write(*socket, asio::buffer(pMsgHeader + totalMsgHeaderBytesTransferred,
                                             sizeof(std_msgs::Header) - totalMsgHeaderBytesTransferred),
                       [publisher=std::move(publisher), socket,
                       msgHeader=std::move(msgHeader), msg=std::move(msg),
@@ -148,11 +145,11 @@ void TcpPublisher::sendMsgHeader(std::shared_ptr<ntwk::TcpPublisher> publisher, 
     });
 }
 
-void TcpPublisher::sendMsg(std::shared_ptr<ntwk::TcpPublisher> publisher, Socket *socket,
+void TcpPublisher::sendMsg(std::shared_ptr<ntwk::TcpPublisher> publisher, tcp::socket *socket,
                            std::shared_ptr<const flatbuffers::DetachedBuffer> msg,
                            unsigned int totalMsgBytesTransferred) {
     auto pMsg = msg.get();
-    asio::async_write(*socket->first, asio::buffer(pMsg->data() + totalMsgBytesTransferred,
+    asio::async_write(*socket, asio::buffer(pMsg->data() + totalMsgBytesTransferred,
                                             pMsg->size() - totalMsgBytesTransferred),
                       [publisher=std::move(publisher), socket,
                       msg=std::move(msg), totalMsgBytesTransferred](const auto &error, auto bytesTransferred) mutable {
@@ -166,21 +163,24 @@ void TcpPublisher::sendMsg(std::shared_ptr<ntwk::TcpPublisher> publisher, Socket
         totalMsgBytesTransferred += bytesTransferred;
         if (totalMsgBytesTransferred < msg->size()) {
             sendMsg(std::move(publisher), socket, std::move(msg), totalMsgBytesTransferred);
+            return;
         }
 
         // Wait for ack signal from subscriber
-        receiveMsgControl(std::move(publisher), socket,
+        receiveMsgControl(std::move(publisher), socket, std::move(msg),
                           std::make_unique<std_msgs::MessageControl>(), 0u);
     });
 }
 
-void TcpPublisher::receiveMsgControl(std::shared_ptr<TcpPublisher> publisher, Socket *socket,
+void TcpPublisher::receiveMsgControl(std::shared_ptr<TcpPublisher> publisher, tcp::socket *socket,
+                                     std::shared_ptr<const flatbuffers::DetachedBuffer> msg,
                                      std::unique_ptr<std_msgs::MessageControl> msgCtrl,
                                      unsigned int totalMsgCtrlBytesReceived) {
     auto pMsgCtrl = reinterpret_cast<uint8_t*>(msgCtrl.get());
-    asio::async_read(*socket->first, asio::buffer(pMsgCtrl + totalMsgCtrlBytesReceived,
+    asio::async_read(*socket, asio::buffer(pMsgCtrl + totalMsgCtrlBytesReceived,
                                            sizeof(std_msgs::MessageControl) - totalMsgCtrlBytesReceived),
-                     [publisher=std::move(publisher), socket, msgCtrl=std::move(msgCtrl),
+                     [publisher=std::move(publisher), socket,
+                     msg=std::move(msg), msgCtrl=std::move(msgCtrl),
                      totalMsgCtrlBytesReceived](const auto &error, auto bytesReceived) mutable {
         // Tear down socket if fatal error
         if (error) {
@@ -191,16 +191,14 @@ void TcpPublisher::receiveMsgControl(std::shared_ptr<TcpPublisher> publisher, So
         // Receive the rest of the msg ctrl if it was only partially received
         totalMsgCtrlBytesReceived += bytesReceived;
         if (totalMsgCtrlBytesReceived < sizeof(std_msgs::MessageControl)) {
-            receiveMsgControl(std::move(publisher), socket, std::move(msgCtrl), totalMsgCtrlBytesReceived);
+            receiveMsgControl(std::move(publisher), socket,
+                              std::move(msg), std::move(msgCtrl), totalMsgCtrlBytesReceived);
             return;
         }
 
         if (*msgCtrl != std_msgs::MessageControl::ACK) {
             // Reset the connection if a successful Ack signal is not received
             publisher->removeSocket(socket);
-            return;
-        } else {
-            socket->second.store(true);
         }
     });
 }

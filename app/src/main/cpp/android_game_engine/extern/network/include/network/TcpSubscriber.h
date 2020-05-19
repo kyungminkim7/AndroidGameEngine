@@ -44,6 +44,8 @@ private:
                   ImageMsgReceivedHandler imgMsgReceivedHandler,
                   unsigned int msgQueueSize, Compression compression);
 
+    bool handleNextAvailableMsg();
+
     static void connect(std::shared_ptr<TcpSubscriber> subscriber);
 
     static void receiveMsgHeader(std::shared_ptr<TcpSubscriber> subscriber,
