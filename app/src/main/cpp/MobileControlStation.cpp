@@ -5,6 +5,7 @@
 #include <android_game_engine/Log.h>
 
 #include <geometry_msgs/Vector3_generated.h>
+#include <network/Image.h>
 
 namespace age {
 
@@ -32,10 +33,11 @@ MobileControlStation::MobileControlStation(JNIEnv *env, jobject javaApplicationC
         imageMsgDisplayShader("shaders/ImageMsgDisplay.vert", "shaders/ImageMsgDisplay.frag") {
     glViewport(0, 0, ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight());
 
-    const std::string robotIp = "192.168.1.110";
-    this->imgSubscriber = this->ntwkNode.subscribe(robotIp, 50000, 1, [this](auto imgMsgBuffer){
-        this->imgMsgDisplay.bufferImage(imgMsgBuffer.get());
-    });
+    const std::string robotIp = "192.168.1.122";
+    this->imgSubscriber = this->ntwkNode.subscribe(robotIp, 50000,
+            [this](std::unique_ptr<ntwk::Image> img){
+                this->imgMsgDisplay.bufferImage(img.get());
+            }, 5, ntwk::Compression::JPEG);
 
 //    this->imgSubscriber = this->ntwkNode.subscribe(robotIp, 50001, [](auto msgBuffer) {
 //        auto vec3 = geometry_msgs::GetVector3(msgBuffer.get());

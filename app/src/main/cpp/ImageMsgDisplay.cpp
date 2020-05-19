@@ -84,28 +84,29 @@ ImageMsgDisplay::~ImageMsgDisplay() {
     glDeleteBuffers(1, &this->vbo);
 }
 
-void ImageMsgDisplay::bufferImage(const uint8_t imgMsgBuffer[]) {
-    auto imgMsg = sensor_msgs::GetImage(imgMsgBuffer);
-
+void ImageMsgDisplay::bufferImage(ntwk::Image *img) {
     GLenum format;
-    unsigned int numChannels;
-    switch (imgMsg->encoding()) {
-        case sensor_msgs::ImageEncoding::RGBA8:
+    switch (img->channels) {
+        case 1:
+            format = GL_R8;
+            break;
+
+        case 3:
+            format = GL_RGB;
+            break;
+
+        case 4:
             format = GL_RGBA;
-            numChannels = 4u;
             break;
 
         default:
-            format = GL_RGB;
-            numChannels = 3u;
-            break;
+            return;
     }
 
-    // TODO - modify positions based off of screen width and height
     // Update texture coordinates to properly scale to screen dimensions
-    if (!(imgMsg->width() == this->width && imgMsg->height() == this->height)) {
-        this->width = imgMsg->width();
-        this->height = imgMsg->height();
+    if (!(img->width == this->width && img->height == this->height)) {
+        this->width = img->width;
+        this->height = img->height;
 
         const std::vector<glm::vec2> textureCoordinates {
             {0.0f, 0.0f},
@@ -127,21 +128,10 @@ void ImageMsgDisplay::bufferImage(const uint8_t imgMsgBuffer[]) {
                 format, GL_UNSIGNED_BYTE, nullptr);
     }
 
-    // Extract img data
-    auto imgDataLength = this->width * this->height * numChannels;
-    auto imgData = std::make_unique<uint8_t[]>(imgDataLength);
-    for (auto i = 0u; i < imgDataLength; ++i) {
-        imgData[i] = imgMsg->data()->Get(i);
-    }
-
-
-    auto x = imgMsg->data()->size();
-    auto y = this->width * this->height * numChannels;
-
     // Update texture
     glBindTexture(GL_TEXTURE_2D, this->texture);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height,
-            format, GL_UNSIGNED_BYTE, imgData.get());
+            format, GL_UNSIGNED_BYTE, img->data.get());
 }
 
 void ImageMsgDisplay::render(ShaderProgram *shader) {
