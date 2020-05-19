@@ -67,7 +67,7 @@ void TcpSubscriber::connect(std::shared_ptr<TcpSubscriber> subscriber) {
 }
 
 void TcpSubscriber::update() {
-    // Attempt to connect to a socket
+    // Attempt to connect to a socket if connection was broken
     {
         std::lock_guard<std::mutex> guard(this->socketMutex);
         if (!this->socket.is_open()) {
@@ -75,21 +75,27 @@ void TcpSubscriber::update() {
         }
     }
 
-    std::unique_ptr<uint8_t[]> msg;
-
-    // Process msgs in queue
+    // Keep msg queue size in check
     {
         std::lock_guard<std::mutex> guard(this->msgQueueMutex);
-        if (this->msgQueue.empty()) {
-            return;
+        while (this->msgQueue.size() > this->msgQueueSize) {
+            this->msgQueue.pop();
         }
+    }
+}
 
+bool TcpSubscriber::handleNextAvailableMsg() {
+    std::unique_ptr<uint8_t[]> msg;
+
+    // Get next msg in queue
+    {
+        std::lock_guard<std::mutex> guard(this->msgQueueMutex);
         msg = std::move(this->msgQueue.front());
         this->msgQueue.pop();
     }
 
     std::unique_ptr<Image> img = nullptr;
-    if (this->imgMsgReceivedHandler) { // Receive image msgs
+    if (this->imgMsgReceivedHandler) { // Handle image msgs
         switch (this->compression) {
         case Compression::JPEG:
             img = jpeg::decodeMsg(msg.get());
@@ -110,28 +116,24 @@ void TcpSubscriber::update() {
         }
 
         if (img == nullptr) {
-            // Close down socket and try reconnecting on the next update cycle upon fatal error
-            std::lock_guard<std::mutex> guard(this->socketMutex);
-            this->socket.close();
-            return;
+            return false;
         }
 
         this->imgMsgReceivedHandler(std::move(img));
 
-    } else { // Receive normal msgs
+    } else { // Handle normal msgs
         if (this->compression == Compression::ZLIB) {
             msg = zlib::decodeMsg(msg.get());
 
             if (msg == nullptr) {
-                // Close down socket and try reconnecting on the next update cycle upon fatal error
-                std::lock_guard<std::mutex> guard(this->socketMutex);
-                this->socket.close();
-                return;
+                return false;
             }
         }
 
         this->msgReceivedHandler(std::move(msg));
     }
+
+    return true;
 }
 
 void TcpSubscriber::receiveMsgHeader(std::shared_ptr<TcpSubscriber> subscriber,
@@ -194,15 +196,18 @@ void TcpSubscriber::receiveMsg(std::shared_ptr<TcpSubscriber> subscriber,
         {
             std::lock_guard<std::mutex> guard(subscriber->msgQueueMutex);
             subscriber->msgQueue.emplace(std::move(msg));
-            while(subscriber->msgQueue.size() > subscriber->msgQueueSize) {
-                subscriber->msgQueue.pop();
-            }
         }
 
-        // Acknowledge successful reception of the msg
-        sendMsgControl(std::move(subscriber),
-                       std::make_unique<std_msgs::MessageControl>(std_msgs::MessageControl::ACK),
-                       0u);
+        // Process the next available msg
+        if (subscriber->handleNextAvailableMsg()) {
+            // Acknowledge successful reception of the msg
+            sendMsgControl(std::move(subscriber),
+                           std::make_unique<std_msgs::MessageControl>(std_msgs::MessageControl::ACK),
+                           0u);
+        } else {
+            std::lock_guard<std::mutex> guard(subscriber->socketMutex);
+            subscriber->socket.close();
+        }
     });
 }
 
