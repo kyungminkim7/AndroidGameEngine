@@ -11,6 +11,7 @@ add_subdirectory(extern)
 add_library(${PROJECT_NAME}
     "src/Compression.cpp"
     "src/Node.cpp"
+    "src/Rate.cpp"
     "src/TcpPublisher.cpp"
     "src/TcpSubscriber.cpp"
 )

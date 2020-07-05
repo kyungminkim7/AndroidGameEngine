@@ -5,27 +5,27 @@
 
 #include <sensor_msgs/Image_generated.h>
 
+#include <iostream>
+
 namespace ntwk {
 
 using namespace asio::ip;
 
-std::shared_ptr<TcpPublisher> TcpPublisher::create(asio::io_context &ioContext, unsigned short port,
-                                                   unsigned int msgQueueSize,
+std::shared_ptr<TcpPublisher> TcpPublisher::create(asio::io_context &publisherContext,
+                                                   unsigned short port,
                                                    Compression compression) {
-    std::shared_ptr<TcpPublisher> publisher(new TcpPublisher(ioContext, port, msgQueueSize,
-                                                             compression));
+    std::shared_ptr<TcpPublisher> publisher(new TcpPublisher(publisherContext, port, compression));
     publisher->listenForConnections();
     return publisher;
 }
 
-TcpPublisher::TcpPublisher(asio::io_context &ioContext, unsigned short port,
-                           unsigned int msgQueueSize, Compression compression) :
-    ioContext(ioContext),
-    socketAcceptor(ioContext, tcp::endpoint(tcp::v4(), port)),
-    msgQueueSize(msgQueueSize), compression(compression) { }
+TcpPublisher::TcpPublisher(asio::io_context &publisherContext, unsigned short port, Compression compression) :
+    publisherContext(publisherContext),
+    socketAcceptor(publisherContext, tcp::endpoint(tcp::v4(), port)),
+    compression(compression) { }
 
 void TcpPublisher::listenForConnections() {
-    auto socket = std::make_unique<tcp::socket>(this->ioContext);
+    auto socket = std::make_unique<tcp::socket>(this->publisherContext);
     auto pSocket = socket.get();
 
     // Save connected sockets for later publishing and listen for more connections
@@ -35,17 +35,12 @@ void TcpPublisher::listenForConnections() {
             throw asio::system_error(error);
         }
 
-        {
-            std::lock_guard<std::mutex> guard(publisher->socketsMutex);
-            publisher->connectedSockets.emplace_back(std::move(socket));
-        }
-
+        publisher->connectedSockets.emplace_back(std::move(socket));
         publisher->listenForConnections();
     });
 }
 
 void TcpPublisher::removeSocket(Socket *socket) {
-    std::lock_guard<std::mutex> guard(this->socketsMutex);
     for (auto iter = this->connectedSockets.cbegin(); iter != this->connectedSockets.cend(); ) {
         if (iter->socket.get() == socket->socket.get()) {
             iter = this->connectedSockets.erase(iter);
@@ -57,30 +52,31 @@ void TcpPublisher::removeSocket(Socket *socket) {
 }
 
 void TcpPublisher::publish(std::shared_ptr<flatbuffers::DetachedBuffer> msg) {
-    // Compress (if applicable)
-    switch (this->compression) {
-    case Compression::ZLIB:
-        msg = zlib::encodeMsg(msg.get());
-        break;
+    asio::post(this->publisherContext, [publisher=shared_from_this(), msg=std::move(msg)]() mutable {
+        // Compress (if applicable)
+        switch (publisher->compression) {
+        case Compression::ZLIB:
+            msg = zlib::encodeMsg(msg.get());
+            break;
 
-    default:
-        break;
-    }
-
-    // Enqueue msg for processing
-    std::lock_guard<std::mutex> socketsGuard(this->socketsMutex);
-    for (auto &s : this->connectedSockets) {
-        std::lock_guard<std::mutex> msgQueueGuard(s.msgQueueMutex);
-        s.msgQueue.emplace(msg);
-
-        while (s.msgQueue.size() > this->msgQueueSize) {
-            s.msgQueue.pop();
+        default:
+            break;
         }
-    }
+
+        // Send msg
+        auto msgHeader = std::make_shared<std_msgs::Header>(msg->size());
+
+        for (auto &s : publisher->connectedSockets) {
+            if (s.readyToWrite) {
+                s.readyToWrite = false;
+                publisher->sendMsgHeader(publisher, &s, msgHeader, msg, 0u);
+            }
+        }
+    });
 }
 
-void TcpPublisher::publishImage(unsigned int width, unsigned int height, uint8_t channels,
-                                const uint8_t data[]) {
+void TcpPublisher::publishImage(unsigned int width, unsigned int height,
+                                uint8_t channels, const uint8_t data[]) {
     switch (this->compression) {
     case Compression::JPEG:
         this->publish(jpeg::encodeMsg(width, height, channels, data));
@@ -94,33 +90,6 @@ void TcpPublisher::publishImage(unsigned int width, unsigned int height, uint8_t
             this->publish(std::make_shared<flatbuffers::DetachedBuffer>(imgMsgBuilder.Release()));
         }
         break;
-    }
-}
-
-void TcpPublisher::update() {
-    // Send the next msg on all available sockets
-    std::lock_guard<std::mutex> socketsGuard(this->socketsMutex);
-    for (auto &socket : this->connectedSockets) {
-        if (!socket.readyToWrite.load()) {
-            continue;
-        }
-
-        std::shared_ptr<flatbuffers::DetachedBuffer> msg;
-
-        {
-            std::lock_guard<std::mutex> msgQueueGuard(socket.msgQueueMutex);
-
-            if (socket.msgQueue.empty()) {
-                continue;
-            }
-
-            msg = std::move(socket.msgQueue.front());
-            socket.msgQueue.pop();
-        }
-
-        socket.readyToWrite.store(false);
-        auto msgHeader = std::make_shared<std_msgs::Header>(msg->size());
-        this->sendMsgHeader(shared_from_this(), &socket, msgHeader, std::move(msg), 0u);
     }
 }
 
@@ -206,7 +175,7 @@ void TcpPublisher::receiveMsgControl(std::shared_ptr<TcpPublisher> publisher, So
             // Reset the connection if a successful Ack signal is not received
             publisher->removeSocket(socket);
         } else {
-            socket->readyToWrite.store(true);
+            socket->readyToWrite = true;
         }
     });
 }

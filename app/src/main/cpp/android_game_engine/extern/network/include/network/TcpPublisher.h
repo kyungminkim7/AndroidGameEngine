@@ -1,10 +1,7 @@
 #pragma once
 
-#include <atomic>
 #include <list>
 #include <memory>
-#include <mutex>
-#include <queue>
 #include <vector>
 
 #include <asio/ip/tcp.hpp>
@@ -18,30 +15,24 @@ namespace ntwk {
 
 class TcpPublisher : public std::enable_shared_from_this<TcpPublisher> {
 public:
-    static std::shared_ptr<TcpPublisher> create(asio::io_context &ioContext,
+    static std::shared_ptr<TcpPublisher> create(asio::io_context &publisherContext,
                                                 unsigned short port,
-                                                unsigned int msgQueueSize,
                                                 Compression compression);
 
     void publish(std::shared_ptr<flatbuffers::DetachedBuffer> msg);
     void publishImage(unsigned int width, unsigned int height, uint8_t channels,
                       const uint8_t data[]);
 
-    void update();
-
 private:
     struct Socket {
         std::unique_ptr<asio::ip::tcp::socket> socket;
-        std::atomic<bool> readyToWrite;
-        std::queue<std::shared_ptr<flatbuffers::DetachedBuffer>> msgQueue;
-        std::mutex msgQueueMutex;
+        bool readyToWrite;
 
         explicit Socket(std::unique_ptr<asio::ip::tcp::socket> socket) :
             socket(std::move(socket)), readyToWrite(true){}
     };
 
-    TcpPublisher(asio::io_context &ioContext, unsigned short port,
-                 unsigned int msgQueueSize, Compression compression);
+    TcpPublisher(asio::io_context &publisherContext, unsigned short port, Compression compression);
 
     void listenForConnections();
     void removeSocket(Socket *socket);
@@ -59,14 +50,11 @@ private:
                                   std::unique_ptr<std_msgs::MessageControl> msgCtrl,
                                   unsigned int totalMsgCtrlBytesReceived);
 
-    asio::io_context &ioContext;
+private:
+    asio::io_context &publisherContext;
     asio::ip::tcp::acceptor socketAcceptor;
 
     std::list<Socket> connectedSockets;
-    std::mutex socketsMutex;
-
-    unsigned int msgQueueSize;
-
     Compression compression;
 };
 
