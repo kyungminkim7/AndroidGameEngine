@@ -18,10 +18,10 @@ add_library(${PROJECT_NAME}
 
 add_library(${package_name}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_include_directories(${PROJECT_NAME} 
+target_include_directories(${PROJECT_NAME}
     PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"    
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"    
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
         "$<INSTALL_INTERFACE:include>"
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -33,7 +33,6 @@ target_link_libraries(${PROJECT_NAME}
         flatbuffers
     PRIVATE
         turbojpeg-static
-        zlibstatic
 )
 
 target_compile_features(${PROJECT_NAME}

@@ -53,16 +53,6 @@ void TcpPublisher::removeSocket(Socket *socket) {
 
 void TcpPublisher::publish(std::shared_ptr<flatbuffers::DetachedBuffer> msg) {
     asio::post(this->publisherContext, [publisher=shared_from_this(), msg=std::move(msg)]() mutable {
-        // Compress (if applicable)
-        switch (publisher->compression) {
-        case Compression::ZLIB:
-            msg = zlib::encodeMsg(msg.get());
-            break;
-
-        default:
-            break;
-        }
-
         // Send msg
         auto msgHeader = std::make_shared<std_msgs::Header>(msg->size());
 

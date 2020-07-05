@@ -170,8 +170,6 @@ void TcpSubscriber::processMsg(std::shared_ptr<TcpSubscriber> subscriber, std::u
             img = jpeg::decodeMsg(msg.get());
             break;
 
-        case Compression::ZLIB:
-            msg = zlib::decodeMsg(msg.get());
         default:
             if (msg != nullptr) {
                 auto imgMsg = sensor_msgs::GetImage(msg.get());
@@ -209,32 +207,14 @@ void TcpSubscriber::processMsg(std::shared_ptr<TcpSubscriber> subscriber, std::u
         }
 
     } else { // Process normal msgs
-        // Decompress msg if necessary
-        if (subscriber->compression == Compression::ZLIB) {
-            msg = zlib::decodeMsg(msg.get());
+        std::lock_guard<std::mutex> guard(subscriber->msgQueueMutex);
 
-            if (msg == nullptr) {
-                {
-                    std::lock_guard<std::mutex> guard(subscriber->socketMutex);
-                    subscriber->socket.close();
-                }
+        subscriber->msgQueue.push(std::move(msg));
 
-                connect(std::move(subscriber));
-                return;
-            }
-        }
-
-        // Schedule msg to be handled by callback handler
-        {
-            std::lock_guard<std::mutex> guard(subscriber->msgQueueMutex);
-
-            subscriber->msgQueue.push(std::move(msg));
-
-            if (subscriber->msgQueue.size() > MSG_QUEUE_SIZE) {
-                subscriber->msgQueue.pop();
-            } else {
-                postMsgHandlingTask(std::move(subscriber));
-            }
+        if (subscriber->msgQueue.size() > MSG_QUEUE_SIZE) {
+            subscriber->msgQueue.pop();
+        } else {
+            postMsgHandlingTask(std::move(subscriber));
         }
     }
 }

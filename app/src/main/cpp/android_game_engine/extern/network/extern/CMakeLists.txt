@@ -11,14 +11,3 @@ target_include_directories(turbojpeg-static INTERFACE
 )
 
 target_compile_options(turbojpeg-static PRIVATE "-fvisibility=hidden")
-
-# zlib library
-add_subdirectory(zlib)
-
-target_include_directories(zlibstatic INTERFACE
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/zlib>"
-)
-
-target_compile_options(zlibstatic PRIVATE "-fvisibility=hidden")
