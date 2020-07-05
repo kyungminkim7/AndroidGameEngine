@@ -10,12 +10,12 @@ def arcore_libpath = "${buildDir}/arcore-native"
 configurations { natives }
 
 android {
-    compileSdkVersion 28
-    ndkVersion "21.0.6113669"
+    compileSdkVersion 29
+//    ndkVersion "21.0.6113669"
     defaultConfig {
         applicationId "com.example.androidgameengine"
         minSdkVersion 24
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
