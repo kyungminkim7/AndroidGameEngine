@@ -9,14 +9,7 @@ namespace ntwk {
 
 struct Image;
 
-enum class Compression {NONE, ZLIB, JPEG};
-
-namespace zlib {
-
-std::shared_ptr<flatbuffers::DetachedBuffer> encodeMsg(flatbuffers::DetachedBuffer *msg);
-std::unique_ptr<uint8_t[]> decodeMsg(uint8_t compressedMsgBuffer[]);
-
-} // namespace zlib
+enum class Compression {NONE, JPEG};
 
 namespace jpeg {
 
