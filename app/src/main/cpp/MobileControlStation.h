@@ -43,7 +43,7 @@ private:
     ShaderProgram imageMsgDisplayShader;
 
     ntwk::Node ntwkNode;
-    std::shared_ptr<ntwk::TcpSubscriber> imgSubscriber;
+    std::shared_ptr<ntwk::TcpSubscriber<ntwk::Image, ntwk::Compression::Image::JpegPolicy>> imgSubscriber;
     ImageMsgDisplay imgMsgDisplay;
 };
 
