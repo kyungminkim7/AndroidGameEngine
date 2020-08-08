@@ -9,15 +9,24 @@ namespace ntwk {
 
 struct Image;
 
-enum class Compression {NONE, JPEG};
+namespace Compression {
+struct IdentityPolicy {
+    static std::shared_ptr<flatbuffers::DetachedBuffer> compressMsg(std::shared_ptr<flatbuffers::DetachedBuffer> msg);
+    static std::unique_ptr<uint8_t[]> decompressMsg(std::unique_ptr<uint8_t[]> msgBuffer);
+};
 
-namespace jpeg {
+namespace Image {
+struct IdentityPolicy {
+    static std::shared_ptr<flatbuffers::DetachedBuffer> compressMsg(unsigned int width, unsigned int height,
+                                                                    uint8_t channels, const uint8_t data[]);
+    static std::unique_ptr<ntwk::Image> decompressMsg(std::unique_ptr<uint8_t[]> msgBuffer);
+};
 
-std::shared_ptr<flatbuffers::DetachedBuffer> encodeMsg(unsigned int width, unsigned int height,
-                                                       uint8_t channels, const uint8_t data[]);
-std::unique_ptr<Image> decodeMsg(const uint8_t jpegMsgBuffer[]);
-
-
-} // namespace jpeg
-
+struct JpegPolicy {
+    static std::shared_ptr<flatbuffers::DetachedBuffer> compressMsg(unsigned int width, unsigned int height,
+                                                                    uint8_t channels, const uint8_t data[]);
+    static std::unique_ptr<ntwk::Image> decompressMsg(std::unique_ptr<uint8_t[]> msgBuffer);
+};
+} // namespace Image
+} // namespace Compression
 } // namespace ntwk
