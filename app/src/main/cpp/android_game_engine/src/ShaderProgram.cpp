@@ -1,6 +1,7 @@
 #include <android_game_engine/ShaderProgram.h>
 
 #include <array>
+#include <cassert>
 #include <memory>
 #include <sstream>
 
@@ -155,35 +156,51 @@ void ShaderProgram::use() {
 }
 
 void ShaderProgram::setUniform(const std::string &name, bool value) {
-    glUniform1i(glGetUniformLocation(this->id, name.c_str()), value);
+    auto location = glGetUniformLocation(this->id, name.c_str());
+    assert(("Failed to glGetUniformLocation()", location != -1));
+    glUniform1i(location, value);
 }
 
 void ShaderProgram::setUniform(const std::string &name, int value) {
-    glUniform1i(glGetUniformLocation(this->id, name.c_str()), value);
+    auto location = glGetUniformLocation(this->id, name.c_str());
+    assert(("Failed to glGetUniformLocation()", location != -1));
+    glUniform1i(location, value);
 }
 
 void ShaderProgram::setUniform(const std::string &name, float value) {
-    glUniform1f(glGetUniformLocation(this->id, name.c_str()), value);
+    auto location = glGetUniformLocation(this->id, name.c_str());
+    assert(("Failed to glGetUniformLocation()", location != -1));
+    glUniform1f(location, value);
 }
 
 void ShaderProgram::setUniform(const std::string &name, const glm::vec2 &v) {
-    glUniform2f(glGetUniformLocation(this->id, name.c_str()), v.x, v.y);
+    auto location = glGetUniformLocation(this->id, name.c_str());
+    assert(("Failed to glGetUniformLocation()", location != -1));
+    glUniform2f(location, v.x, v.y);
 }
 
 void ShaderProgram::setUniform(const std::string &name, const glm::vec3 &v) {
-    glUniform3f(glGetUniformLocation(this->id, name.c_str()), v.x, v.y, v.z);
+    auto location = glGetUniformLocation(this->id, name.c_str());
+    assert(("Failed to glGetUniformLocation()", location != -1));
+    glUniform3f(location, v.x, v.y, v.z);
 }
 
 void ShaderProgram::setUniform(const std::string &name, const glm::vec4 &v) {
-    glUniform4f(glGetUniformLocation(this->id, name.c_str()), v.x, v.y, v.z, v.w);
+    auto location = glGetUniformLocation(this->id, name.c_str());
+    assert(("Failed to glGetUniformLocation()", location != -1));
+    glUniform4f(location, v.x, v.y, v.z, v.w);
 }
 
 void ShaderProgram::setUniform(const std::string &name, const glm::mat3 &m) {
-    glUniformMatrix3fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, glm::value_ptr(m));
+    auto location = glGetUniformLocation(this->id, name.c_str());
+    assert(("Failed to glGetUniformLocation()", location != -1));
+    glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(m));
 }
 
 void ShaderProgram::setUniform(const std::string &name, const glm::mat4 &m) {
-    glUniformMatrix4fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, glm::value_ptr(m));
+    auto location = glGetUniformLocation(this->id, name.c_str());
+    assert(("Failed to glGetUniformLocation()", location != -1));
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(m));
 }
 
 void ShaderProgram::setUniformBlockBinding(const UniformBuffer &ubo) {
