@@ -109,7 +109,7 @@ void Game::renderShadowMapSetup() {
 void Game::renderShadowMap() {
     this->shadowMapShader.use();
     for (auto &gameObject : this->worldList) {
-        gameObject->render(&this->shadowMapShader);
+        gameObject->renderShadow(&this->shadowMapShader);
     }
 }
 

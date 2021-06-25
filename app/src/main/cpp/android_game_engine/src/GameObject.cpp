@@ -30,13 +30,23 @@ void GameObject::updateFromPhysics() {
     }
 }
 
+void GameObject::renderShadow(ShaderProgram *shader) {
+    shader->setUniform("model", this->model.getModelMatrix());
+
+    for (auto& mesh : *this->meshes) {
+        mesh.renderVAO(shader);
+    }
+}
+
 void GameObject::render(ShaderProgram *shader) {
-    this->model.render(shader);
+    shader->setUniform("model", this->model.getModelMatrix());
+    shader->setUniform("normal", this->model.getNormalMatrix());
 
     shader->setUniform("material.specularExponent", this->specularExponent);
 
     for (auto& mesh : *this->meshes) {
-        mesh.render(shader);
+        mesh.bindTextures(shader);
+        mesh.renderVAO(shader);
     }
 }
 

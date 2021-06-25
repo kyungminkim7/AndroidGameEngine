@@ -91,9 +91,4 @@ void Model::setScale(const glm::vec3 &scale) {
     this->normalMatrixIsValid = false;
 }
 
-void Model::render(ShaderProgram *shader) {
-    shader->setUniform("model", this->getModelMatrix());
-    shader->setUniform("normal", this->getNormalMatrix());
-}
-
 } // namespace age

@@ -10,8 +10,6 @@
 
 namespace age {
 
-class ShaderProgram;
-
 ///
 /// \brief Contains the pose data.
 ///
@@ -97,12 +95,6 @@ public:
     
     void setScale(const glm::vec3 &scale);
     glm::vec3 getScale() const;
-    
-    ///
-    /// \brief render Sets the uniform model and normal matrices on the shader.
-    /// \param shader
-    ///
-    void render(ShaderProgram *shader);
 
 private:
     glm::vec3 scale {1.0f};

@@ -41,11 +41,6 @@ void Mesh::init() {
     }
 }
 
-void Mesh::render(ShaderProgram *shader) {
-    this->bindTextures(shader);
-    this->vao->render();
-}
-
 void Mesh::bindTextures(ShaderProgram *shader) {
     int textureUnit = 0;
     
@@ -62,6 +57,10 @@ void Mesh::bindTextures(ShaderProgram *shader) {
     }
     
     glActiveTexture(GL_TEXTURE0);
+}
+
+void Mesh::renderVAO(ShaderProgram *shader) {
+    this->vao->render();
 }
 
 } // namespace ge

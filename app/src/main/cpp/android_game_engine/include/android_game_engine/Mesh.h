@@ -25,11 +25,11 @@ public:
          const std::vector<Texture2D> &diffuseTextures,
          const std::vector<Texture2D> &specularTextures);
 
-    void render(ShaderProgram *shader);
+    void bindTextures(ShaderProgram *shader);
+    void renderVAO(ShaderProgram *shader);
 
 private:
     void init();
-    void bindTextures(ShaderProgram *shader);
 
     std::shared_ptr<VertexArray> vao;
 

@@ -51,7 +51,8 @@ public:
     virtual void onUpdate(std::chrono::duration<float> updateDuration);
     
     virtual void updateFromPhysics();
-    
+
+    void renderShadow(ShaderProgram *shader);
     virtual void render(ShaderProgram *shader);
     
     void setMesh(std::shared_ptr<Meshes> mesh);
