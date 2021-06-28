@@ -37,6 +37,7 @@ add_library(${PROJECT_NAME} STATIC
         src/PhysicsRigidBody.cpp
         src/Quad.cpp
         src/Quadcopter.cpp
+        src/Shader.cpp
         src/ShaderProgram.cpp
         src/ShadowMap.cpp
         src/Skybox.cpp
