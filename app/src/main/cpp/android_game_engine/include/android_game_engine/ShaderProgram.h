@@ -1,4 +1,6 @@
 #pragma once
+#include <functional>
+#include <memory>
 #include <string>
 
 #include <GLES3/gl32.h>
@@ -23,12 +25,7 @@ public:
     ///
     ShaderProgram(const std::string &vertexShaderPath,
                   const std::string &fragmentShaderPath);
-    
-    ///
-    /// \brief Deletes the OpenGL shader program from the GPU.
-    ///
-    ~ShaderProgram();
-    
+
     ShaderProgram(ShaderProgram &&) noexcept = default;
     ShaderProgram& operator=(ShaderProgram &&) noexcept = default;
     
@@ -62,7 +59,7 @@ public:
     void setUniformBlockBinding(const UniformBuffer &ubo);
     
 private:
-    unsigned int id;
+    std::unique_ptr<unsigned int, std::function<void(unsigned int *)>> program;
 };
 
 } // namespace age
