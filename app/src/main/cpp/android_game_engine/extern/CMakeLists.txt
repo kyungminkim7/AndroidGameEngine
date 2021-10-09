@@ -1,3 +1,6 @@
+# assimp library for loading 3D models
+add_subdirectory(assimp)
+
 # bullet library for physics and collision detection
 add_subdirectory(bullet3)
 
@@ -53,41 +56,8 @@ add_library(bullet3::LinearMath ALIAS LinearMath)
 # glm library for linear algebra
 add_subdirectory(glm)
 
-# lib3ds library for loading 3DS model files
-add_library(lib3ds STATIC
-        lib3ds/src/lib3ds.h
-        lib3ds/src/lib3ds_impl.h
-        lib3ds/src/lib3ds_atmosphere.c
-        lib3ds/src/lib3ds_background.c
-        lib3ds/src/lib3ds_camera.c
-        lib3ds/src/lib3ds_chunk.c
-        lib3ds/src/lib3ds_chunktable.c
-        lib3ds/src/lib3ds_file.c
-        lib3ds/src/lib3ds_io.c
-        lib3ds/src/lib3ds_light.c
-        lib3ds/src/lib3ds_material.c
-        lib3ds/src/lib3ds_math.c
-        lib3ds/src/lib3ds_matrix.c
-        lib3ds/src/lib3ds_mesh.c
-        lib3ds/src/lib3ds_node.c
-        lib3ds/src/lib3ds_quat.c
-        lib3ds/src/lib3ds_shadow.c
-        lib3ds/src/lib3ds_track.c
-        lib3ds/src/lib3ds_util.c
-        lib3ds/src/lib3ds_vector.c
-        lib3ds/src/lib3ds_viewport.c
-        lib3ds/src/lib3ds.rc
-)
-
-add_library(lib3ds::lib3ds ALIAS lib3ds)
-
-target_include_directories(lib3ds PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib3ds/src>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/lib3ds/src>
-)
-
 # network library for networking
-add_subdirectory(network)
+#add_subdirectory(network)
 
 # STB library for loading image files
 add_library(stb INTERFACE)

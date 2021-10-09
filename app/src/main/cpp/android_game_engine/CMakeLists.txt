@@ -27,8 +27,6 @@ add_library(${PROJECT_NAME} STATIC
         src/ManagerWindowing.cpp
         src/Mesh.cpp
         src/Model.cpp
-        src/ModelLoader.cpp
-        src/ModelLoader3ds.cpp
         src/PID.cpp
         src/PhysicsCompoundShape.cpp
         src/PhysicsDebugDrawer.cpp
@@ -52,7 +50,8 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+)
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
@@ -64,11 +63,12 @@ target_link_libraries(${PROJECT_NAME}
         bullet3::BulletCollision
         bullet3::LinearMath
         glm::glm
-        lib3ds::lib3ds
         log
-        network::network
+#        network::network
     PRIVATE
-        stb::stb)
+        assimp::assimp
+        stb::stb
+)
 
 target_compile_features(${PROJECT_NAME}
     PUBLIC
@@ -81,4 +81,5 @@ target_compile_features(${PROJECT_NAME}
         cxx_auto_type
         cxx_generic_lambdas
         cxx_range_for
-        cxx_strong_enums)
+        cxx_strong_enums
+)

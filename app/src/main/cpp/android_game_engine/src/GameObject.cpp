@@ -5,7 +5,6 @@
 #include <glm/mat3x3.hpp>
 #include <glm/vec3.hpp>
 
-#include <android_game_engine/ModelLoader3ds.h>
 #include <android_game_engine/ShaderProgram.h>
 
 namespace age {
@@ -13,11 +12,11 @@ namespace age {
 GameObject::GameObject() : meshes(std::make_shared<Meshes>()) {}
 
 GameObject::GameObject(const std::string &modelFilepath){
-    ModelLoader3ds modelLoader(modelFilepath);
-    this->unscaledDimensions = modelLoader.loadDimensions();
-    this->meshes = std::move(modelLoader.loadMeshes());
-    this->physicsBody = std::make_unique<PhysicsRigidBody>(this,
-                                                           std::move(modelLoader.loadCollisionShape()));
+//    ModelLoader3ds modelLoader(modelFilepath);
+//    this->unscaledDimensions = modelLoader.loadDimensions();
+//    this->meshes = std::move(modelLoader.loadMeshes());
+//    this->physicsBody = std::make_unique<PhysicsRigidBody>(this,
+//                                                           std::move(modelLoader.loadCollisionShape()));
 }
 
 void GameObject::onUpdate(std::chrono::duration<float> updateDuration) {}
