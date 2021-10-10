@@ -58,17 +58,21 @@ void TestGame::onCreate() {
     std::mt19937 rand;
     std::uniform_real_distribution<float> color(0.0f, 1.0f);
 
-    constexpr auto numBoxes = 100u;
-    this->boxes.reserve(numBoxes);
-    for (auto i = 0u; i < numBoxes; ++i) {
-        this->boxes.push_back(std::shared_ptr<Box>(new Box({Texture2D(glm::vec3(color(rand), color(rand), color(rand)))},
-                                                           {Texture2D(glm::vec3(1.0f))})));
-        this->boxes.back()->setScale(glm::vec3(0.2f));
-        this->boxes.back()->setMass(1.0f);
-        this->addToWorldList(this->boxes.back());
-    }
+//    constexpr auto numBoxes = 100u;
+//    this->boxes.reserve(numBoxes);
+//    for (auto i = 0u; i < numBoxes; ++i) {
+//        this->boxes.push_back(std::shared_ptr<Box>(new Box({Texture2D(glm::vec3(color(rand), color(rand), color(rand)))},
+//                                                           {Texture2D(glm::vec3(1.0f))})));
+//        this->boxes.back()->setScale(glm::vec3(0.2f));
+//        this->boxes.back()->setMass(1.0f);
+//        this->addToWorldList(this->boxes.back());
+//    }
+//
+//    this->setRandomBoxPositions();
 
-    this->setRandomBoxPositions();
+    auto go = std::make_shared<GameObject>("models/atv/ATV.3DS");
+    go->setPosition({1.0f, 0.0f, 0.5f});
+    this->addToWorldList(go);
 }
 
 void TestGame::onLeftJoystickInput(float x, float y) { this->getCam()->onMove({x, y}); }

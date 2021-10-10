@@ -3,6 +3,7 @@
 #include <chrono>
 #include <vector>
 
+#include <assimp/scene.h>
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <glm/fwd.hpp>
 
@@ -164,6 +165,8 @@ protected:
     void setUnscaledDimensions(const glm::vec3 &dimensions);
     
 private:
+    void processNode(const aiNode *node, const aiScene *scene, const std::string &dir);
+
     std::string label;
     Model model;
     glm::vec3 unscaledDimensions;

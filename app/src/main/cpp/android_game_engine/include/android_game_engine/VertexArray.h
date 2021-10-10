@@ -6,29 +6,34 @@
 
 namespace age {
 
-    ///
-    /// \brief Wrapper class for OpenGL Vertex Array Object.
-    ///
-    class VertexArray {
-    public:
-        VertexArray(const std::vector<glm::vec3> &positions,
-                    const std::vector<glm::vec3> &normals,
-                    const std::vector<glm::vec2> &textureCoordinates,
-                    const std::vector<glm::uvec3> &indices);
+class Vertex;
 
-        ~VertexArray();
+///
+/// \brief Wrapper class for OpenGL Vertex Array Object.
+///
+class VertexArray {
+public:
+    VertexArray(const std::vector<glm::vec3> &positions,
+                const std::vector<glm::vec3> &normals,
+                const std::vector<glm::vec2> &textureCoordinates,
+                const std::vector<glm::uvec3> &indices);
 
-        VertexArray(VertexArray &&) noexcept = default;
-        VertexArray& operator=(VertexArray &&) noexcept = default;
+    VertexArray(const std::vector<Vertex> &vertices,
+                const std::vector<unsigned int> &indices);
 
-        void render();
+    ~VertexArray();
 
-    private:
-        unsigned int vao;
-        unsigned int vbo;
-        unsigned int ebo;
+    VertexArray(VertexArray &&) noexcept = default;
+    VertexArray& operator=(VertexArray &&) noexcept = default;
 
-        size_t numIndices;
-    };
+    void render();
+
+private:
+    unsigned int vao;
+    unsigned int vbo;
+    unsigned int ebo;
+
+    size_t numIndices;
+};
 
 } // namespace age

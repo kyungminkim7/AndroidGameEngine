@@ -12,6 +12,8 @@ add_library(${PROJECT_NAME} STATIC
         src/ARCameraBackground.cpp
         src/ARPlane.cpp
         src/Asset.cpp
+        src/AssimpIOStream.cpp
+        src/AssimpIOSystem.cpp
         src/Box.cpp
         src/Camera.cpp
         src/CameraChase.cpp
@@ -43,6 +45,7 @@ add_library(${PROJECT_NAME} STATIC
         src/UniformBuffer.cpp
         src/Utilities.cpp
         src/Vehicle.cpp
+        src/Vertex.cpp
         src/VertexArray.cpp
 )
 
@@ -55,6 +58,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
+        assimp::assimp
         EGL
         GLESv3
         android
@@ -66,7 +70,6 @@ target_link_libraries(${PROJECT_NAME}
         log
 #        network::network
     PRIVATE
-        assimp::assimp
         stb::stb
 )
 

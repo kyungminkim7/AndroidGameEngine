@@ -9,17 +9,11 @@
 namespace age {
 
 Mesh::Mesh(std::shared_ptr<age::VertexArray> vao,
-           const std::set<std::string> &diffuseTextureFilepaths,
-           const std::set<std::string> &specularTextureFilepaths)
-        : vao(std::move(vao)) {
-    for (const auto& file : diffuseTextureFilepaths) {
-        this->diffuseTextures.emplace_back(file);
-    }
-
-    for (const auto& file : specularTextureFilepaths) {
-        this->specularTextures.emplace_back(file);
-    }
-
+           const std::vector<std::string> &diffuseTextureFilepaths,
+           const std::vector<std::string> &specularTextureFilepaths)
+        : vao(std::move(vao)),
+        diffuseTextures(diffuseTextureFilepaths.cbegin(), diffuseTextureFilepaths.cend()),
+        specularTextures(specularTextureFilepaths.cbegin(), specularTextureFilepaths.cend()) {
     this->init();
 }
 

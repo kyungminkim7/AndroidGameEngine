@@ -1,7 +1,7 @@
 #pragma once
 
-#include <set>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "Texture2D.h"
@@ -18,8 +18,8 @@ class VertexArray;
 class Mesh {
 public:
     Mesh(std::shared_ptr<VertexArray> vao,
-         const std::set<std::string> &diffuseTextureFilepaths,
-         const std::set<std::string> &specularTextureFilepaths);
+         const std::vector<std::string> &diffuseTextureFilepaths,
+         const std::vector<std::string> &specularTextureFilepaths);
 
     Mesh(std::shared_ptr<VertexArray> vao,
          const std::vector<Texture2D> &diffuseTextures,
