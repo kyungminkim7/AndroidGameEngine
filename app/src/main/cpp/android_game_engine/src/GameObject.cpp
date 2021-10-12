@@ -1,11 +1,13 @@
 #include <android_game_engine/GameObject.h>
 
 #include <algorithm>
+#include <cmath>
 #include <iterator>
 #include <memory>
 #include <numeric>
 #include <tuple>
 
+#include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <glm/mat3x3.hpp>
@@ -81,6 +83,36 @@ std::vector<std::string> loadMaterialTextures(const aiMaterial *material, aiText
     return textures;
 }
 
+template<typename Iter>
+glm::vec3 getBound(Iter begin, Iter end) {
+    const auto compareAbsX = [](const auto &v1, const auto &v2){ return std::abs(v1.x) < std::abs(v2.x); };
+    const auto compareAbsY = [](const auto &v1, const auto &v2){ return std::abs(v1.y) < std::abs(v2.y); };
+    const auto compareAbsZ = [](const auto &v1, const auto &v2){ return std::abs(v1.z) < std::abs(v2.z); };
+    return {
+        std::max_element(begin, end, compareAbsX)->x,
+        std::max_element(begin, end, compareAbsY)->y,
+        std::max_element(begin, end, compareAbsZ)->z
+    };
+}
+
+glm::vec3 getHalfExtents(const aiNode *node, const aiScene *scene) {
+    std::vector<glm::vec3> bounds;
+    bounds.reserve(node->mNumMeshes + node->mNumChildren);
+
+    std::transform(node->mMeshes, node->mMeshes + node->mNumMeshes,
+                   std::back_inserter(bounds),
+                   [scene](const auto i){
+                        const auto mesh = scene->mMeshes[i];
+                        return getBound(mesh->mVertices, mesh->mVertices + mesh->mNumVertices);
+                   });
+
+    std::transform(node->mChildren, node->mChildren + node->mNumChildren,
+                   std::back_inserter(bounds),
+                   [scene](const auto child){ return getHalfExtents(child, scene); });
+
+    return getBound(bounds.cbegin(), bounds.cend());
+}
+
 } // namespace
 
 namespace age {
@@ -88,11 +120,6 @@ namespace age {
 GameObject::GameObject() : meshes(std::make_shared<Meshes>()) {}
 
 GameObject::GameObject(const std::string &modelFilepath) : meshes(std::make_shared<Meshes>()) {
-//    ModelLoader3ds modelLoader(modelFilepath);
-//    this->unscaledDimensions = modelLoader.loadDimensions();
-//    this->meshes = std::move(modelLoader.loadMeshes());
-//    this->physicsBody = std::make_unique<PhysicsRigidBody>(this,
-//                                                           std::move(modelLoader.loadCollisionShape()));
     Assimp::Importer importer;
     importer.SetIOHandler(new AssimpIOSystem);
 
@@ -101,9 +128,17 @@ GameObject::GameObject(const std::string &modelFilepath) : meshes(std::make_shar
         throw LoadError("Failed to load model from: " + modelFilepath);
     }
 
+    // Load meshes
     this->meshes->reserve(getNumMeshes(scene->mRootNode));
     const auto dir = modelFilepath.substr(0, modelFilepath.find_last_of("/\\"));
     this->processNode(scene->mRootNode, scene, dir);
+
+    // Create collision box
+    const auto halfExtents = getHalfExtents(scene->mRootNode, scene);
+    this->unscaledDimensions = halfExtents * 2.0f;
+    this->setCollisionShape(std::make_unique<btBoxShape>(btVector3{halfExtents.x,
+                                                                   halfExtents.y,
+                                                                   halfExtents.z}));
 }
 
 void GameObject::processNode(const aiNode *node, const aiScene *scene, const std::string &dir) {
