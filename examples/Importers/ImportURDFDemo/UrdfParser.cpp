@@ -94,7 +94,8 @@ static void ParseUserData(const XMLElement* element, btHashMap<btHashString,
 			if (!key_attr) {
 				logger->reportError("User data tag must have a key attribute.");
 			}
-			user_data.insert(key_attr, user_data_xml->GetText());
+			const char* text = user_data_xml->GetText();
+			user_data.insert(key_attr, text ? text : "");
 		}
 	}
 }
@@ -1132,6 +1133,7 @@ bool UrdfParser::parseDeformable(UrdfModel& model, tinyxml2::XMLElement* config,
 	if (!i)
 	{
 		logger->reportError("expected an inertial element");
+		return false;
 	}
 	UrdfInertia inertia;
 	if (!parseInertia(inertia, i, logger))
@@ -1163,6 +1165,34 @@ bool UrdfParser::parseDeformable(UrdfModel& model, tinyxml2::XMLElement* config,
 		}
 		deformable.m_friction = urdfLexicalCast<double>(friction_xml->Attribute("value"));
 	}
+	
+	XMLElement* repulsion_xml = config->FirstChildElement("repulsion_stiffness");
+	if (repulsion_xml)
+	{
+		if (!repulsion_xml->Attribute("value"))
+		{
+			logger->reportError("repulsion_stiffness element must have value attribute");
+			return false;
+		}
+		deformable.m_repulsionStiffness = urdfLexicalCast<double>(repulsion_xml->Attribute("value"));
+	}
+	
+	XMLElement* grav_xml = config->FirstChildElement("gravity_factor");
+	if (grav_xml)
+	{
+		if (!grav_xml->Attribute("value"))
+		{
+			logger->reportError("gravity_factor element must have value attribute");
+			return false;
+		}
+		deformable.m_gravFactor = urdfLexicalCast<double>(grav_xml->Attribute("value"));
+	}
+
+	XMLElement* cache_barycenter = config->FirstChildElement("cache_barycenter");
+	if (cache_barycenter)
+	{
+		deformable.m_cache_barycenter = true;
+	}
 
 	XMLElement* spring_xml = config->FirstChildElement("spring");
 	if (spring_xml)
@@ -1177,7 +1207,12 @@ bool UrdfParser::parseDeformable(UrdfModel& model, tinyxml2::XMLElement* config,
 		deformable.m_springCoefficients.damping_stiffness = urdfLexicalCast<double>(spring_xml->Attribute("damping_stiffness"));
 
 		if (spring_xml->Attribute("bending_stiffness"))
+		{
 			deformable.m_springCoefficients.bending_stiffness = urdfLexicalCast<double>(spring_xml->Attribute("bending_stiffness"));
+
+			if (spring_xml->Attribute("bending_stride"))
+				deformable.m_springCoefficients.bending_stride = urdfLexicalCast<int>(spring_xml->Attribute("bending_stride"));
+		}
 	}
 
 	XMLElement* corotated_xml = config->FirstChildElement("corotated");
@@ -1484,8 +1519,9 @@ bool UrdfParser::parseJoint(UrdfJoint& joint, XMLElement* config, ErrorLogger* l
 			XMLElement* axis_xml = config->FirstChildElement("axis");
 			if (!axis_xml)
 			{
-				logger->reportWarning("urdfdom: no axis elemement for Joint, defaulting to (1,0,0) axis");
-				logger->reportWarning(joint.m_name.c_str());
+				std::string msg("urdfdom: no axis element for Joint, defaulting to (1,0,0) axis");
+				msg = msg + " " + joint.m_name + "\n";
+				logger->reportWarning(msg.c_str());
 				joint.m_localJointAxis.setValue(1, 0, 0);
 			}
 			else
@@ -1551,8 +1587,9 @@ bool UrdfParser::parseJoint(UrdfJoint& joint, XMLElement* config, ErrorLogger* l
 			XMLElement* axis_xml = config->FirstChildElement("axis");
 			if (!axis_xml)
 			{
-				logger->reportWarning("urdfdom: no axis elemement for Joint, defaulting to (1,0,0) axis");
-				logger->reportWarning(joint.m_name.c_str());
+				std::string msg("urdfdom: no axis element for Joint, defaulting to (1,0,0) axis");
+				msg = msg + " " + joint.m_name + "\n";
+				logger->reportWarning(msg.c_str());
 				joint.m_localJointAxis.setValue(1, 0, 0);
 			}
 			else

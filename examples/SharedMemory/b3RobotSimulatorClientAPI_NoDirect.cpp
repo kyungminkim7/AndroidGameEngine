@@ -2309,6 +2309,29 @@ int b3RobotSimulatorClientAPI_NoDirect::createCollisionShape(int shapeType, stru
 		scalarToDouble3(args.m_meshScale, meshScale);
 		shapeIndex = b3CreateCollisionShapeAddMesh(command, args.m_fileName, meshScale);
 	}
+	if (shapeType == GEOM_HEIGHTFIELD)
+	{
+		double meshScale[3];
+		scalarToDouble3(args.m_meshScale, meshScale);
+		if (args.m_fileName)
+		{
+			shapeIndex = b3CreateCollisionShapeAddHeightfield(command, args.m_fileName, meshScale, args.m_heightfieldTextureScaling);
+		}
+		else
+		{
+			if (args.m_heightfieldData.size() && args.m_numHeightfieldRows>0 && args.m_numHeightfieldColumns>0)
+			{
+				shapeIndex = b3CreateCollisionShapeAddHeightfield2(sm, command, meshScale, args.m_heightfieldTextureScaling,
+					&args.m_heightfieldData[0],
+					args.m_numHeightfieldRows,
+					args.m_numHeightfieldColumns,
+					args.m_replaceHeightfieldIndex);
+			}
+		}
+		
+
+	}
+
 	if (shapeType == GEOM_PLANE)
 	{
 		double planeConstant = 0;
@@ -2544,6 +2567,27 @@ void b3RobotSimulatorClientAPI_NoDirect::restoreStateFromMemory(int stateId)
 
 	statusHandle = b3SubmitClientCommandAndWaitStatus(sm, command);
 	statusType = b3GetStatusType(statusHandle);
+}
+
+void b3RobotSimulatorClientAPI_NoDirect::removeState(int stateUniqueId)
+{
+	b3PhysicsClientHandle sm = m_data->m_physicsClientHandle;
+	if (sm == 0)
+	{
+		b3Warning("Not connected");
+		return;
+	}
+
+	if (stateUniqueId >= 0)
+	{
+		b3SharedMemoryStatusHandle statusHandle;
+		int statusType;
+		if (b3CanSubmitCommand(sm))
+		{
+			statusHandle = b3SubmitClientCommandAndWaitStatus(sm, b3InitRemoveStateCommand(sm, stateUniqueId));
+			statusType = b3GetStatusType(statusHandle);
+		}
+	}
 }
 
 bool b3RobotSimulatorClientAPI_NoDirect::getVisualShapeData(int bodyUniqueId, b3VisualShapeInformation& visualShapeInfo)

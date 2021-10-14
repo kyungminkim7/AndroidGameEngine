@@ -347,6 +347,11 @@ void TCPThreadFunc(void* userPtr, void* lsMemory)
 
 									case GFX_CMD_SET_VISUALIZER_FLAG:
 									{
+										//disable single step rendering for GraphicsServer
+										if (args->m_cmdPtr->m_visualizerFlagCommand.m_visualizerFlag == COV_ENABLE_SINGLE_STEP_RENDERING)
+										{
+											args->m_cmdPtr->m_visualizerFlagCommand.m_visualizerFlag = 0;
+										}
 										args->submitCommand();
 										while (args->isCommandOutstanding())
 										{
@@ -488,6 +493,18 @@ void TCPThreadFunc(void* userPtr, void* lsMemory)
 											printf("GFX_CMD_CHANGE_RGBA_COLOR\n");
 										break;
 									}
+									case GFX_CMD_CHANGE_SCALING:
+									{
+										args->submitCommand();
+										while (args->isCommandOutstanding())
+										{
+											clock.usleep(0);
+										}
+										if (gVerboseNetworkMessagesServer)
+											printf("GFX_CMD_CHANGE_SCALING\n");
+										break;
+									}
+
 									case GFX_CMD_GET_CAMERA_INFO:
 									{
 										args->submitCommand();
@@ -728,7 +745,8 @@ public:
 			}
 			case GFX_CMD_SET_VISUALIZER_FLAG:
 			{
-				if (clientCmd.m_visualizerFlagCommand.m_visualizerFlag != COV_ENABLE_RENDERING)
+				if ((clientCmd.m_visualizerFlagCommand.m_visualizerFlag != COV_ENABLE_RENDERING) &&
+					(clientCmd.m_visualizerFlagCommand.m_visualizerFlag != COV_ENABLE_SINGLE_STEP_RENDERING))
 				{
 					//printf("clientCmd.m_visualizerFlag.m_visualizerFlag: %d, clientCmd.m_visualizerFlag.m_enable %d\n",
 					//	clientCmd.m_visualizerFlagCommand.m_visualizerFlag, clientCmd.m_visualizerFlagCommand.m_enable);
@@ -833,6 +851,14 @@ public:
 				m_args.processCommand();
 				break;
 			}
+
+			case GFX_CMD_CHANGE_SCALING:
+			{
+				m_guiHelper->changeScaling(clientCmd.m_changeScalingCommand.m_graphicsUid, clientCmd.m_changeScalingCommand.m_scaling);
+				m_args.processCommand();
+				break;
+			}
+
 			case GFX_CMD_GET_CAMERA_INFO:
 			{
 				serverStatusOut.m_type = GFX_CMD_GET_CAMERA_INFO_FAILED;

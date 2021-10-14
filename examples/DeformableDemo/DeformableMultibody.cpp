@@ -192,13 +192,14 @@ void DeformableMultibody::initPhysics()
 //                                                         3,3,
                                                          1 + 2 + 4 + 8, true);
 
-        psb->getCollisionShape()->setMargin(0.25);
+        psb->getCollisionShape()->setMargin(0.025);
         psb->generateBendingConstraints(2);
         psb->setTotalMass(1);
         psb->m_cfg.kKHR = 1; // collision hardness with kinematic objects
         psb->m_cfg.kCHR = 1; // collision hardness with rigid body
         psb->m_cfg.kDF = 2;
         psb->m_cfg.collisions = btSoftBody::fCollision::SDF_RD;
+        psb->m_cfg.collisions |= btSoftBody::fCollision::SDF_RDF;
         psb->m_cfg.collisions |= btSoftBody::fCollision::SDF_MDF;
         psb->setCollisionFlags(0);
         getDeformableDynamicsWorld()->addSoftBody(psb);
@@ -340,6 +341,7 @@ void DeformableMultibody::addColliders_testMultiDof(btMultiBody* pMultiBody, btM
         btScalar quat[4] = {-world_to_local[0].x(), -world_to_local[0].y(), -world_to_local[0].z(), world_to_local[0].w()};
         
         btCollisionShape* box = new btBoxShape(baseHalfExtents);
+        box->setMargin(0.01);
         btMultiBodyLinkCollider* col = new btMultiBodyLinkCollider(pMultiBody, -1);
         col->setCollisionShape(box);
         

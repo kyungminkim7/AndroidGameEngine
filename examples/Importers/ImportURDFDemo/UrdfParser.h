@@ -200,15 +200,18 @@ struct UrdfJoint
 	}
 };
 
-
-struct SpringCoeffcients{
-    double elastic_stiffness;
-    double damping_stiffness;
-    double bending_stiffness;
-    SpringCoeffcients():
-      elastic_stiffness(0.),
-      damping_stiffness(0.),
-      bending_stiffness(0.){}
+struct SpringCoeffcients
+{
+	double elastic_stiffness;
+	double damping_stiffness;
+	double bending_stiffness;
+	int damp_all_directions;
+	int bending_stride;
+	SpringCoeffcients() : elastic_stiffness(0.),
+						  damping_stiffness(0.),
+						  bending_stiffness(0.),
+						  damp_all_directions(0),
+						  bending_stride(2) {}
 };
 
 struct LameCoefficients
@@ -225,6 +228,9 @@ struct UrdfDeformable
 	double m_mass;
 	double m_collisionMargin;
 	double m_friction;
+	double m_repulsionStiffness;
+	double m_gravFactor;
+	bool m_cache_barycenter;
 
 	SpringCoeffcients m_springCoefficients;
 	LameCoefficients m_corotatedCoefficients;
@@ -234,7 +240,7 @@ struct UrdfDeformable
 	std::string m_simFileName;
 	btHashMap<btHashString, std::string> m_userData;
 
-	UrdfDeformable() : m_mass(1.), m_collisionMargin(0.02), m_friction(1.), m_visualFileName(""), m_simFileName("")
+	UrdfDeformable() : m_mass(1.), m_collisionMargin(0.02), m_friction(1.), m_repulsionStiffness(0.5), m_gravFactor(1.), m_cache_barycenter(false), m_visualFileName(""), m_simFileName("")
 	{
 	}
 };
