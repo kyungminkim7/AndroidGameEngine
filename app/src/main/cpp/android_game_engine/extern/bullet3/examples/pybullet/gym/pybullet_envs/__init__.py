@@ -181,12 +181,12 @@ register(
     reward_threshold=18.0,
 )
 
-register(
-    id='StrikerBulletEnv-v0',
-    entry_point='pybullet_envs.gym_manipulator_envs:StrikerBulletEnv',
-    max_episode_steps=100,
-    reward_threshold=18.0,
-)
+#register(
+#    id='StrikerBulletEnv-v0',
+#    entry_point='pybullet_envs.gym_manipulator_envs:StrikerBulletEnv',
+#    max_episode_steps=100,
+#    reward_threshold=18.0,
+#)
 
 register(id='Walker2DBulletEnv-v0',
          entry_point='pybullet_envs.gym_locomotion_envs:Walker2DBulletEnv',
@@ -229,4 +229,10 @@ register(id='HumanoidFlagrunHarderBulletEnv-v0',
 
 def getList():
   btenvs = ['- ' + spec.id for spec in gym.envs.registry.all() if spec.id.find('Bullet') >= 0]
+  btenvs.extend([
+        '- MinitaurExtendedEnv-v0', '- MinitaurReactiveEnv-v0',
+        '- MinitaurBallGymEnv-v0', '- MinitaurTrottingEnv-v0',
+        '- MinitaurStandGymEnv-v0', '- MinitaurAlternatingLegsEnv-v0',
+        '- MinitaurFourLegStandEnv-v0', '- KukaDiverseObjectGrasping-v0'
+    ])
   return btenvs

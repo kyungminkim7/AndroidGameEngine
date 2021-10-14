@@ -31,6 +31,7 @@ public:
     DeformableSelfCollision(struct GUIHelperInterface* helper)
     : CommonDeformableBodyBase(helper)
     {
+        m_maxPickingForce = 0.004;
     }
     virtual ~DeformableSelfCollision()
     {
@@ -41,7 +42,7 @@ public:
     
     void resetCamera()
     {
-        float dist = 1.0;
+        float dist = 2.0;
         float pitch = -8;
         float yaw = 100;
         float targetPos[3] = {0, -1.0, 0};
@@ -54,7 +55,7 @@ public:
         m_dynamicsWorld->stepSimulation(deltaTime, 4, internalTimeStep);
     }
     
-    void addCloth(btVector3 origin);
+    void addCloth(const btVector3& origin);
     
     virtual void renderScene()
     {
@@ -93,7 +94,7 @@ void DeformableSelfCollision::initPhysics()
     {
         ///create a ground
         btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(150.), btScalar(2.5), btScalar(150.)));
-        
+        groundShape->setMargin(0.02);
         m_collisionShapes.push_back(groundShape);
         
         btTransform groundTransform;
@@ -119,16 +120,16 @@ void DeformableSelfCollision::initPhysics()
         //add the ground to the dynamics world
         m_dynamicsWorld->addRigidBody(body);
     }
+    addCloth(btVector3(0, -0.2, 0));
     addCloth(btVector3(0, -0.1, 0));
-    addCloth(btVector3(0, 1, 0));
     getDeformableDynamicsWorld()->setImplicit(false);
     getDeformableDynamicsWorld()->setLineSearch(false);
     m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
-void DeformableSelfCollision::addCloth(btVector3 origin)
+void DeformableSelfCollision::addCloth(const btVector3& origin)
 // create a piece of cloth
 {
-    const btScalar s = 0.3;
+    const btScalar s = 0.6;
     const btScalar h = 0;
     
     btSoftBody* psb = btSoftBodyHelpers::CreatePatch(getDeformableDynamicsWorld()->getWorldInfo(), btVector3(-s, h, -2*s),
@@ -146,23 +147,26 @@ void DeformableSelfCollision::addCloth(btVector3 origin)
     psb->m_cfg.kKHR = 1; // collision hardness with kinematic objects
     psb->m_cfg.kCHR = 1; // collision hardness with rigid body
     psb->m_cfg.kDF = 0.1;
-    psb->rotate(btQuaternion(0, SIMD_PI / 4, 0));
+//    psb->rotate(btQuaternion(0, SIMD_PI / 2, 0));
     btTransform clothTransform;
     clothTransform.setIdentity();
     clothTransform.setOrigin(btVector3(0,0.2,0)+origin);
     psb->transform(clothTransform);
     psb->m_cfg.collisions = btSoftBody::fCollision::SDF_RD;
+    psb->m_cfg.collisions |= btSoftBody::fCollision::SDF_RDN;
+    psb->m_cfg.collisions |= btSoftBody::fCollision::SDF_RDF;
     psb->m_cfg.collisions |= btSoftBody::fCollision::VF_DD;
     getDeformableDynamicsWorld()->addSoftBody(psb);
     psb->setSelfCollision(true);
     
-    btDeformableMassSpringForce* mass_spring = new btDeformableMassSpringForce(2,0.1, true);
-    psb->setSpringStiffness(2);
+    btDeformableMassSpringForce* mass_spring = new btDeformableMassSpringForce(2,0.2, true);
+    psb->setSpringStiffness(4);
     getDeformableDynamicsWorld()->addForce(psb, mass_spring);
     m_forces.push_back(mass_spring);
     btVector3 gravity = btVector3(0, -9.8, 0);
     btDeformableGravityForce* gravity_force =  new btDeformableGravityForce(gravity);
     getDeformableDynamicsWorld()->addForce(psb, gravity_force);
+    getDeformableDynamicsWorld()->setUseProjection(true);
     m_forces.push_back(gravity_force);
 }
 

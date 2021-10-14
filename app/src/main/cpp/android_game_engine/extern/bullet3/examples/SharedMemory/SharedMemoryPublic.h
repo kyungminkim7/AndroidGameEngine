@@ -7,7 +7,12 @@
 //Please don't replace an existing magic number:
 //instead, only ADD a new one at the top, comment-out previous one
 
-#define SHARED_MEMORY_MAGIC_NUMBER 202002030
+
+
+#define SHARED_MEMORY_MAGIC_NUMBER 202010061
+//#define SHARED_MEMORY_MAGIC_NUMBER 202007060
+//#define SHARED_MEMORY_MAGIC_NUMBER 202005070
+//#define SHARED_MEMORY_MAGIC_NUMBER 202002030
 //#define SHARED_MEMORY_MAGIC_NUMBER 202001230
 //#define SHARED_MEMORY_MAGIC_NUMBER 201911280
 //#define SHARED_MEMORY_MAGIC_NUMBER 201911180
@@ -110,7 +115,9 @@ enum EnumSharedMemoryClientCommand
 	CMD_REMOVE_USER_DATA,
 	CMD_COLLISION_FILTER,
 	CMD_REQUEST_MESH_DATA,
-
+	
+	CMD_PERFORM_COLLISION_DETECTION,
+	CMD_RESET_MESH_DATA,
 	//don't go beyond this command!
 	CMD_MAX_CLIENT_COMMANDS,
 };
@@ -233,6 +240,10 @@ enum EnumSharedMemoryServerStatus
 
 	CMD_REQUEST_MESH_DATA_COMPLETED,
 	CMD_REQUEST_MESH_DATA_FAILED,
+
+	CMD_PERFORM_COLLISION_DETECTION_COMPLETED,
+	CMD_RESET_MESH_DATA_COMPLETED,
+	CMD_RESET_MESH_DATA_FAILED,
 	//don't go beyond 'CMD_MAX_SERVER_COMMANDS!
 	CMD_MAX_SERVER_COMMANDS
 };
@@ -389,6 +400,7 @@ struct b3DynamicsInfo
 	double m_contactProcessingThreshold;
 	int m_frictionAnchor;
 	double m_collisionMargin;
+	int m_dynamicType;
 };
 
 // copied from btMultiBodyLink.h
@@ -450,9 +462,17 @@ struct b3MeshVertex
 };
 
 
+enum eMeshDataFlags
+{
+	B3_MESH_DATA_SIMULATION_MESH=1,
+	B3_MESH_DATA_SIMULATION_INDICES,
+	B3_MESH_DATA_GRAPHICS_INDICES,
+};
+
 enum eMeshDataEnum
 {
 	B3_MESH_DATA_COLLISIONSHAPEINDEX=1,
+	B3_MESH_DATA_FLAGS=2,
 };
 
 struct b3MeshData
@@ -930,6 +950,7 @@ enum eURDF_Flags
 	URDF_IGNORE_VISUAL_SHAPES = 1 << 20,
 	URDF_IGNORE_COLLISION_SHAPES = 1 << 21,
 	URDF_PRINT_URDF_INFO = 1 << 22,
+	URDF_GOOGLEY_UNDEFINED_COLORS = 1 << 23,
 };
 
 enum eUrdfGeomTypes  //sync with UrdfParser UrdfGeomTypes
@@ -981,6 +1002,12 @@ struct b3PluginArguments
 	int m_ints[B3_MAX_PLUGIN_ARG_SIZE];
 	int m_numFloats;
 	double m_floats[B3_MAX_PLUGIN_ARG_SIZE];
+};
+
+enum eInternalSimFlags
+{
+	eVRTinyGUI = 1<<1,
+	eDeformableAlternativeIndexing = 1<<2,
 };
 
 struct b3PhysicsSimulationParameters
@@ -1049,6 +1076,13 @@ struct b3ForwardDynamicsAnalyticsArgs
 	struct b3ForwardDynamicsAnalyticsIslandData m_islandData[MAX_ISLANDS_ANALYTICS];
 };
 
+enum eDynamicTypes
+{
+	eDynamic= 0,
+	eStatic= 1,
+	eKinematic= 2
+};
+
 enum eFileIOActions
 {
 	eAddFileIOAction = 1024,//avoid collision with eFileIOTypes
@@ -1064,6 +1098,10 @@ enum eFileIOTypes
 	eInMemoryFileIO,
 };
 
+enum eEnumUpdateVisualShapeFlags
+{
+	eVISUAL_SHAPE_DOUBLE_SIDED = 4,//see B3_INSTANCE_DOUBLE_SIDED
+};
 
 //limits for vertices/indices in PyBullet::createCollisionShape
 //Make sure the data fits in SHARED_MEMORY_MAX_STREAM_CHUNK_SIZE
