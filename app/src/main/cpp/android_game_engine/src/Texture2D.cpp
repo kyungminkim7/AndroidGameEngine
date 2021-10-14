@@ -7,7 +7,6 @@
 #include <GLES3/gl32.h>
 #include <glm/vec3.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 #include <android_game_engine/Asset.h>
