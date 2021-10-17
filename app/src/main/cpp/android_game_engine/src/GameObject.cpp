@@ -89,9 +89,9 @@ glm::vec3 getBound(Iter begin, Iter end) {
     const auto compareAbsY = [](const auto &v1, const auto &v2){ return std::abs(v1.y) < std::abs(v2.y); };
     const auto compareAbsZ = [](const auto &v1, const auto &v2){ return std::abs(v1.z) < std::abs(v2.z); };
     return {
-        std::max_element(begin, end, compareAbsX)->x,
-        std::max_element(begin, end, compareAbsY)->y,
-        std::max_element(begin, end, compareAbsZ)->z
+        std::abs(std::max_element(begin, end, compareAbsX)->x),
+        std::abs(std::max_element(begin, end, compareAbsY)->y),
+        std::abs(std::max_element(begin, end, compareAbsZ)->z)
     };
 }
 
@@ -162,9 +162,8 @@ void GameObject::updateFromPhysics() {
 void GameObject::renderShadow(ShaderProgram *shader) {
     shader->setUniform("model", this->model.getModelMatrix());
 
-    for (auto& mesh : *this->meshes) {
-        mesh.renderVAO(shader);
-    }
+    std::for_each(this->meshes->begin(), this->meshes->end(),
+                  [shader](auto &mesh){ mesh.renderVAO(shader); });
 }
 
 void GameObject::render(ShaderProgram *shader) {
@@ -173,10 +172,11 @@ void GameObject::render(ShaderProgram *shader) {
 
     shader->setUniform("material.specularExponent", this->specularExponent);
 
-    for (auto& mesh : *this->meshes) {
-        mesh.bindTextures(shader);
-        mesh.renderVAO(shader);
-    }
+    std::for_each(this->meshes->begin(), this->meshes->end(),
+                  [shader](auto &mesh){
+                      mesh.bindTextures(shader);
+                      mesh.renderVAO(shader);
+                  });
 }
 
 void GameObject::setMesh(std::shared_ptr<Meshes> mesh) {
