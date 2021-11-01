@@ -68,7 +68,7 @@ target_link_libraries(${PROJECT_NAME}
         bullet3::LinearMath
         glm::glm
         log
-#        network::network
+        network::network
     PRIVATE
         stb::stb
 )

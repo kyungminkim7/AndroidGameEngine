@@ -18,16 +18,16 @@
         android:theme="@style/AppTheme">
         <meta-data android:name="com.google.ar.core" android:value="required" />
 
-        <activity android:name=".GameActivity"
-                  android:screenOrientation="landscape">
-            <meta-data android:name="android.app.lib_name"
-                       android:value="game"/>
+<!--        <activity android:name=".GameActivity"-->
+<!--                  android:screenOrientation="landscape">-->
+<!--            <meta-data android:name="android.app.lib_name"-->
+<!--                       android:value="game"/>-->
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
 
 <!--        <activity android:name=".GameActivityAR"-->
 <!--            android:screenOrientation="landscape">-->
@@ -40,16 +40,16 @@
 <!--            </intent-filter>-->
 <!--        </activity>-->
 
-<!--        <activity android:name=".MobileControlStationActivity"-->
-<!--            android:screenOrientation="landscape">-->
-<!--            <meta-data android:name="android.app.lib_name"-->
-<!--                android:value="game"/>-->
+        <activity android:name=".MobileControlStationActivity"
+            android:screenOrientation="landscape">
+            <meta-data android:name="android.app.lib_name"
+                android:value="game"/>
 
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
     </application>
 

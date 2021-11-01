@@ -13,7 +13,7 @@ public:
     ImageMsgDisplay();
     ~ImageMsgDisplay();
 
-    void bufferImage(ntwk::Image *img);
+    void bufferImage(const ntwk::Image &img);
     void render(ShaderProgram *shader);
 
 private:

@@ -84,9 +84,9 @@ ImageMsgDisplay::~ImageMsgDisplay() {
     glDeleteBuffers(1, &this->vbo);
 }
 
-void ImageMsgDisplay::bufferImage(ntwk::Image *img) {
+void ImageMsgDisplay::bufferImage(const ntwk::Image &img) {
     GLenum format;
-    switch (img->channels) {
+    switch (img.channels) {
         case 1:
             format = GL_R8;
             break;
@@ -104,9 +104,9 @@ void ImageMsgDisplay::bufferImage(ntwk::Image *img) {
     }
 
     // Update texture coordinates to properly scale to screen dimensions
-    if (!(img->width == this->width && img->height == this->height)) {
-        this->width = img->width;
-        this->height = img->height;
+    if (!(img.width == this->width && img.height == this->height)) {
+        this->width = img.width;
+        this->height = img.height;
 
         const std::vector<glm::vec2> textureCoordinates {
             {0.0f, 0.0f},
@@ -131,7 +131,7 @@ void ImageMsgDisplay::bufferImage(ntwk::Image *img) {
     // Update texture
     glBindTexture(GL_TEXTURE_2D, this->texture);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height,
-            format, GL_UNSIGNED_BYTE, img->data.get());
+            format, GL_UNSIGNED_BYTE, img.data.get());
 }
 
 void ImageMsgDisplay::render(ShaderProgram *shader) {

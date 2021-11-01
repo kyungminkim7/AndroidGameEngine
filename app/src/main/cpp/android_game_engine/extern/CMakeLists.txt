@@ -57,7 +57,7 @@ add_library(bullet3::LinearMath ALIAS LinearMath)
 add_subdirectory(glm)
 
 # network library for networking
-#add_subdirectory(network)
+add_subdirectory(network)
 
 # STB library for loading image files
 add_library(stb INTERFACE)

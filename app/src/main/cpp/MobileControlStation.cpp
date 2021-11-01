@@ -1,11 +1,12 @@
 #include "MobileControlStation.h"
 
+#include <utility>
+
 #include <GLES3/gl32.h>
 
 #include <android_game_engine/Log.h>
-
-#include <geometry_msgs/Vector3_generated.h>
 #include <network/Image.h>
+#include <network/MsgTypeId.h>
 
 namespace age {
 
@@ -33,11 +34,11 @@ MobileControlStation::MobileControlStation(JNIEnv *env, jobject javaApplicationC
         imageMsgDisplayShader("shaders/ImageMsgDisplay.vert", "shaders/ImageMsgDisplay.frag") {
     glViewport(0, 0, ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight());
 
-    const std::string robotIp = "192.168.1.130";
-    this->imgSubscriber = this->ntwkNode.subscribeImage<ntwk::Compression::Image::JpegPolicy>(robotIp, 50000,
-            [this](std::unique_ptr<ntwk::Image> img){
-                this->imgMsgDisplay.bufferImage(img.get());
-            });
+    auto piHost = std::make_pair("192.168.1.204", 2048);
+    this->ntwkNode.subscribe(piHost, ntwk::MsgTypeId::IMAGE, [this](auto &&msg){
+        auto img = ntwk::Image::makeImage(msg.get());
+        this->imgMsgDisplay.bufferImage(img);
+    });
 
 //    this->imgSubscriber = this->ntwkNode.subscribe(robotIp, 50001, [](auto msgBuffer) {
 //        auto vec3 = geometry_msgs::GetVector3(msgBuffer.get());

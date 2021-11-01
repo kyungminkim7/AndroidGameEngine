@@ -6,7 +6,6 @@
 #include <memory>
 
 #include <network/Node.h>
-#include <network/TcpSubscriber.h>
 
 #define JAVA_ACTIVITY MobileControlStationActivity
 #include <android_game_engine/GameEngineJNI.h>
@@ -43,7 +42,6 @@ private:
     ShaderProgram imageMsgDisplayShader;
 
     ntwk::Node ntwkNode;
-    std::shared_ptr<ntwk::TcpSubscriber<ntwk::Image, ntwk::Compression::Image::JpegPolicy>> imgSubscriber;
     ImageMsgDisplay imgMsgDisplay;
 };
 
