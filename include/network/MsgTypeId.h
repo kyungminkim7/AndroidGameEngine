@@ -6,6 +6,7 @@ namespace ntwk {
 
 enum class MsgTypeId : uint32_t {
     IMAGE,
+    IMAGE_JPEG,
     JOYSTICK,
     MSG_CTRL,
     TWIST,
