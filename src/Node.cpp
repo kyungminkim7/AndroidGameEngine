@@ -23,7 +23,7 @@ void Node::advertise(unsigned short port) {
 }
 
 void Node::subscribe(const Endpoint &endpoint, MsgTypeId msgType,
-                     std::function<void(std::unique_ptr<uint8_t[]>)> msgHandler) {
+                     std::function<void(std::unique_ptr<uint8_t[]> &&)> msgHandler) {
     auto &s = this->subscribers[endpoint];
     if (!s) {
         s = TcpSubscriber::create(this->mainContext, this->tasksContext,

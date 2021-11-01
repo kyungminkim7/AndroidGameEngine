@@ -28,7 +28,7 @@ public:
 
     void advertise(unsigned short port);
     void subscribe(const Endpoint &endpoint, MsgTypeId msgTypeId,
-                   std::function<void(std::unique_ptr<uint8_t[]>)> msgHandler);
+                   std::function<void(std::unique_ptr<uint8_t[]> &&)> msgHandler);
 
     void publish(MsgTypeId msgTypeId, std::shared_ptr<flatbuffers::DetachedBuffer> msg);
 
