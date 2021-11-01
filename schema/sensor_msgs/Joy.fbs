@@ -1,8 +1,0 @@
-namespace sensor_msgs;
-
-table Joy {
-    x:float32;
-    y:float32;
-}
-
-root_type Joy;

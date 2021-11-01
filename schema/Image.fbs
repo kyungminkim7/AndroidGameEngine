@@ -1,0 +1,10 @@
+namespace msgs;
+
+table Image {
+    width:uint32;
+    height:uint32;
+    channels:uint8;
+    data:[uint8];
+}
+
+root_type Image;

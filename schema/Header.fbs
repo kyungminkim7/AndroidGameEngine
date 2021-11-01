@@ -1,0 +1,6 @@
+namespace msgs;
+
+struct Header {
+    msg_type_id:uint32;
+    msg_size:uint32;
+}

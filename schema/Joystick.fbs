@@ -1,0 +1,8 @@
+namespace msgs;
+
+table Joystick {
+    x:float32;
+    y:float32;
+}
+
+root_type Joystick;

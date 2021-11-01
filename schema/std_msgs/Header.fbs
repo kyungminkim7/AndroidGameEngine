@@ -1,5 +1,0 @@
-namespace std_msgs;
-
-struct Header {
-    msgSize:uint32;
-}

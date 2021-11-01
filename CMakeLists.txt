@@ -9,9 +9,11 @@ add_subdirectory(extern)
 
 # Create targets and set properties
 add_library(${PROJECT_NAME}
-    "src/Compression.cpp"
+    "src/Image.cpp"
     "src/Node.cpp"
     "src/Rate.cpp"
+    "src/TcpPublisher.cpp"
+    "src/TcpSubscriber.cpp"
 )
 
 add_library(${package_name}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
@@ -29,8 +31,6 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         asio::asio
         flatbuffers
-    PRIVATE
-        turbojpeg-static
 )
 
 target_compile_features(${PROJECT_NAME}
