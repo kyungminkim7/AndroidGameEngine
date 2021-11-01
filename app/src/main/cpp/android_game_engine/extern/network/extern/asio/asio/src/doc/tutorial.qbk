@@ -1,5 +1,5 @@
 [/
- / Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+ / Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
  /
  / Distributed under the Boost Software License, Version 1.0. (See accompanying
  / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -81,8 +81,10 @@ All of the asio classes can be used by simply including the `"asio.hpp"` header 
 
 
 
-All programs that use asio need to have at least one 
-[link asio.reference.io_context io_context] object. This class provides access to I/O functionality. We declare an object of this type first thing in the main function.
+All programs that use asio need to have at least one I/O execution context, such as an 
+[link asio.reference.io_context io_context] or 
+[link asio.reference.thread_pool thread_pool] object. An I/O execution context provides access to I/O functionality. We declare an object of type 
+[link asio.reference.io_context io_context] first thing in the main function.
 
 
 
@@ -135,7 +137,7 @@ Next: [link asio.tutorial.tuttimer2 Timer.2 - Using a timer asynchronously]
   ``''''''``// timer.cpp
   ``''''''``// ~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -233,7 +235,7 @@ Next: [link asio.tutorial.tuttimer3 Timer.3 - Binding arguments to a handler]
   ``''''''``// timer.cpp
   ``''''''``// ~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -379,7 +381,7 @@ Next: [link asio.tutorial.tuttimer4 Timer.4 - Using a member function as a handl
   ``''''''``// timer.cpp
   ``''''''``// ~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -538,7 +540,7 @@ Next: [link asio.tutorial.tuttimer5 Timer.5 - Synchronising handlers in multithr
   ``''''''``// timer.cpp
   ``''''''``// ~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -749,7 +751,7 @@ Previous: [link asio.tutorial.tuttimer4 Timer.4 - Using a member function as a h
   ``''''''``// timer.cpp
   ``''''''``// ~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -867,7 +869,7 @@ The purpose of this application is to access a daytime service, so we need the u
 
 
 
-All programs that use asio need to have at least one 
+All programs that use asio need to have at least one I/O execution context, such as an 
 [link asio.reference.io_context io_context] object.
 
 
@@ -958,7 +960,7 @@ Next: [link asio.tutorial.tutdaytime2 Daytime.2 - A synchronous TCP daytime serv
   ``''''''``// client.cpp
   ``''''''``// ~~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1117,7 +1119,7 @@ Next: [link asio.tutorial.tutdaytime3 Daytime.3 - An asynchronous TCP daytime se
   ``''''''``// server.cpp
   ``''''''``// ~~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1370,7 +1372,7 @@ Next: [link asio.tutorial.tutdaytime4 Daytime.4 - A synchronous UDP daytime clie
   ``''''''``// server.cpp
   ``''''''``// ~~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1535,6 +1537,8 @@ We use an [link asio.reference.ip__udp.resolver ip::udp::resolver] object to fin
 
 The [link asio.reference.ip__basic_resolver.resolve ip::udp::resolver::resolve()] function is guaranteed to return at least one endpoint in the list if it does not fail. This means it is safe to dereference the return value directly.
 
+Since UDP is datagram-oriented, we will not be using a stream socket. Create an [link asio.reference.ip__udp.socket ip::udp::socket] and initiate contact with the remote endpoint.
+
 
 
   ``''''''``    udp::socket socket(io_context);
@@ -1543,26 +1547,32 @@ The [link asio.reference.ip__basic_resolver.resolve ip::udp::resolver::resolve()
   ``''''''``    boost::array<char, 1> send_buf  = {{ 0 }};
   ``''''''``    socket.send_to(asio::buffer(send_buf), receiver_endpoint);
 
-  ``''''''``    boost::array<char, 128> recv_buf;
-  ``''''''``    udp::endpoint sender_endpoint;
-
-
-
-Since UDP is datagram-oriented, we will not be using a stream socket. Create an [link asio.reference.ip__udp.socket ip::udp::socket] and initiate contact with the remote endpoint.
-
-
-
 
 
 Now we need to be ready to accept whatever the server sends back to us. The endpoint on our side that receives the server's response will be initialised by [link asio.reference.basic_datagram_socket.receive_from ip::udp::socket::receive_from()].
 
 
 
+  ``''''''``    boost::array<char, 128> recv_buf;
+  ``''''''``    udp::endpoint sender_endpoint;
+  ``''''''``    size_t len = socket.receive_from(
+  ``''''''``        asio::buffer(recv_buf), sender_endpoint);
+
+  ``''''''``    std::cout.write(recv_buf.data(), len);
+  ``''''''``  }
+
 
 
 Finally, handle any exceptions that may have been thrown.
 
 
+  ``''''''``  catch (std::exception& e)
+  ``''''''``  {
+  ``''''''``    std::cerr << e.what() << std::endl;
+  ``''''''``  }
+
+  ``''''''``  return 0;
+  ``''''''``}
 
 See the [link asio.tutorial.tutdaytime4.src full source listing]
 
@@ -1581,7 +1591,7 @@ Next: [link asio.tutorial.tutdaytime5 Daytime.5 - A synchronous UDP daytime serv
   ``''''''``// client.cpp
   ``''''''``// ~~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1719,7 +1729,7 @@ Next: [link asio.tutorial.tutdaytime6 Daytime.6 - An asynchronous UDP daytime se
   ``''''''``// server.cpp
   ``''''''``// ~~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1933,7 +1943,7 @@ Next: [link asio.tutorial.tutdaytime7 Daytime.7 - A combined TCP/UDP asynchronou
   ``''''''``// server.cpp
   ``''''''``// ~~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -2214,7 +2224,7 @@ Previous: [link asio.tutorial.tutdaytime6 Daytime.6 - An asynchronous UDP daytim
   ``''''''``// server.cpp
   ``''''''``// ~~~~~~~~~~
   ``''''''``//
-  ``''''''``// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  ``''''''``// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
   ``''''''``//
   ``''''''``// Distributed under the Boost Software License, Version 1.0. (See accompanying
   ``''''''``// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)

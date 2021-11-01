@@ -2,36 +2,35 @@
 
 #include <cstdint>
 #include <functional>
+#include <map>
 #include <memory>
 #include <thread>
+#include <utility>
 
 #include <asio/io_context.hpp>
+#include <flatbuffers/flatbuffers.h>
 
-#include "Compression.h"
-#include "Image.h"
-#include "TcpPublisher.h"
-#include "TcpSubscriber.h"
+#include "MsgTypeId.h"
 
 namespace ntwk {
 
+class TcpPublisher;
+class TcpSubscriber;
+
 class Node {
 public:
+    using Endpoint = std::pair<std::string, unsigned short>;
+    using PublisherPtr = std::shared_ptr<TcpPublisher>;
+    using SubscriberPtr = std::shared_ptr<TcpSubscriber>;
+
     Node();
     ~Node();
 
-    template<typename CompressionPolicy=Compression::IdentityPolicy>
-    std::shared_ptr<TcpPublisher<CompressionPolicy>> advertise(unsigned short port);
+    void advertise(unsigned short port);
+    void subscribe(const Endpoint &endpoint, MsgTypeId msgTypeId,
+                   std::function<void(std::unique_ptr<uint8_t[]>)> msgHandler);
 
-    template<typename CompressionPolicy=Compression::Image::IdentityPolicy>
-    std::shared_ptr<TcpPublisher<CompressionPolicy>> advertiseImage(unsigned short port);
-
-    template<typename DecompressionPolicy=Compression::IdentityPolicy>
-    std::shared_ptr<TcpSubscriber<uint8_t[], DecompressionPolicy>> subscribe(const std::string &host, unsigned short port,
-                                                                             std::function<void(std::unique_ptr<uint8_t[]>)> msgReceivedHandler);
-
-    template<typename DecompressionPolicy=Compression::Image::IdentityPolicy>
-    std::shared_ptr<TcpSubscriber<Image, DecompressionPolicy>> subscribeImage(const std::string &host, unsigned short port,
-                                                                              std::function<void(std::unique_ptr<Image>)> imgMsgReceivedHandler);
+    void publish(MsgTypeId msgTypeId, std::shared_ptr<flatbuffers::DetachedBuffer> msg);
 
     void run();
     void runOnce();
@@ -41,30 +40,10 @@ private:
     asio::io_context tasksContext;
 
     std::thread tasksThread;
+
+    std::map<Endpoint, SubscriberPtr> subscribers;
+    PublisherPtr publisher;
+
 };
-
-template<typename CompressionPolicy>
-std::shared_ptr<TcpPublisher<CompressionPolicy>> Node::advertise(unsigned short port) {
-    return TcpPublisher<CompressionPolicy>::create(this->tasksContext, port);
-}
-
-template<typename CompressionPolicy>
-std::shared_ptr<TcpPublisher<CompressionPolicy>> Node::advertiseImage(unsigned short port) {
-    return TcpPublisher<CompressionPolicy>::create(this->tasksContext, port);
-}
-
-template<typename DecompressionPolicy>
-std::shared_ptr<TcpSubscriber<uint8_t[], DecompressionPolicy>> Node::subscribe(const std::string &host, unsigned short port,
-                                                                               std::function<void (std::unique_ptr<uint8_t[]>)> msgReceivedHandler) {
-    return TcpSubscriber<uint8_t[], DecompressionPolicy>::create(this->mainContext, this->tasksContext,
-                                                                 host, port, std::move(msgReceivedHandler));
-}
-
-template<typename DecompressionPolicy>
-std::shared_ptr<TcpSubscriber<Image, DecompressionPolicy>> Node::subscribeImage(const std::string &host, unsigned short port,
-                                                                                std::function<void (std::unique_ptr<Image>)> imgMsgReceivedHandler) {
-    return TcpSubscriber<Image, DecompressionPolicy>::create(this->mainContext, this->tasksContext,
-                                                             host, port, std::move(imgMsgReceivedHandler));
-}
 
 } // namespace ntwk

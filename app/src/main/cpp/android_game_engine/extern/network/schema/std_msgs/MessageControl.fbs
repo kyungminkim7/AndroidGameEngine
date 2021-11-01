@@ -1,3 +1,0 @@
-namespace std_msgs;
-
-enum MessageControl:uint8 { ACK = 1 }

@@ -1,9 +1,0 @@
-namespace geometry_msgs;
-
-table Vector3 {
-    x:float32;
-    y:float32;
-    z:float32;
-}
-
-root_type Vector3;

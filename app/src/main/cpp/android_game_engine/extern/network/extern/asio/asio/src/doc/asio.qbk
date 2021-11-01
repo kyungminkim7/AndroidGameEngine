@@ -1,5 +1,5 @@
 [/
- / Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+ / Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
  /
  / Distributed under the Boost Software License, Version 1.0. (See accompanying
  / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,7 +7,7 @@
 
 [library Asio
     [quickbook 1.4]
-    [copyright 2003 - 2020 Christopher M. Kohlhoff]
+    [copyright 2003 - 2021 Christopher M. Kohlhoff]
     [purpose Networking library]
     [license
         Distributed under the Boost Software License, Version 1.0.
@@ -25,6 +25,9 @@
 [template indexterm2[id term1 term2] '''<indexterm id="'''[id]'''"><primary>'''[term1]'''</primary><secondary>'''[term2]'''</secondary></indexterm>''']
 [template inline_note[text] \[['Note:] [text] '''&mdash;'''['end note]\] ]
 [template ticket[number]'''<ulink url="https://svn.boost.org/trac/boost/ticket/'''[number]'''">'''#[number]'''</ulink>''']
+[template static[] '''<phrase role="silver">'''\[static\]'''</phrase>''']
+[template constructor[] '''<phrase role="silver">'''\[constructor\]'''</phrase>''']
+[template destructor[] '''<phrase role="silver">'''\[destructor\]'''</phrase>''']
 [def __POSIX__ /POSIX/]
 [def __Windows__ /Windows/]
 [def __accept__ [@http://www.opengroup.org/onlinepubs/9699919799/functions/accept.html `accept()`]]
@@ -57,7 +60,7 @@ C++ approach.
   ]
   [
     [
-      [link asio.using Using Asio]
+      [link asio.using Using, Building, and Configuring Asio]
     ]
     [
       How to use Asio in your applications. Includes information on
@@ -101,6 +104,15 @@ C++ approach.
   ]
   [
     [
+      [link asio.std_executors Proposed Standard Executors]
+    ]
+    [
+      Description of Asio's support for the proposed standard executors
+      library.
+    ]
+  ]
+  [
+    [
       [link asio.history Revision History]
     ]
     [
@@ -123,5 +135,6 @@ C++ approach.
 [include examples.qbk]
 [include reference.qbk]
 [include net_ts.qbk]
+[include std_executors.qbk]
 [include history.qbk]
 [xinclude index.xml]
