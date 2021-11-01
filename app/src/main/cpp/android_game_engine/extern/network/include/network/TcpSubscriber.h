@@ -19,7 +19,7 @@ private:
     using MsgPtr = std::unique_ptr<uint8_t[]>;
     using MsgBufferMap = std::unordered_map<MsgTypeIdUnderlyingType, MsgPtr>;
 
-    using MsgHandler = std::function<void(MsgPtr&&)>;
+    using MsgHandler = std::function<void(MsgPtr &&)>;
     using MsgHandlerMap = std::unordered_map<MsgTypeIdUnderlyingType, MsgHandler>;
 
 public:
