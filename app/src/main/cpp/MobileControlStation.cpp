@@ -5,7 +5,6 @@
 #include <GLES3/gl32.h>
 
 #include <android_game_engine/Log.h>
-#include <network/Image.h>
 #include <network/MsgTypeId.h>
 
 namespace age {
@@ -36,8 +35,7 @@ MobileControlStation::MobileControlStation(JNIEnv *env, jobject javaApplicationC
 
     auto piHost = std::make_pair("192.168.1.204", 2048);
     this->ntwkNode.subscribe(piHost, ntwk::MsgTypeId::IMAGE, [this](auto &&msg){
-        auto img = ntwk::Image::makeImage(msg.get());
-        this->imgMsgDisplay.bufferImage(img);
+        this->imgMsgDisplay.bufferImage(msg.get());
     });
 
 //    this->imgSubscriber = this->ntwkNode.subscribe(robotIp, 50001, [](auto msgBuffer) {

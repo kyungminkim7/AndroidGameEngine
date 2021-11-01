@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-#include <network/Image.h>
-
 namespace age {
 
 class ShaderProgram;
@@ -13,7 +11,7 @@ public:
     ImageMsgDisplay();
     ~ImageMsgDisplay();
 
-    void bufferImage(const ntwk::Image &img);
+    void bufferImage(const uint8_t buffer[]);
     void render(ShaderProgram *shader);
 
 private:
