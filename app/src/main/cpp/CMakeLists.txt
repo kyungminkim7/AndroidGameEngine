@@ -9,21 +9,24 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_o
 
 set(CMAKE_CXX_STANDARD 14)
 
-#add_library(${PROJECT_NAME} SHARED TestGame.cpp TestGame.h)
+add_library(${PROJECT_NAME} SHARED TestGame.cpp TestGame.h)
+target_compile_definitions(${PROJECT_NAME} PRIVATE JAVA_ACTIVITY=GameActivity)
 
 #add_library(${PROJECT_NAME} SHARED TestGameAR.cpp TestGameAR.h)
+#target_compile_definitions(${PROJECT_NAME} PRIVATE JAVA_ACTIVITY=GameActivityAR)
 
-add_library(${PROJECT_NAME} SHARED
-        ImageMsgDisplay.cpp
-        ImageMsgDisplay.h
-        MobileControlStation.cpp
-        MobileControlStation.h
-)
+#add_library(${PROJECT_NAME} SHARED
+#        ImageMsgDisplay.cpp
+#        ImageMsgDisplay.h
+#        MobileControlStation.cpp
+#        MobileControlStation.h
+#)
+#target_compile_definitions(${PROJECT_NAME} PRIVATE JAVA_ACTIVITY=MobileControlStationActivity)
 
-target_include_directories(game
+target_include_directories(${PROJECT_NAME}
         INTERFACE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
-target_link_libraries(game PUBLIC android_game_engine::android_game_engine)
+target_link_libraries(${PROJECT_NAME} PUBLIC android_game_engine::android_game_engine)

@@ -7,9 +7,7 @@
 
 #include <network/Node.h>
 
-#define JAVA_ACTIVITY MobileControlStationActivity
 #include <android_game_engine/GameEngineJNI.h>
-
 #include <android_game_engine/ShaderProgram.h>
 #include "ImageMsgDisplay.h"
 
