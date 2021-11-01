@@ -4,7 +4,7 @@
 
 #include <GLES3/gl32.h>
 #include <glm/vec2.hpp>
-#include <sensor_msgs/Image_generated.h>
+#include <network/msgs/Image_generated.h>
 
 #include <android_game_engine/ShaderProgram.h>
 
