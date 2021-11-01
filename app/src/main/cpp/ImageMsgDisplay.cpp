@@ -6,8 +6,7 @@
 #include <glm/vec2.hpp>
 
 #include <android_game_engine/ShaderProgram.h>
-#include <network/msgs/Image_generated.h>
-#include <network/Image.h>
+#include <network/ImageJpeg.h>
 
 namespace {
 
@@ -84,9 +83,9 @@ ImageMsgDisplay::~ImageMsgDisplay() {
 }
 
 void ImageMsgDisplay::bufferImage(const uint8_t buffer[]) {
-    const auto image = msgs::GetImage(buffer);
+    const auto image = ntwk::ImageJpeg::decompressImage(buffer);
     GLenum format;
-    switch (image->channels()) {
+    switch (image.channels) {
         case 1:
             format = GL_R8;
             break;
@@ -104,9 +103,9 @@ void ImageMsgDisplay::bufferImage(const uint8_t buffer[]) {
     }
 
     // Update texture coordinates to properly scale to screen dimensions
-    if (!(image->width() == this->width && image->height() == this->height)) {
-        this->width = image->width();
-        this->height = image->height();
+    if (!(image.width == this->width && image.height == this->height)) {
+        this->width = image.width;
+        this->height = image.height;
 
         const std::vector<glm::vec2> textureCoordinates {
             {0.0f, 0.0f},
@@ -131,7 +130,7 @@ void ImageMsgDisplay::bufferImage(const uint8_t buffer[]) {
     // Update texture
     glBindTexture(GL_TEXTURE_2D, this->texture);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height,
-            format, GL_UNSIGNED_BYTE, image->data()->data());
+            format, GL_UNSIGNED_BYTE, image.data.get());
 }
 
 void ImageMsgDisplay::render(ShaderProgram *shader) {

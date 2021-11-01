@@ -34,14 +34,9 @@ MobileControlStation::MobileControlStation(JNIEnv *env, jobject javaApplicationC
     glViewport(0, 0, ManagerWindowing::getWindowWidth(), ManagerWindowing::getWindowHeight());
 
     auto piHost = std::make_pair("192.168.1.204", 2048);
-    this->ntwkNode.subscribe(piHost, ntwk::MsgTypeId::IMAGE, [this](auto &&msg){
+    this->ntwkNode.subscribe(piHost, ntwk::MsgTypeId::IMAGE_JPEG, [this](auto &&msg){
         this->imgMsgDisplay.bufferImage(msg.get());
     });
-
-//    this->imgSubscriber = this->ntwkNode.subscribe(robotIp, 50001, [](auto msgBuffer) {
-//        auto vec3 = geometry_msgs::GetVector3(msgBuffer.get());
-//        Log::info("(" + std::to_string(vec3->x()) + ", " + std::to_string(vec3->y()) + ", " + std::to_string(vec3->z()) + ")");
-//    });
 }
 
 void MobileControlStation::onWindowChanged(int width, int height, int displayRotation) {
