@@ -1,6 +1,5 @@
 #include <android_game_engine/ShaderProgram.h>
 
-#include <cassert>
 #include <memory>
 #include <sstream>
 
@@ -61,49 +60,41 @@ void ShaderProgram::use() {
 
 void ShaderProgram::setUniform(const std::string &name, bool value) {
     auto location = glGetUniformLocation(*this->program, name.c_str());
-    assert(("Failed to glGetUniformLocation()", location != -1));
     glUniform1i(location, value);
 }
 
 void ShaderProgram::setUniform(const std::string &name, int value) {
     auto location = glGetUniformLocation(*this->program, name.c_str());
-    assert(("Failed to glGetUniformLocation()", location != -1));
     glUniform1i(location, value);
 }
 
 void ShaderProgram::setUniform(const std::string &name, float value) {
     auto location = glGetUniformLocation(*this->program, name.c_str());
-    assert(("Failed to glGetUniformLocation()", location != -1));
     glUniform1f(location, value);
 }
 
 void ShaderProgram::setUniform(const std::string &name, const glm::vec2 &v) {
     auto location = glGetUniformLocation(*this->program, name.c_str());
-    assert(("Failed to glGetUniformLocation()", location != -1));
     glUniform2f(location, v.x, v.y);
 }
 
 void ShaderProgram::setUniform(const std::string &name, const glm::vec3 &v) {
     auto location = glGetUniformLocation(*this->program, name.c_str());
-    assert(("Failed to glGetUniformLocation()", location != -1));
     glUniform3f(location, v.x, v.y, v.z);
 }
 
 void ShaderProgram::setUniform(const std::string &name, const glm::vec4 &v) {
     auto location = glGetUniformLocation(*this->program, name.c_str());
-    assert(("Failed to glGetUniformLocation()", location != -1));
     glUniform4f(location, v.x, v.y, v.z, v.w);
 }
 
 void ShaderProgram::setUniform(const std::string &name, const glm::mat3 &m) {
     auto location = glGetUniformLocation(*this->program, name.c_str());
-    assert(("Failed to glGetUniformLocation()", location != -1));
     glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(m));
 }
 
 void ShaderProgram::setUniform(const std::string &name, const glm::mat4 &m) {
     auto location = glGetUniformLocation(*this->program, name.c_str());
-    assert(("Failed to glGetUniformLocation()", location != -1));
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(m));
 }
 
