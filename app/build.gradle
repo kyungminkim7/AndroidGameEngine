@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 /*
 The ARCore aar library contains the native shared libraries. These are
@@ -10,12 +11,11 @@ def arcore_libpath = "${buildDir}/arcore-native"
 configurations { natives }
 
 android {
-    compileSdkVersion 29
-//    ndkVersion "21.0.6113669"
+    compileSdkVersion 31
     defaultConfig {
         applicationId "com.example.androidgameengine"
         minSdkVersion 24
-        targetSdkVersion 29
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -58,6 +58,8 @@ dependencies {
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 // Extracts the shared libraries from aars in the natives configuration.
@@ -81,4 +83,7 @@ tasks.whenTaskAdded {
     task-> if (task.name.contains("external") && !task.name.contains("Clean")) {
         task.dependsOn(extractNativeLibraries)
     }
+}
+repositories {
+    mavenCentral()
 }

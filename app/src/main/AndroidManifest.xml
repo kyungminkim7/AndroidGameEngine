@@ -19,7 +19,8 @@
         <meta-data android:name="com.google.ar.core" android:value="required" />
 
         <activity android:name=".GameActivity"
-                  android:screenOrientation="landscape">
+            android:exported="true"
+            android:screenOrientation="landscape">
             <meta-data android:name="android.app.lib_name"
                        android:value="game"/>
 
@@ -30,6 +31,7 @@
         </activity>
 
 <!--        <activity android:name=".GameActivityAR"-->
+<!--            android:exported="true"-->
 <!--            android:screenOrientation="landscape">-->
 <!--            <meta-data android:name="android.app.lib_name"-->
 <!--                android:value="game"/>-->
@@ -41,6 +43,7 @@
 <!--        </activity>-->
 
 <!--        <activity android:name=".MobileControlStationActivity"-->
+<!--            android:exported="true"-->
 <!--            android:screenOrientation="landscape">-->
 <!--            <meta-data android:name="android.app.lib_name"-->
 <!--                android:value="game"/>-->
