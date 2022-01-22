@@ -114,15 +114,15 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     @Override
     protected void onResume() {
         super.onResume();
-        this.onResumeJNI();
         this.glSurfaceView.onResume();
+        this.onResumeJNI();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        this.glSurfaceView.onPause();
         this.onPauseJNI();
+        this.glSurfaceView.onPause();
     }
 
     @Override
@@ -134,11 +134,7 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        // Synchronized to avoid racing onDrawFrame.
-        synchronized (this) {
-            this.onDestroyJNI();
-        }
+        this.onDestroyJNI();
     }
 
     @Override
@@ -206,10 +202,7 @@ public class GameActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        // Synchronized to avoid racing onDestroy.
-        synchronized (this) {
-            this.updateJNI();
-            this.renderJNI();
-        }
+        this.updateJNI();
+        this.renderJNI();
     }
 }
