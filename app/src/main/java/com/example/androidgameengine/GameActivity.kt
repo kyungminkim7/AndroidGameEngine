@@ -11,10 +11,10 @@ import com.google.android.material.button.MaterialButton
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-val TAG = GameActivity::class.java.simpleName
-
 class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     companion object {
+        private val TAG = GameActivity::class.java.simpleName
+
         init { System.loadLibrary("game") }
     }
 
@@ -108,7 +108,7 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
         this.onDestroyJNI()
     }
 
-    override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+    override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
         this.onSurfaceCreatedJNI(this.applicationContext,
             this.binding.glSurfaceView.width, this.binding.glSurfaceView.height,
             this.windowManager.defaultDisplay.rotation, this.assets)
@@ -144,11 +144,11 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
         }
     }
 
-    override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+    override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) =
         this.onSurfaceChangedJNI(width, height, this.windowManager.defaultDisplay.rotation)
-    }
 
-    override fun onDrawFrame(gl: GL10?) {
+
+    override fun onDrawFrame(gl: GL10) {
         this.updateJNI()
         this.renderJNI()
     }
