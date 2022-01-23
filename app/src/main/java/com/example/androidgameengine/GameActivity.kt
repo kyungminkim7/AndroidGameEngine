@@ -83,24 +83,24 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
 
     override fun onStart() {
         super.onStart()
-        this.onStartJNI()
+        this.binding.glSurfaceView.onResume()
+        this.binding.glSurfaceView.queueEvent { this.onStartJNI() }
     }
 
     override fun onResume() {
         super.onResume()
-        this.binding.glSurfaceView.onResume()
-        this.onResumeJNI()
+        this.binding.glSurfaceView.queueEvent { this.onResumeJNI() }
     }
 
     override fun onPause() {
         super.onPause()
-        this.onPauseJNI()
-        this.binding.glSurfaceView.onPause()
+        this.binding.glSurfaceView.queueEvent { this.onPauseJNI() }
     }
 
     override fun onStop() {
         super.onStop()
-        this.onStopJNI()
+        this.binding.glSurfaceView.queueEvent { this.onStopJNI() }
+        this.binding.glSurfaceView.onPause()
     }
 
     override fun onDestroy() {
