@@ -2,6 +2,7 @@ package com.example.androidgameengine
 
 import android.content.Context
 import android.content.res.AssetManager
+import android.graphics.Color
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.os.Handler
@@ -23,6 +24,7 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
     companion object {
         private val TAG = GameActivityAR::class.java.simpleName
         private const val SNACKBAR_COLOR = -0x40cdcdce
+        private const val SNACKBAR_TEXT_COLOR = Color.WHITE
 
         init { System.loadLibrary("game") }
     }
@@ -81,6 +83,7 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
             Snackbar.LENGTH_INDEFINITE
         )
         snackbar.view.setBackgroundColor(SNACKBAR_COLOR)
+        snackbar.setTextColor(SNACKBAR_TEXT_COLOR)
         snackbar.show()
     }
 
@@ -92,6 +95,7 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
             Snackbar.LENGTH_LONG
         )
         snackbar.view.setBackgroundColor(SNACKBAR_COLOR)
+        snackbar.setTextColor(SNACKBAR_TEXT_COLOR)
         snackbar.show()
     }
 
@@ -123,7 +127,8 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
 
     override fun onStart() {
         super.onStart()
-        onStartJNI()
+        this.binding.glSurfaceView.onResume()
+        this.binding.glSurfaceView.queueEvent { this.onStartJNI() }
     }
 
     override fun onResume() {
@@ -142,36 +147,37 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
             Snackbar.LENGTH_INDEFINITE
         )
         loadingSnackbar.view.setBackgroundColor(SNACKBAR_COLOR)
+        loadingSnackbar.setTextColor(SNACKBAR_TEXT_COLOR)
         loadingSnackbar.show()
 
         // Resume game
-        onResumeJNI()
-        this.binding.glSurfaceView.onResume()
+        this.binding.glSurfaceView.queueEvent { this.onResumeJNI() }
     }
 
     override fun onPause() {
         super.onPause()
 
-        this.binding.glSurfaceView.onPause()
-        onPauseJNI()
+        this.binding.glSurfaceView.queueEvent { this.onPauseJNI() }
 
         this.arPlaneInitializedHandler.removeCallbacks(arPlaneInitializedRunnable)
+        this.gameInitializedHandler.removeCallbacks(gameInitializedRunnable)
     }
 
     override fun onStop() {
         super.onStop()
-        onStopJNI()
+        this.binding.glSurfaceView.queueEvent { this.onStopJNI() }
+        this.binding.glSurfaceView.onPause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        // Synchronized to avoid racing onDrawFrame.
-        synchronized(this) { onDestroyJNI() }
+        onDestroyJNI()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
                                             results: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, results)
+
         if (!CameraPermissionHelper.hasCameraPermission(this)) {
             Toast.makeText(this, "Camera permission is needed to run this application",
                 Toast.LENGTH_LONG).show()
@@ -211,11 +217,8 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
         this.onSurfaceChangedJNI(width, height, this.windowManager.defaultDisplay.rotation)
 
     override fun onDrawFrame(gl: GL10) {
-        // Synchronized to avoid racing onDestroy.
-        synchronized(this) {
-            updateJNI()
-            renderJNI()
-        }
+        updateJNI()
+        renderJNI()
     }
 
     private fun arPlaneInitialized(): Unit {
