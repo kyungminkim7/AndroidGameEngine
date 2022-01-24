@@ -16,17 +16,17 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE JAVA_ACTIVITY=GameActivity)
 #target_compile_definitions(${PROJECT_NAME} PRIVATE JAVA_ACTIVITY=GameActivityAR)
 
 #add_library(${PROJECT_NAME} SHARED
-#        ImageMsgDisplay.cpp
-#        ImageMsgDisplay.h
-#        MobileControlStation.cpp
-#        MobileControlStation.h
+#    ImageMsgDisplay.cpp
+#    ImageMsgDisplay.h
+#    MobileControlStation.cpp
+#    MobileControlStation.h
 #)
-#target_compile_definitions(${PROJECT_NAME} PRIVATE JAVA_ACTIVITY=MobileControlStationActivity)
+#target_compile_definitions(${PROJECT_NAME} PRIVATE JAVA_ACTIVITY=GameActivity)
 
-target_include_directories(${PROJECT_NAME}
-        INTERFACE
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+# Target properties
+target_include_directories(${PROJECT_NAME} INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC android_game_engine::android_game_engine)

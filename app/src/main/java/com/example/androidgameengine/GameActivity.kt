@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.androidgameengine.databinding.ActivityGameBinding
-import com.google.android.material.button.MaterialButton
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
