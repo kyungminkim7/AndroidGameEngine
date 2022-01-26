@@ -199,8 +199,9 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
             val result = view.onTouchEvent(event)
             this.binding.glSurfaceView.queueEvent {
                 when (event.action) {
-                    MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE ->
-                        this.onJoystickInputJNI( event.x, event.y )
+                    MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> this.onJoystickInputJNI(
+                        this.binding.joystick.xAxis, this.binding.joystick.yAxis)
+
                     MotionEvent.ACTION_UP -> this.onJoystickInputJNI(0.0f, 0.0f)
                 }
             }

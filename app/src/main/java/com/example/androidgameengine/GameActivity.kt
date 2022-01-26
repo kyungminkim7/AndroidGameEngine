@@ -117,8 +117,8 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             this.binding.glSurfaceView.queueEvent{
                 when (event.action) {
                     MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> this.onLeftJoystickInputJNI(
-                            this.binding.leftJoystick.measurementX,
-                            this.binding.leftJoystick.measurementY)
+                            this.binding.leftJoystick.xAxis, this.binding.leftJoystick.yAxis)
+
                     else -> this.onLeftJoystickInputJNI(0.0f, 0.0f)
                 }
             }
@@ -129,9 +129,10 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             val result = view.onTouchEvent(event)
             this.binding.glSurfaceView.queueEvent{
                 when (event.action) {
-                    MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> this.onRightJoystickInputJNI(
-                        this.binding.rightJoystick.measurementX,
-                        this.binding.rightJoystick.measurementY)
+                    MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE ->
+                        this.onRightJoystickInputJNI(
+                            this.binding.rightJoystick.xAxis, this.binding.rightJoystick.yAxis)
+
                     else -> this.onRightJoystickInputJNI(0.0f, 0.0f)
                 }
             }
