@@ -76,11 +76,8 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
 
     private lateinit var arPlaneInitializedHandler: Handler
     private val arPlaneInitializedRunnable = Runnable {
-        val snackbar = Snackbar.make(
-            findViewById(android.R.id.content),
-            "Touch the floor to set the game.",
-            Snackbar.LENGTH_INDEFINITE
-        )
+        val snackbar = Snackbar.make(findViewById(android.R.id.content),
+            getString(R.string.ar_plane_initialized), Snackbar.LENGTH_INDEFINITE)
         snackbar.view.setBackgroundColor(SNACKBAR_COLOR)
         snackbar.setTextColor(SNACKBAR_TEXT_COLOR)
         snackbar.show()
@@ -88,11 +85,8 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
 
     private lateinit var gameInitializedHandler: Handler
     private val gameInitializedRunnable = Runnable {
-        val snackbar = Snackbar.make(
-            findViewById(android.R.id.content),
-            "Game initialized.",
-            Snackbar.LENGTH_LONG
-        )
+        val snackbar = Snackbar.make(findViewById(android.R.id.content),
+            getString(R.string.game_initialized), Snackbar.LENGTH_LONG)
         snackbar.view.setBackgroundColor(SNACKBAR_COLOR)
         snackbar.setTextColor(SNACKBAR_TEXT_COLOR)
         snackbar.show()
@@ -140,14 +134,11 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
         }
 
         // Notify user of env initialization
-        val loadingSnackbar = Snackbar.make(
-            findViewById(android.R.id.content),
-            "Searching for the floor. Move the camera around slowly to scan the environment...",
-            Snackbar.LENGTH_INDEFINITE
-        )
-        loadingSnackbar.view.setBackgroundColor(SNACKBAR_COLOR)
-        loadingSnackbar.setTextColor(SNACKBAR_TEXT_COLOR)
-        loadingSnackbar.show()
+        val snackbar = Snackbar.make(findViewById(android.R.id.content),
+            getString(R.string.ar_plane_search), Snackbar.LENGTH_INDEFINITE)
+        snackbar.view.setBackgroundColor(SNACKBAR_COLOR)
+        snackbar.setTextColor(SNACKBAR_TEXT_COLOR)
+        snackbar.show()
 
         // Resume game
         this.binding.glSurfaceView.queueEvent { this.onResumeJNI() }
