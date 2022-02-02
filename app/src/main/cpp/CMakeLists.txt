@@ -5,8 +5,6 @@ project(game)
 
 add_subdirectory(android_game_engine)
 
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
-
 set(CMAKE_CXX_STANDARD 14)
 
 add_library(${PROJECT_NAME} SHARED TestGame.cpp TestGame.h)

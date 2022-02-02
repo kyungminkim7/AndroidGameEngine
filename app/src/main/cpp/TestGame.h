@@ -4,25 +4,24 @@
 
 #include <memory>
 
-#include <android_game_engine/GameEngineJNI.h>
-
-namespace age {
+#include <android_game_engine/GameEngine.h>
 
 extern "C" {
-JNI_METHOD_DECLARATION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject gameActivity, jobject gameApplicationContext,
-                                                  int windowWidth, int windowHeight, int displayRotation,
-                                                  jobject j_asset_manager);
-JNI_METHOD_DECLARATION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y);
-JNI_METHOD_DECLARATION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y);
-JNI_METHOD_DECLARATION(void, onResetJNI)(JNIEnv *env, jobject gameActivity);
+JNI_METHOD_DECLARATION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject activity,
+                                                  int width, int height, int displayRotation);
+JNI_METHOD_DECLARATION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject activity,
+                                                     float x, float y);
+JNI_METHOD_DECLARATION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject activity,
+                                                      float x, float y);
+JNI_METHOD_DECLARATION(void, onResetJNI)(JNIEnv *env, jobject activity);
 }
+
+namespace age {
 
 class Box;
 
 class TestGame : public Game {
 public:
-    TestGame(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject);
-
     void onCreate() override;
 
     void onLeftJoystickInput(float x, float y);

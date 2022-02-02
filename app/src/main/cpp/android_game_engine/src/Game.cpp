@@ -5,22 +5,21 @@
 
 #include <android_game_engine/GameObject.h>
 #include <android_game_engine/Exception.h>
-#include <android_game_engine/LightDirectional.h>
 #include <android_game_engine/ManagerWindowing.h>
 
 namespace age {
 
-Game::Game(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject) :
-                GameTemplate(env, javaApplicationContext, javaActivityObject),
-                shadowMapShader("shaders/ShadowMap.vert", "shaders/ShadowMap.frag"),
-                defaultShader("shaders/Default.vert", "shaders/Default.frag"),
-                skyboxShader("shaders/Skybox.vert", "shaders/Skybox.frag"),
-                physicsDebugShader("shaders/PhysicsDebug.vert", "shaders/PhysicsDebug.frag"),
-                projectionViewUbo("ProjectionViewUB", sizeof(glm::mat4)),
-                lightSpaceUbo("LightSpaceUB", sizeof(glm::mat4)),
-                skybox(nullptr), cam(nullptr), directionalLight(nullptr), shadowMap(nullptr),
-                physics(new PhysicsEngine(&this->physicsDebugShader)),
-                drawDebugPhysics(false) {
+Game::Game() :
+    shadowMapShader("shaders/ShadowMap.vert", "shaders/ShadowMap.frag"),
+    defaultShader("shaders/Default.vert", "shaders/Default.frag"),
+    skyboxShader("shaders/Skybox.vert", "shaders/Skybox.frag"),
+    physicsDebugShader("shaders/PhysicsDebug.vert", "shaders/PhysicsDebug.frag"),
+    projectionViewUbo("ProjectionViewUB", sizeof(glm::mat4)),
+    lightSpaceUbo("LightSpaceUB", sizeof(glm::mat4)),
+    skybox(nullptr), cam(nullptr), directionalLight(nullptr), shadowMap(nullptr),
+    physics(new PhysicsEngine(&this->physicsDebugShader)),
+    drawDebugPhysics(false) {
+
     // Link shaders to necessary UBOs
     this->defaultShader.setUniformBlockBinding(this->projectionViewUbo);
     this->physicsDebugShader.setUniformBlockBinding(this->projectionViewUbo);
@@ -38,8 +37,6 @@ Game::Game(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObje
 }
 
 void Game::onCreate() {
-    GameTemplate::onCreate();
-
     // Setup cam
     this->cam = std::make_unique<CameraType>(45.0f,
                                              static_cast<float>(ManagerWindowing::getWindowWidth()) / ManagerWindowing::getWindowHeight(),
@@ -58,15 +55,17 @@ void Game::onCreate() {
     this->shadowMap = std::make_unique<ShadowMap>(shadowMapDimension, shadowMapDimension);
 }
 
-void Game::onWindowChanged(int width, int height, int displayRotation) {
-    GameTemplate::onWindowChanged(width, height, displayRotation);
+void Game::onStart() {}
+void Game::onResume() {}
+void Game::onPause() {}
+void Game::onStop() {}
+void Game::onDestroy() {}
 
+void Game::onWindowChanged(int width, int height, int displayRotation) {
     this->cam->setAspectRatioWidthToHeight(static_cast<float>(width) / height);
 }
 
 void Game::onUpdate(std::chrono::duration<float> updateDuration) {
-    GameTemplate::onUpdate(updateDuration);
-
     this->cam->onUpdate(updateDuration);
     
     for (auto &gameObject : this->worldList) {

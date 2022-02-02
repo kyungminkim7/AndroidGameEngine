@@ -5,6 +5,7 @@
 #include <android_game_engine/ARPlane.h>
 #include <android_game_engine/Exception.h>
 #include <android_game_engine/LightDirectional.h>
+#include <android_game_engine/ManagerJNI.h>
 #include <android_game_engine/ManagerWindowing.h>
 
 namespace {
@@ -25,8 +26,7 @@ const auto R_ar_game = static_cast<glm::mat3>(glm::rotate(glm::mat4(1.0f),
 
 namespace age {
 
-GameAR::GameAR(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject) :
-    Game(env, javaApplicationContext, javaActivityObject),
+GameAR::GameAR() : Game(),
     arCameraBackgroundShader("shaders/ARCameraBackground.vert", "shaders/ARCameraBackground.frag"),
     arPlaneShader("shaders/ARPlane.vert", "shaders/ARPlane.frag"),
     arPlaneShadowedShader("shaders/ARPlaneShadowed.vert", "shaders/ARPlaneShadowed.frag") {
@@ -59,8 +59,8 @@ void GameAR::onResume() {
     Game::onResume();
 
     if (this->arSession == nullptr) {
-        auto env = this->getJNIEnv();
-        auto activity = this->getJavaActivityObject();
+        auto env = ManagerJNI::getJNIEnv();
+        auto activity = ManagerJNI::getActivity();
         ArInstallStatus installStatus;
 
         // If install was not yet requested, that means that we are resuming the
@@ -75,7 +75,7 @@ void GameAR::onResume() {
             return;
         }
 
-        if (ArSession_create(env, this->getJavaApplicationContext(), &this->arSession) != AR_SUCCESS) {
+        if (ArSession_create(env, ManagerJNI::getContext(), &this->arSession) != AR_SUCCESS) {
             throw ARError("Failed to create AR session.");
         }
 
@@ -231,10 +231,11 @@ void GameAR::updatePlanes() {
             this->registerPhysics(this->floor.get());
 
             // Signal to Java activity that a plane was found
-            auto env = this->getJNIEnv();
-            auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
+            auto env = ManagerJNI::getJNIEnv();
+            auto activity = ManagerJNI::getActivity();
+            auto activityClass = env->GetObjectClass(activity);
             auto callback = env->GetMethodID(activityClass, "arPlaneInitialized", "()V");
-            env->CallVoidMethod(this->getJavaActivityObject(), callback);
+            env->CallVoidMethod(activity, callback);
         }
 
         this->floor->setDimensions({floorLength, floorWidth});

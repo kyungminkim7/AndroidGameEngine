@@ -17,7 +17,7 @@ class ARPlane;
 
 class GameAR : public Game {
 public:
-    GameAR(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject);
+    GameAR();
     ~GameAR();
 
     void onCreate() override;

@@ -3,37 +3,37 @@
 #include <random>
 
 #include <android_game_engine/Box.h>
-#include <android_game_engine/LightDirectional.h>
 #include <android_game_engine/Texture2D.h>
 
-namespace age {
-
-JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)
-    (JNIEnv *env, jobject gameActivity, jobject gameApplicationContext,
-     int windowWidth, int windowHeight, int displayRotation, jobject j_asset_manager) {
-    GameEngineJNI::init(env, windowWidth, windowHeight, displayRotation, j_asset_manager);
-    GameEngineJNI::onCreate(std::make_unique<TestGame>(env, gameApplicationContext, gameActivity));
+JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject activity,
+                                                 int width, int height, int rotation) {
+    age::GameEngine::onSurfaceCreated(width, height, rotation,
+                                      std::make_unique<age::TestGame>());
 }
 
-JNI_METHOD_DEFINITION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y) {
-    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onLeftJoystickInput(x, y);
+JNI_METHOD_DEFINITION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject gameActivity,
+        float x, float y) {
+    auto lock = age::GameEngine::getGameLock();
+    reinterpret_cast<age::TestGame*>(age::GameEngine::getGame())->onLeftJoystickInput(x, y);
 }
 
-JNI_METHOD_DEFINITION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y) {
-    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onRightJoystickInput(x, y);
+JNI_METHOD_DEFINITION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameActivity,
+        float x, float y) {
+    auto lock = age::GameEngine::getGameLock();
+    reinterpret_cast<age::TestGame*>(age::GameEngine::getGame())->onRightJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onResetJNI)(JNIEnv *env, jobject gameActivity) {
-    reinterpret_cast<TestGame*>(GameEngineJNI::getGame())->onReset();
+    auto lock = age::GameEngine::getGameLock();
+    reinterpret_cast<age::TestGame*>(age::GameEngine::getGame())->onReset();
 }
 
-TestGame::TestGame(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject)
-    : Game(env, javaApplicationContext, javaActivityObject) {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-}
+namespace age {
 
 void TestGame::onCreate() {
     Game::onCreate();
+
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
     this->enablePhysicsDebugDrawer(true);
     this->getDirectionalLight()->setLookAtDirection({1.0f, 1.0f, -3.0f});

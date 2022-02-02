@@ -21,14 +21,6 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     ///
     /// Functions to be declared and implemented by the custom Game class.
     ///@{
-
-    ///
-    /// Starting point for game and engine initialization.
-    ///
-    private external fun onSurfaceCreatedJNI(applicationContext: Context,
-                                             windowWidth: Int, windowHeight: Int,
-                                             displayRotation: Int, assetManager: AssetManager )
-
     private external fun onLeftJoystickInputJNI(x: Float, y: Float)
     private external fun onRightJoystickInputJNI(x: Float, y: Float)
     private external fun onResetJNI()
@@ -38,17 +30,19 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     ///
     /// Functions that are implemented and handled by the game engine.
     ///@{
+    private external fun onCreateJNI(context: Context, assetManager: AssetManager)
     private external fun onStartJNI()
     private external fun onResumeJNI()
     private external fun onPauseJNI()
     private external fun onStopJNI()
     private external fun onDestroyJNI()
 
+    private external fun onSurfaceCreatedJNI(windowWidth: Int, windowHeight: Int,
+                                             displayRotation: Int)
     private external fun onSurfaceChangedJNI(width: Int, height: Int,
                                              displayRotation: Int)
 
     private external fun updateJNI()
-    private external fun renderJNI()
 
     private external fun onTouchDownEventJNI(x: Float, y: Float)
     private external fun onTouchMoveEventJNI(x: Float, y: Float)
@@ -78,28 +72,30 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             }
             true
         }
+
+        this.onCreateJNI(this.applicationContext, this.assets)
     }
 
     override fun onStart() {
         super.onStart()
+        this.onStartJNI()
         this.binding.glSurfaceView.onResume()
-        this.binding.glSurfaceView.queueEvent { this.onStartJNI() }
     }
 
     override fun onResume() {
         super.onResume()
-        this.binding.glSurfaceView.queueEvent { this.onResumeJNI() }
+        this.onResumeJNI()
     }
 
     override fun onPause() {
         super.onPause()
-        this.binding.glSurfaceView.queueEvent { this.onPauseJNI() }
+        this.onPauseJNI()
     }
 
     override fun onStop() {
         super.onStop()
-        this.binding.glSurfaceView.queueEvent { this.onStopJNI() }
         this.binding.glSurfaceView.onPause()
+        this.onStopJNI()
     }
 
     override fun onDestroy() {
@@ -108,9 +104,9 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
-        this.onSurfaceCreatedJNI(this.applicationContext,
+        this.onSurfaceCreatedJNI(
             this.binding.glSurfaceView.width, this.binding.glSurfaceView.height,
-            this.windowManager.defaultDisplay.rotation, this.assets)
+            this.windowManager.defaultDisplay.rotation)
 
         this.binding.leftJoystick.setOnTouchListener{view, event ->
             val result = view.onTouchEvent(event)
@@ -139,17 +135,11 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             result
         }
 
-        this.binding.resetButton.setOnClickListener{
-            this.binding.glSurfaceView.queueEvent{this.onResetJNI()}
-        }
+        this.binding.resetButton.setOnClickListener{ this.onResetJNI() }
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) =
         this.onSurfaceChangedJNI(width, height, this.windowManager.defaultDisplay.rotation)
 
-
-    override fun onDrawFrame(gl: GL10) {
-        this.updateJNI()
-        this.renderJNI()
-    }
+    override fun onDrawFrame(gl: GL10) = this.updateJNI()
 }

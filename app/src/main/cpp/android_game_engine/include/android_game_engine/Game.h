@@ -1,13 +1,12 @@
 #pragma once
 
-#include "GameTemplate.h"
-
 #include <chrono>
 #include <memory>
 #include <vector>
 
 #include "CameraChase.h"
 #include "CameraFPV.h"
+#include "LightDirectional.h"
 #include "PhysicsEngine.h"
 #include "ShaderProgram.h"
 #include "ShadowMap.h"
@@ -25,26 +24,30 @@ struct Ray {
 };
 
 class GameObject;
-class LightDirectional;
 
 /**
- * Users should subclass Game and then run it using GameEngine::run with the derived
- * Game class.
+ * Users should subclass Game
  */
-class Game : public GameTemplate {
+class Game {
 public:
-    Game(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject);
+    Game();
+    virtual ~Game() = default;
 
-    void onCreate() override;
+    virtual void onCreate();
+    virtual void onStart();
+    virtual void onResume();
+    virtual void onPause();
+    virtual void onStop();
+    virtual void onDestroy();
 
-    void onWindowChanged(int width, int height, int displayRotation) override;
+    virtual void onWindowChanged(int width, int height, int displayRotation);
 
-    void onUpdate(std::chrono::duration<float> updateDuration) override;
-    void render() override;
+    virtual void onUpdate(std::chrono::duration<float> updateDuration);
+    virtual void render();
 
-    bool onTouchDownEvent(float x, float y) override;
-    bool onTouchMoveEvent(float x, float y) override;
-    bool onTouchUpEvent(float x, float y) override;
+    virtual bool onTouchDownEvent(float x, float y);
+    virtual bool onTouchMoveEvent(float x, float y);
+    virtual bool onTouchUpEvent(float x, float y);
     
     void enablePhysicsDebugDrawer(bool enable);
 

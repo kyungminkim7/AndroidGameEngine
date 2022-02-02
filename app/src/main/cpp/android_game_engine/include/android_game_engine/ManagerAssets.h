@@ -10,6 +10,8 @@
 #include <memory>
 #include <string>
 
+#include <jni.h>
+
 #include <android/asset_manager.h>
 
 namespace age {
@@ -18,7 +20,7 @@ class Asset;
 
 namespace ManagerAssets {
 
-void init(AAssetManager *manager);
+void init(JNIEnv *env, jobject jAssetManager);
 void shutdown();
 
 Asset openAsset(const std::string &filepath);
