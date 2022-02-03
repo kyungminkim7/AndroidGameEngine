@@ -22,11 +22,11 @@ add_library(${PROJECT_NAME} STATIC
         src/GameAR.cpp
         src/GameEngine.cpp
         src/GameObject.cpp
+        src/JNIInterface.cpp
         src/Light.cpp
         src/LightDirectional.cpp
         src/Log.cpp
         src/ManagerAssets.cpp
-        src/ManagerJNI.cpp
         src/ManagerWindowing.cpp
         src/Mesh.cpp
         src/Model.cpp

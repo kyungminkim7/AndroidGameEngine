@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include <android_game_engine/GameEngine.h>
+#include <android_game_engine/JNIInterface.h>
 
 extern "C" {
 JNI_METHOD_DECLARATION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject activity,

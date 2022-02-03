@@ -4,7 +4,7 @@
 
 #include <android_game_engine/Asset.h>
 #include <android_game_engine/Exception.h>
-#include <android_game_engine/ManagerJNI.h>
+#include <android_game_engine/JNIInterface.h>
 
 namespace {
 jobject jAssetManagerGlobal;
@@ -21,7 +21,7 @@ void init(JNIEnv *env, jobject jAssetManager) {
 
 void shutdown() {
     assetManager = nullptr;
-    ManagerJNI::getJNIEnv()->DeleteGlobalRef(jAssetManagerGlobal);
+    JNIInterface::getJNIEnv()->DeleteGlobalRef(jAssetManagerGlobal);
 }
 
 Asset openAsset(const std::string &filepath) {

@@ -1,7 +1,9 @@
 #include <android_game_engine/GameEngine.h>
 
+#include <chrono>
+
+#include <android_game_engine/Game.h>
 #include <android_game_engine/ManagerAssets.h>
-#include <android_game_engine/ManagerJNI.h>
 #include <android_game_engine/ManagerWindowing.h>
 
 namespace {
@@ -22,8 +24,7 @@ Game *getGame() {
     return game.get();
 }
 
-void onCreate(JNIEnv *env, jobject activity, jobject context, jobject assetManager) {
-    ManagerJNI::init(env, activity, context);
+void onCreate(JNIEnv *env, jobject assetManager) {
     ManagerAssets::init(env, assetManager);
 }
 
@@ -58,8 +59,7 @@ void onDestroy() {
     ManagerWindowing::shutdown();
 }
 
-void onSurfaceCreated(int width, int height, int displayRotation,
-                                  std::unique_ptr<Game> &&g) {
+void onSurfaceCreated(int width, int height, int displayRotation, std::unique_ptr<Game> &&g) {
     ManagerWindowing::init(width, height, displayRotation);
 
     const std::lock_guard<std::mutex> guard(gameMutex);

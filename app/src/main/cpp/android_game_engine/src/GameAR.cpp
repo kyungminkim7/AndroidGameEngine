@@ -4,8 +4,8 @@
 
 #include <android_game_engine/ARPlane.h>
 #include <android_game_engine/Exception.h>
+#include <android_game_engine/JNIInterface.h>
 #include <android_game_engine/LightDirectional.h>
-#include <android_game_engine/ManagerJNI.h>
 #include <android_game_engine/ManagerWindowing.h>
 
 namespace {
@@ -59,8 +59,8 @@ void GameAR::onResume() {
     Game::onResume();
 
     if (this->arSession == nullptr) {
-        auto env = ManagerJNI::getJNIEnv();
-        auto activity = ManagerJNI::getActivity();
+        auto env = JNIInterface::getJNIEnv();
+        auto activity = JNIInterface::getActivity();
         ArInstallStatus installStatus;
 
         // If install was not yet requested, that means that we are resuming the
@@ -75,7 +75,7 @@ void GameAR::onResume() {
             return;
         }
 
-        if (ArSession_create(env, ManagerJNI::getContext(), &this->arSession) != AR_SUCCESS) {
+        if (ArSession_create(env, JNIInterface::getContext(), &this->arSession) != AR_SUCCESS) {
             throw ARError("Failed to create AR session.");
         }
 
@@ -231,8 +231,8 @@ void GameAR::updatePlanes() {
             this->registerPhysics(this->floor.get());
 
             // Signal to Java activity that a plane was found
-            auto env = ManagerJNI::getJNIEnv();
-            auto activity = ManagerJNI::getActivity();
+            auto env = JNIInterface::getJNIEnv();
+            auto activity = JNIInterface::getActivity();
             auto activityClass = env->GetObjectClass(activity);
             auto callback = env->GetMethodID(activityClass, "arPlaneInitialized", "()V");
             env->CallVoidMethod(activity, callback);

@@ -3,6 +3,7 @@
 #include <random>
 
 #include <android_game_engine/Box.h>
+#include <android_game_engine/GameEngine.h>
 #include <android_game_engine/Texture2D.h>
 
 JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject activity,
