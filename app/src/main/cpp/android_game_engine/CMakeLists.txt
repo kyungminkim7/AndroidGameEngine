@@ -1,61 +1,50 @@
 project(android_game_engine)
 
 add_subdirectory(extern)
-add_library(arcore SHARED IMPORTED)
-
-set_target_properties(arcore PROPERTIES IMPORTED_LOCATION
-        ${ARCORE_LIBPATH}/${ANDROID_ABI}/libarcore_sdk_c.so
-        INTERFACE_INCLUDE_DIRECTORIES ${ARCORE_INCLUDE}
-)
 
 add_library(${PROJECT_NAME} STATIC
-        src/ARCameraBackground.cpp
-        src/ARPlane.cpp
-        src/Asset.cpp
-        src/AssimpIOStream.cpp
-        src/AssimpIOSystem.cpp
-        src/Box.cpp
-        src/Camera.cpp
-        src/CameraChase.cpp
-        src/CameraFPV.cpp
-        src/Game.cpp
-        src/GameAR.cpp
-        src/GameEngine.cpp
-        src/GameObject.cpp
-        src/JNIInterface.cpp
-        src/Light.cpp
-        src/LightDirectional.cpp
-        src/Log.cpp
-        src/ManagerAssets.cpp
-        src/ManagerWindowing.cpp
-        src/Mesh.cpp
-        src/Model.cpp
-        src/PID.cpp
-        src/PhysicsCompoundShape.cpp
-        src/PhysicsDebugDrawer.cpp
-        src/PhysicsEngine.cpp
-        src/PhysicsMotionState.cpp
-        src/PhysicsRigidBody.cpp
-        src/Quad.cpp
-        src/Quadcopter.cpp
-        src/Shader.cpp
-        src/ShaderProgram.cpp
-        src/ShadowMap.cpp
-        src/Skybox.cpp
-        src/Texture2D.cpp
-        src/UniformBuffer.cpp
-        src/Utilities.cpp
-        src/Vehicle.cpp
-        src/Vertex.cpp
-        src/VertexArray.cpp
-)
+    src/Asset.cpp
+    src/AssimpIOStream.cpp
+    src/AssimpIOSystem.cpp
+    src/Box.cpp
+    src/Camera.cpp
+    src/CameraChase.cpp
+    src/CameraFPV.cpp
+    src/Game.cpp
+    src/GameEngine.cpp
+    src/GameObject.cpp
+    src/JNIInterface.cpp
+    src/Light.cpp
+    src/LightDirectional.cpp
+    src/Log.cpp
+    src/ManagerAssets.cpp
+    src/ManagerWindowing.cpp
+    src/Mesh.cpp
+    src/Model.cpp
+    src/PID.cpp
+    src/PhysicsCompoundShape.cpp
+    src/PhysicsDebugDrawer.cpp
+    src/PhysicsEngine.cpp
+    src/PhysicsMotionState.cpp
+    src/PhysicsRigidBody.cpp
+    src/Quad.cpp
+    src/Quadcopter.cpp
+    src/Shader.cpp
+    src/ShaderProgram.cpp
+    src/ShadowMap.cpp
+    src/Skybox.cpp
+    src/Texture2D.cpp
+    src/UniformBuffer.cpp
+    src/Utilities.cpp
+    src/Vehicle.cpp
+    src/Vertex.cpp
+    src/VertexArray.cpp)
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-)
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
@@ -63,7 +52,6 @@ target_link_libraries(${PROJECT_NAME}
         EGL
         GLESv3
         android
-        arcore
         bullet3::BulletDynamics
         bullet3::BulletCollision
         bullet3::LinearMath
@@ -71,8 +59,7 @@ target_link_libraries(${PROJECT_NAME}
         log
         network::network
     PRIVATE
-        stb::stb
-)
+        stb::stb)
 
 target_compile_features(${PROJECT_NAME}
     PUBLIC
@@ -85,5 +72,17 @@ target_compile_features(${PROJECT_NAME}
         cxx_auto_type
         cxx_generic_lambdas
         cxx_range_for
-        cxx_strong_enums
-)
+        cxx_strong_enums)
+
+if (gameType STREQUAL AR)
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/ARCameraBackground.cpp
+        src/ARPlane.cpp
+        src/GameAR.cpp)
+
+    add_library(arcore SHARED IMPORTED)
+    set_target_properties(arcore PROPERTIES IMPORTED_LOCATION
+        ${ARCORE_LIBPATH}/${ANDROID_ABI}/libarcore_sdk_c.so
+        INTERFACE_INCLUDE_DIRECTORIES ${ARCORE_INCLUDE})
+    target_link_libraries(${PROJECT_NAME} PUBLIC arcore)
+endif()
