@@ -135,7 +135,9 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             result
         }
 
-        this.binding.resetButton.setOnClickListener{ this.onResetJNI() }
+        this.binding.resetButton.setOnClickListener{
+            this.binding.glSurfaceView.queueEvent{this.onResetJNI()}
+        }
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) =
