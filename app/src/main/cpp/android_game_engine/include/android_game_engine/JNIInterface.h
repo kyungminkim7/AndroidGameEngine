@@ -12,10 +12,10 @@
 #define EVAL_CONCAT(a,b,c) CONCAT(a,b,c)
 
 #define JNI_METHOD_DEFINITION(return_type, method_name) \
-  EVAL_CONCAT(return_type JNICALL Java_com_example_androidgameengine, JAVA_ACTIVITY, method_name)
+    EVAL_CONCAT(return_type JNICALL Java, JNI_CLASS_PATH, method_name)
 
 #define JNI_METHOD_DECLARATION(return_type, method_name) \
-  JNIEXPORT JNI_METHOD_DEFINITION(return_type, method_name)
+    JNIEXPORT JNI_METHOD_DEFINITION(return_type, method_name)
 
 namespace age {
 namespace JNIInterface {

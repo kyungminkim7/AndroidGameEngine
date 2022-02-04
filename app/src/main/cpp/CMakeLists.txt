@@ -9,25 +9,30 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Create game shared library
 set(gameType NORMAL)
+#set(gameType AR)
+#set(gameType MOBILE_CONTROL_STATION)
+
 if (gameType STREQUAL AR)
     add_library(${PROJECT_NAME} SHARED TestGameAR.cpp TestGameAR.h)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        JAVA_ACTIVITY=GameActivityAR
-        JNI_ENV_CLASS_PATH="com/example/androidgameengine/GameActivityAR")
-elseif(gameType STREQUAL MOBILE_CONTROL_STATION)
-    add_library(${PROJECT_NAME} SHARED
-        ImageMsgDisplay.cpp
-        ImageMsgDisplay.h
-        MobileControlStation.cpp
-        MobileControlStation.h)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        JAVA_ACTIVITY=GameActivity
-        JNI_ENV_CLASS_PATH="com/example/androidgameengine/GameActivity")
-else() # Regular game type
-    add_library(${PROJECT_NAME} SHARED TestGame.cpp TestGame.h)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        JAVA_ACTIVITY=GameActivity
-        JNI_ENV_CLASS_PATH="com/example/androidgameengine/GameActivity")
+
+    target_compile_definitions(android_game_engine
+        PUBLIC JNI_CLASS_PATH=com_example_androidgameengine_GameActivityAR
+        PRIVATE JNI_ENV_CLASS_PATH="com/example/androidgameengine/GameActivityAR")
+
+else()
+    if (gameType STREQUAL MOBILE_CONTROL_STATION)
+        add_library(${PROJECT_NAME} SHARED
+            ImageMsgDisplay.cpp
+            ImageMsgDisplay.h
+            MobileControlStation.cpp
+            MobileControlStation.h)
+    else() # Regular game type
+        add_library(${PROJECT_NAME} SHARED TestGame.cpp TestGame.h)
+    endif()
+
+    target_compile_definitions(android_game_engine
+        PUBLIC JNI_CLASS_PATH=com_example_androidgameengine_GameActivity
+        PRIVATE JNI_ENV_CLASS_PATH="com/example/androidgameengine/GameActivity")
 endif()
 
 # Target properties

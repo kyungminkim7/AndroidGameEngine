@@ -77,7 +77,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     javaVM = vm;
     auto env = age::JNIInterface::getJNIEnv();
 
-    auto c = env->FindClass("com/example/androidgameengine/GameActivity");
+    auto c = env->FindClass(JNI_ENV_CLASS_PATH);
     if (c == nullptr) return JNI_ERR;
 
     const std::vector<JNINativeMethod> methods = {
