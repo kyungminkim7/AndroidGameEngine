@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.androidgameengine.databinding.ActivityGameBinding
@@ -73,34 +74,36 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             true
         }
 
-        this.onCreateJNI(this.applicationContext, this.assets)
+        this.binding.glSurfaceView.queueEvent {
+            this.onCreateJNI(this.applicationContext, this.assets)
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        this.onStartJNI()
+        this.binding.glSurfaceView.queueEvent{ this.onStartJNI() }
         this.binding.glSurfaceView.onResume()
     }
 
     override fun onResume() {
         super.onResume()
-        this.onResumeJNI()
+        this.binding.glSurfaceView.queueEvent{ this.onResumeJNI() }
     }
 
     override fun onPause() {
         super.onPause()
-        this.onPauseJNI()
+        this.binding.glSurfaceView.queueEvent{ this.onPauseJNI() }
     }
 
     override fun onStop() {
         super.onStop()
         this.binding.glSurfaceView.onPause()
-        this.onStopJNI()
+        this.binding.glSurfaceView.queueEvent{ this.onStopJNI() }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        this.onDestroyJNI()
+        this.binding.glSurfaceView.queueEvent{ this.onDestroyJNI() }
     }
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {

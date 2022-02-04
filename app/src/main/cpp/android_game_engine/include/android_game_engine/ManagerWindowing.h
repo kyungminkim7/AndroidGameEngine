@@ -7,7 +7,7 @@
 namespace age {
 namespace ManagerWindowing {
 
-void init(int width, int height, int displayRotation=0);
+void init(int width, int height, int displayRotation);
 void shutdown();
 
 void setWindowDimensions(int width, int height);

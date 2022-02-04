@@ -6,7 +6,6 @@
  * Shutdown ManagerAssets before ManagerWindowing.
  */
 
-#include <cstdint>
 #include <memory>
 #include <string>
 

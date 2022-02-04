@@ -1,10 +1,9 @@
 #pragma once
 
 #include <android_game_engine/Game.h>
+#include <android_game_engine/GameEngine.h>
 
 #include <memory>
-
-#include <android_game_engine/JNIInterface.h>
 
 extern "C" {
 JNI_METHOD_DECLARATION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject activity,

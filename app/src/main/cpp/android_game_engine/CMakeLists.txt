@@ -13,7 +13,6 @@ add_library(${PROJECT_NAME} STATIC
     src/Game.cpp
     src/GameEngine.cpp
     src/GameObject.cpp
-    src/JNIInterface.cpp
     src/Light.cpp
     src/LightDirectional.cpp
     src/Log.cpp

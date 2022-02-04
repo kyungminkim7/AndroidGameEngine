@@ -4,24 +4,20 @@
 
 #include <android_game_engine/Asset.h>
 #include <android_game_engine/Exception.h>
-#include <android_game_engine/JNIInterface.h>
 
 namespace {
-jobject jAssetManagerGlobal;
 AAssetManager *assetManager = nullptr;
-}
+} // namespace
 
 namespace age {
 namespace ManagerAssets {
 
 void init(JNIEnv *env, jobject jAssetManager) {
-    jAssetManagerGlobal = env->NewGlobalRef(jAssetManager);
-    assetManager = AAssetManager_fromJava(env, jAssetManagerGlobal);
+    assetManager = AAssetManager_fromJava(env, jAssetManager);
 }
 
 void shutdown() {
     assetManager = nullptr;
-    JNIInterface::getJNIEnv()->DeleteGlobalRef(jAssetManagerGlobal);
 }
 
 Asset openAsset(const std::string &filepath) {

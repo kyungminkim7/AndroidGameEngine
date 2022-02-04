@@ -3,7 +3,6 @@
 #include <random>
 
 #include <android_game_engine/Box.h>
-#include <android_game_engine/GameEngine.h>
 #include <android_game_engine/Texture2D.h>
 
 JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject activity,
@@ -14,18 +13,15 @@ JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject activity,
 
 JNI_METHOD_DEFINITION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject gameActivity,
         float x, float y) {
-    auto lock = age::GameEngine::getGameLock();
     reinterpret_cast<age::TestGame*>(age::GameEngine::getGame())->onLeftJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameActivity,
         float x, float y) {
-    auto lock = age::GameEngine::getGameLock();
     reinterpret_cast<age::TestGame*>(age::GameEngine::getGame())->onRightJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onResetJNI)(JNIEnv *env, jobject gameActivity) {
-    auto lock = age::GameEngine::getGameLock();
     reinterpret_cast<age::TestGame*>(age::GameEngine::getGame())->onReset();
 }
 
