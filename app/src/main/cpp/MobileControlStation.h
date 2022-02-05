@@ -1,30 +1,31 @@
 #pragma once
 
-#include <android_game_engine/GameTemplate.h>
+#include <android_game_engine/Game.h>
 
 #include <chrono>
 #include <memory>
 
 #include <network/Node.h>
 
-#include <android_game_engine/GameEngineJNI.h>
+#include <android_game_engine/GameEngine.h>
 #include <android_game_engine/ShaderProgram.h>
 #include "ImageMsgDisplay.h"
 
-namespace age {
-
 extern "C" {
-JNI_METHOD_DECLARATION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject gameActivity, jobject gameApplicationContext,
-                                                  int windowWidth, int windowHeight, int displayRotation,
-                                                  jobject j_asset_manager);
-JNI_METHOD_DECLARATION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y);
-JNI_METHOD_DECLARATION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y);
+JNI_METHOD_DECLARATION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject activity,
+                                                  int width, int height, int displayRotation);
+JNI_METHOD_DECLARATION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject gameActivity,
+    float x, float y);
+JNI_METHOD_DECLARATION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameActivity,
+    float x, float y);
 JNI_METHOD_DECLARATION(void, onResetJNI)(JNIEnv *env, jobject gameActivity);
 }
 
-class MobileControlStation : public GameTemplate {
+namespace age {
+
+class MobileControlStation : public Game {
 public:
-    MobileControlStation(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject);
+    MobileControlStation();
 
     void onWindowChanged(int width, int height, int displayRotation) override;
 
