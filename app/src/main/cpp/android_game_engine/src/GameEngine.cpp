@@ -20,7 +20,6 @@ jobject jActivityRef;
 jobject jContextRef;
 jobject jAssetManagerRef;
 
-JNIEnv *getJNIEnv();
 void onCreateJNI(JNIEnv *env, jobject activity, jobject context, jobject assetManager);
 void onStartJNI(JNIEnv *env, jobject activity);
 void onResumeJNI(JNIEnv *env, jobject activity);
@@ -88,20 +87,12 @@ void onTouchUpEventJNI(JNIEnv *env, jobject activity, float x, float y) {
     game->onTouchUpEvent(x, y);
 }
 
-JNIEnv *getJNIEnv() {
-    JNIEnv *env;
-    if (javaVM->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION) != JNI_OK) {
-        throw age::JNIError("Failed to obtain JNIEnv from javaVM");
-    }
-    return env;
-}
-
 } // namespace
 
 // Register native methods
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     javaVM = vm;
-    auto env = getJNIEnv();
+    auto env = age::GameEngine::getJNIEnv();
 
     auto activityClass = env->FindClass(JNI_ENV_CLASS_PATH);
     if (activityClass == nullptr) return JNI_ERR;
@@ -140,6 +131,17 @@ void onSurfaceCreated(int width, int height, int displayRotation, std::unique_pt
     game->onStart();
     game->onResume();
 }
+
+JNIEnv *getJNIEnv() {
+    JNIEnv *env;
+    if (javaVM->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION) != JNI_OK) {
+        throw age::JNIError("Failed to obtain JNIEnv from javaVM");
+    }
+    return env;
+}
+
+jobject getJavaActivity() { return jActivityRef; }
+jobject getJavaAppContext() { return jContextRef; }
 
 void callJavaActivityVoidMethod(const std::string &methodName, const std::string &signature) {
     auto env = getJNIEnv();

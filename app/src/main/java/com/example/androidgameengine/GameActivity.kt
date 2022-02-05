@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.opengl.GLSurfaceView
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.androidgameengine.databinding.ActivityGameBinding
@@ -38,10 +37,8 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     private external fun onStopJNI()
     private external fun onDestroyJNI()
 
-    private external fun onSurfaceCreatedJNI(windowWidth: Int, windowHeight: Int,
-                                             displayRotation: Int)
-    private external fun onSurfaceChangedJNI(width: Int, height: Int,
-                                             displayRotation: Int)
+    private external fun onSurfaceCreatedJNI(width: Int, height: Int, displayRotation: Int)
+    private external fun onSurfaceChangedJNI(width: Int, height: Int, displayRotation: Int)
 
     private external fun updateJNI()
 

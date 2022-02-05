@@ -60,6 +60,11 @@ Game *getGame();
  */
 void onSurfaceCreated(int width, int height, int displayRotation, std::unique_ptr<Game> &&g);
 
+JNIEnv *getJNIEnv();
+
+jobject getJavaActivity();
+jobject getJavaAppContext();
+
 /**
  * Makes calls to the owning Java Activity through the JNI
  * @param methodName Java Activity method name to invoke

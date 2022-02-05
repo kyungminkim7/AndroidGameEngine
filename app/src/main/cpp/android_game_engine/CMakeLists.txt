@@ -72,16 +72,3 @@ target_compile_features(${PROJECT_NAME}
         cxx_generic_lambdas
         cxx_range_for
         cxx_strong_enums)
-
-if (gameType STREQUAL AR)
-    target_sources(${PROJECT_NAME} PRIVATE
-        src/ARCameraBackground.cpp
-        src/ARPlane.cpp
-        src/GameAR.cpp)
-
-    add_library(arcore SHARED IMPORTED)
-    set_target_properties(arcore PROPERTIES IMPORTED_LOCATION
-        ${ARCORE_LIBPATH}/${ANDROID_ABI}/libarcore_sdk_c.so
-        INTERFACE_INCLUDE_DIRECTORIES ${ARCORE_INCLUDE})
-    target_link_libraries(${PROJECT_NAME} PUBLIC arcore)
-endif()

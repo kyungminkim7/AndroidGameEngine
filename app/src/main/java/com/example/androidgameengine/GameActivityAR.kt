@@ -32,44 +32,30 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
     ///
     /// Functions to be declared and implemented by the custom Game class.
     ///@{
-
-    /// \name Game Functions
-    ///
-    /// Functions to be declared and implemented by the custom Game class.
-    ///@{
-    ///
-    /// Starting point for game and engine initialization.
-    ///
-    private external fun onSurfaceCreatedJNI(applicationContext: Context,
-                                             windowWidth: Int, windowHeight: Int,
-                                             displayRotation: Int, assetManager: AssetManager)
-
     private external fun onJoystickInputJNI(x: Float, y: Float)
 
     private external fun onResetJNI()
     ///@}
 
-    ///@}
     /// \name Game Engine Functions
     ///
     /// Functions that are implemented and handled by the game engine.
     ///@{
+    private external fun onCreateJNI(context: Context, assetManager: AssetManager)
     private external fun onStartJNI()
     private external fun onResumeJNI()
     private external fun onPauseJNI()
     private external fun onStopJNI()
     private external fun onDestroyJNI()
 
+    private external fun onSurfaceCreatedJNI(width: Int, height: Int, displayRotation: Int)
     private external fun onSurfaceChangedJNI(width: Int, height: Int, displayRotation: Int)
 
     private external fun updateJNI()
-    private external fun renderJNI()
 
     private external fun onTouchDownEventJNI(x: Float, y: Float)
     private external fun onTouchMoveEventJNI(x: Float, y: Float)
     private external fun onTouchUpEventJNI(x: Float, y: Float)
-    ///@}
-
     ///@}
 
     private lateinit var binding: ArActivityGameBinding
@@ -104,7 +90,7 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
         this.binding.glSurfaceView.preserveEGLContextOnPause = true
         this.binding.glSurfaceView.setRenderer(this)
         this.binding.glSurfaceView.setOnTouchListener(OnTouchListener { _, event -> // Save event results before passing it to glSurfaceView thread to prevent race condition
-            this.binding.glSurfaceView.queueEvent {
+            this.binding.glSurfaceView.queueEvent{
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> onTouchDownEventJNI( event.x, event.y )
                     MotionEvent.ACTION_MOVE -> onTouchMoveEventJNI( event.x, event.y )
@@ -116,12 +102,16 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
 
         this.arPlaneInitializedHandler = Handler(Looper.getMainLooper())
         this.gameInitializedHandler = Handler(Looper.getMainLooper())
+
+        this.binding.glSurfaceView.queueEvent{
+            this.onCreateJNI(this.applicationContext, this.assets)
+        }
     }
 
     override fun onStart() {
         super.onStart()
+        this.binding.glSurfaceView.queueEvent{ this.onStartJNI() }
         this.binding.glSurfaceView.onResume()
-        this.binding.glSurfaceView.queueEvent { this.onStartJNI() }
     }
 
     override fun onResume() {
@@ -140,14 +130,13 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
         snackbar.setTextColor(SNACKBAR_TEXT_COLOR)
         snackbar.show()
 
-        // Resume game
-        this.binding.glSurfaceView.queueEvent { this.onResumeJNI() }
+        this.binding.glSurfaceView.queueEvent{ this.onResumeJNI() }
     }
 
     override fun onPause() {
         super.onPause()
 
-        this.binding.glSurfaceView.queueEvent { this.onPauseJNI() }
+        this.binding.glSurfaceView.queueEvent{ this.onPauseJNI() }
 
         this.arPlaneInitializedHandler.removeCallbacks(arPlaneInitializedRunnable)
         this.gameInitializedHandler.removeCallbacks(gameInitializedRunnable)
@@ -155,13 +144,13 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
 
     override fun onStop() {
         super.onStop()
-        this.binding.glSurfaceView.queueEvent { this.onStopJNI() }
         this.binding.glSurfaceView.onPause()
+        this.binding.glSurfaceView.queueEvent{ this.onStopJNI() }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        onDestroyJNI()
+        this.binding.glSurfaceView.queueEvent{ this.onDestroyJNI() }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
@@ -182,9 +171,9 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
     }
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
-        this.onSurfaceCreatedJNI(this.applicationContext,
+        this.onSurfaceCreatedJNI(
             this.binding.glSurfaceView.width, this.binding.glSurfaceView.height,
-            this.windowManager.defaultDisplay.rotation, this.assets)
+            this.windowManager.defaultDisplay.rotation)
 
         this.binding.joystick.setOnTouchListener { view, event ->
             val result = view.onTouchEvent(event)
@@ -207,10 +196,7 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) =
         this.onSurfaceChangedJNI(width, height, this.windowManager.defaultDisplay.rotation)
 
-    override fun onDrawFrame(gl: GL10) {
-        updateJNI()
-        renderJNI()
-    }
+    override fun onDrawFrame(gl: GL10) = updateJNI()
 
     private fun arPlaneInitialized(): Unit {
         this.arPlaneInitializedHandler.post(arPlaneInitializedRunnable)

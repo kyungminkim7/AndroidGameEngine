@@ -3,25 +3,21 @@
 #include <android_game_engine/LightDirectional.h>
 #include <android_game_engine/Vehicle.h>
 
-namespace age {
-
-JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)
-    (JNIEnv *env, jobject gameActivity, jobject gameApplicationContext,
-     int windowWidth, int windowHeight, int displayRotation, jobject j_asset_manager) {
-    GameEngineJNI::init(env, windowWidth, windowHeight, displayRotation, j_asset_manager);
-    GameEngineJNI::onCreate(std::make_unique<TestGameAR>(env, gameApplicationContext, gameActivity));
+JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI) (JNIEnv *env, jobject activity,
+                                                  int width, int height, int displayRotation) {
+    age::GameEngine::onSurfaceCreated(width, height, displayRotation,
+                                      std::make_unique<age::TestGameAR>());
 }
 
 JNI_METHOD_DEFINITION(void, onJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y) {
-    reinterpret_cast<TestGameAR*>(GameEngineJNI::getGame())->onJoystickInput(x, y);
+    reinterpret_cast<age::TestGameAR*>(age::GameEngine::getGame())->onJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onResetJNI)(JNIEnv *env, jobject gameActivity) {
-    reinterpret_cast<TestGameAR*>(GameEngineJNI::getGame())->onReset();
+    reinterpret_cast<age::TestGameAR*>(age::GameEngine::getGame())->onReset();
 }
 
-TestGameAR::TestGameAR(JNIEnv *env, jobject javaApplicationContext, jobject javaActivityObject)
-    : GameAR(env, javaApplicationContext, javaActivityObject) {}
+namespace age {
 
 void TestGameAR::onCreate() {
     GameAR::onCreate();
@@ -50,11 +46,7 @@ void TestGameAR::onReset() {
     this->clearWorldList();
     this->setState(GameAR::State::TRACK_PLANES);
 
-    // Signal back to Java GameActivityAR
-    auto env = this->getJNIEnv();
-    auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
-    auto callback = env->GetMethodID(activityClass, "arPlaneInitialized", "()V");
-    env->CallVoidMethod(this->getJavaActivityObject(), callback);
+    GameEngine::callJavaActivityVoidMethod("arPlaneInitialized", "()V");
 }
 
 void TestGameAR::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
@@ -76,11 +68,7 @@ void TestGameAR::onGameObjectTouched(age::GameObject *gameObject, const glm::vec
 
         this->setState(GameAR::State::GAMEPLAY);
 
-        // Signal back to Java GameActivityAR
-        auto env = this->getJNIEnv();
-        auto activityClass = env->GetObjectClass(this->getJavaActivityObject());
-        auto callback = env->GetMethodID(activityClass, "gameInitialized", "()V");
-        env->CallVoidMethod(this->getJavaActivityObject(), callback);
+        GameEngine::callJavaActivityVoidMethod("gameInitialized", "()V");
     }
 }
 
