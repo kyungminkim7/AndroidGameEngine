@@ -24,8 +24,8 @@ This game engine has been used to build games such as [AR Drone](https://play.go
   ![TestGame](images/testgame_screenshot.png)
 - A game template for an augmented reality game is provided by the GameActivityAR.kt, TestGameAR.h, and TestGameAR.cpp files. To build and run this template, make the following modifications to the project:
     1. AndroidManifest.xml: 
-        a. Comment out the activity block for `".GameActivity"`
-        b. Uncomment the activity block for `".GameActivityAR"`
+        1. Comment out the activity block for `".GameActivity"`
+        2. Uncomment the activity block for `".GameActivityAR"`
     2. cpp/CMakeLists.txt: 
-        a. Comment out the line setting the `gameType` variable to `NORMAL` 
-        b. Uncomment the line setting the `gameType` variable to `AR`
+        1. Comment out the line setting the `gameType` variable to `NORMAL` 
+        2. Uncomment the line setting the `gameType` variable to `AR`
