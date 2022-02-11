@@ -2,7 +2,15 @@ project(android_game_engine)
 
 add_subdirectory(extern)
 
+# Add ARCore library dependency
+add_library(arcore SHARED IMPORTED)
+set_target_properties(arcore PROPERTIES IMPORTED_LOCATION
+    ${ARCORE_LIBPATH}/${ANDROID_ABI}/libarcore_sdk_c.so
+    INTERFACE_INCLUDE_DIRECTORIES ${ARCORE_INCLUDE})
+
 add_library(${PROJECT_NAME} STATIC
+    src/ARCameraBackground.cpp
+    src/ARPlane.cpp
     src/Asset.cpp
     src/AssimpIOStream.cpp
     src/AssimpIOSystem.cpp
@@ -11,6 +19,7 @@ add_library(${PROJECT_NAME} STATIC
     src/CameraChase.cpp
     src/CameraFPV.cpp
     src/Game.cpp
+    src/GameAR.cpp
     src/GameEngine.cpp
     src/GameObject.cpp
     src/Light.cpp
@@ -47,6 +56,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
+        arcore
         assimp::assimp
         EGL
         GLESv3
