@@ -1,3 +1,4 @@
+include(GetBullet3)
 include(GetGLM)
 
 add_library(android_game_engine STATIC
@@ -53,9 +54,9 @@ target_link_libraries(android_game_engine
         EGL
         GLESv3
         android
-        bullet3::BulletDynamics
-        bullet3::BulletCollision
-        bullet3::LinearMath
+        BulletDynamics
+        BulletCollision
+        LinearMath
         glm::glm
         log
         network::network
