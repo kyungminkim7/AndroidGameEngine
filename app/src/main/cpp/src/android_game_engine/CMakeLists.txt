@@ -60,17 +60,3 @@ target_link_libraries(android_game_engine
     PRIVATE
         stb::stb
 )
-
-target_compile_features(android_game_engine
-    PUBLIC
-        cxx_constexpr
-        cxx_noexcept
-        cxx_nullptr
-        cxx_override
-        cxx_uniform_initialization
-    PRIVATE
-        cxx_auto_type
-        cxx_generic_lambdas
-        cxx_range_for
-        cxx_strong_enums
-)
