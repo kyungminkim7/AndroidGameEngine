@@ -53,9 +53,6 @@ add_library(bullet3::BulletInverseDynamics ALIAS BulletInverseDynamics)
 add_library(bullet3::BulletSoftBody ALIAS BulletSoftBody)
 add_library(bullet3::LinearMath ALIAS LinearMath)
 
-# glm library for linear algebra
-add_subdirectory(glm)
-
 # network library for networking
 add_subdirectory(network)
 

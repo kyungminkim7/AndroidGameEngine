@@ -1,3 +1,5 @@
+include(GetGLM)
+
 add_library(android_game_engine STATIC
     "ARCameraBackground.cpp"
     "ARPlane.cpp"
