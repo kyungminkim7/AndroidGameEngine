@@ -1,11 +1,24 @@
-# For more information about using CMake with Android Studio, read the
-# documentation: https://d.android.com/studio/projects/add-native-code.html
 cmake_minimum_required(VERSION 3.13)
 project(game)
 
-add_subdirectory(android_game_engine)
-
 set(CMAKE_CXX_STANDARD 14)
+
+
+
+add_subdirectory(extern)
+
+# Add ARCore library dependency
+add_library(arcore SHARED IMPORTED)
+message("ARCORE_LIBPATH: ${ARCORE_LIBPATH}")
+message("ARCORE_INCLUDE: ${ARCORE_INCLUDE}")
+set_target_properties(arcore PROPERTIES IMPORTED_LOCATION
+    "${ARCORE_LIBPATH}/${ANDROID_ABI}/libarcore_sdk_c.so"
+    INTERFACE_INCLUDE_DIRECTORIES "${ARCORE_INCLUDE}"
+)
+
+add_subdirectory(src)
+
+
 
 # Create game shared library
 set(gameType NORMAL)
@@ -40,4 +53,4 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC android_game_engine::android_game_engine)
+target_link_libraries(${PROJECT_NAME} PUBLIC android_game_engine)

@@ -1,0 +1,76 @@
+add_library(android_game_engine STATIC
+    "ARCameraBackground.cpp"
+    "ARPlane.cpp"
+    "Asset.cpp"
+    "AssimpIOStream.cpp"
+    "AssimpIOSystem.cpp"
+    "Box.cpp"
+    "Camera.cpp"
+    "CameraChase.cpp"
+    "CameraFPV.cpp"
+    "Game.cpp"
+    "GameAR.cpp"
+    "GameEngine.cpp"
+    "GameObject.cpp"
+    "Light.cpp"
+    "LightDirectional.cpp"
+    "Log.cpp"
+    "ManagerAssets.cpp"
+    "ManagerWindowing.cpp"
+    "Mesh.cpp"
+    "Model.cpp"
+    "PID.cpp"
+    "PhysicsCompoundShape.cpp"
+    "PhysicsDebugDrawer.cpp"
+    "PhysicsEngine.cpp"
+    "PhysicsMotionState.cpp"
+    "PhysicsRigidBody.cpp"
+    "Quad.cpp"
+    "Quadcopter.cpp"
+    "Shader.cpp"
+    "ShaderProgram.cpp"
+    "ShadowMap.cpp"
+    "Skybox.cpp"
+    "Texture2D.cpp"
+    "UniformBuffer.cpp"
+    "Utilities.cpp"
+    "Vehicle.cpp"
+    "Vertex.cpp"
+    "VertexArray.cpp"
+)
+
+target_include_directories(android_game_engine PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
+)
+
+target_link_libraries(android_game_engine
+    PUBLIC
+        arcore
+        assimp::assimp
+        EGL
+        GLESv3
+        android
+        bullet3::BulletDynamics
+        bullet3::BulletCollision
+        bullet3::LinearMath
+        glm::glm
+        log
+        network::network
+    PRIVATE
+        stb::stb
+)
+
+target_compile_features(android_game_engine
+    PUBLIC
+        cxx_constexpr
+        cxx_noexcept
+        cxx_nullptr
+        cxx_override
+        cxx_uniform_initialization
+    PRIVATE
+        cxx_auto_type
+        cxx_generic_lambdas
+        cxx_range_for
+        cxx_strong_enums
+)
