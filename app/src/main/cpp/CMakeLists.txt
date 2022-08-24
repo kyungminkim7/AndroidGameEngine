@@ -9,14 +9,12 @@ add_subdirectory(extern)
 
 # Add ARCore library dependency
 add_library(arcore SHARED IMPORTED)
-message("ARCORE_LIBPATH: ${ARCORE_LIBPATH}")
-message("ARCORE_INCLUDE: ${ARCORE_INCLUDE}")
 set_target_properties(arcore PROPERTIES IMPORTED_LOCATION
     "${ARCORE_LIBPATH}/${ANDROID_ABI}/libarcore_sdk_c.so"
     INTERFACE_INCLUDE_DIRECTORIES "${ARCORE_INCLUDE}"
 )
 
-add_subdirectory(src)
+add_subdirectory(src bin)
 
 
 
