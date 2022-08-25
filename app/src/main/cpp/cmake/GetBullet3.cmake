@@ -1,5 +1,7 @@
 include(FetchContent)
 
+set(FETCHCONTENT_QUIET FALSE)
+
 FetchContent_Declare(bullet3
     GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
     GIT_TAG 3.24
