@@ -20,7 +20,6 @@ add_subdirectory(src bin)
 
 
 # Create game shared library
-set(gameType NORMAL)
 #set(gameType AR)
 #set(gameType MOBILE_CONTROL_STATION)
 

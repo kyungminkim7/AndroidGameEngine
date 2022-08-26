@@ -1,4 +1,4 @@
-#include "TestGameAR.h"
+#include "GameActivityAR.h"
 
 #include <android_game_engine/LightDirectional.h>
 #include <android_game_engine/Vehicle.h>
@@ -6,20 +6,20 @@
 JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI) (JNIEnv *env, jobject activity,
                                                   int width, int height, int displayRotation) {
     age::GameEngine::onSurfaceCreated(width, height, displayRotation,
-                                      std::make_unique<age::TestGameAR>());
+                                      std::make_unique<age::GameActivityAR>());
 }
 
 JNI_METHOD_DEFINITION(void, onJoystickInputJNI)(JNIEnv *env, jobject gameActivity, float x, float y) {
-    reinterpret_cast<age::TestGameAR*>(age::GameEngine::getGame())->onJoystickInput(x, y);
+    reinterpret_cast<age::GameActivityAR*>(age::GameEngine::getGame())->onJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onResetJNI)(JNIEnv *env, jobject gameActivity) {
-    reinterpret_cast<age::TestGameAR*>(age::GameEngine::getGame())->onReset();
+    reinterpret_cast<age::GameActivityAR*>(age::GameEngine::getGame())->onReset();
 }
 
 namespace age {
 
-void TestGameAR::onCreate() {
+void GameActivityAR::onCreate() {
     GameAR::onCreate();
 
 //    this->enablePhysicsDebugDrawer(true);
@@ -30,13 +30,13 @@ void TestGameAR::onCreate() {
     this->atvCache->setMass(1.0f);
 }
 
-void TestGameAR::onJoystickInput(float x, float y){
+void GameActivityAR::onJoystickInput(float x, float y){
     if (this->atv != nullptr) {
         this->atv->onJoystickInput({x, y});
     }
 }
 
-void TestGameAR::onReset() {
+void GameActivityAR::onReset() {
     if (this->atv == nullptr) {
         return;
     }
@@ -49,8 +49,8 @@ void TestGameAR::onReset() {
     GameEngine::callJavaActivityVoidMethod("arPlaneInitialized", "()V");
 }
 
-void TestGameAR::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
-                                     const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
+void GameActivityAR::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
+                                         const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
     if (this->atv == nullptr) {
         this->atv = this->atvCache;
         this->atv->setPosition(touchPoint + glm::vec3(0.0f, 0.0f, 0.5f));

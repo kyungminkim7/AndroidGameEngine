@@ -25,7 +25,7 @@ class GameActivityAR: AppCompatActivity(), ActivityCompat.OnRequestPermissionsRe
         private const val SNACKBAR_COLOR = -0x40cdcdce
         private const val SNACKBAR_TEXT_COLOR = Color.WHITE
 
-        init { System.loadLibrary("game") }
+        init { System.loadLibrary("game_activity_ar") }
     }
 
     /// \name Game Functions

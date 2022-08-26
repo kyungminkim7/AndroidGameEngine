@@ -22,7 +22,7 @@ This game engine has been used to build games such as [AR Drone](https://play.go
 - To create your game, provide a subclass of the Game class in the cpp/ directory and make the necessary modifications to the CMakeLists.txt file in the same directory. 
 - A game template is provided by the GameActivity.kt, GameActivity.h, and GameActivity.cpp files which is what the Android Game Engine will build by default. Below is a screenshot of the default GameActivity template.
   ![GameActivity](images/testgame_screenshot.png)
-- A game template for an augmented reality game is provided by the GameActivityAR.kt, TestGameAR.h, and TestGameAR.cpp files. To build and run this template, make the following modifications to the project:
+- A game template for an augmented reality game is provided by the GameActivityAR.kt, GameActivityAR.h, and GameActivityAR.cpp files. To build and run this template, make the following modifications to the project:
     1. AndroidManifest.xml: 
         1. Comment out the activity block for `".GameActivity"`
         2. Uncomment the activity block for `".GameActivityAR"`

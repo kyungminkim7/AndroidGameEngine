@@ -1,2 +1,5 @@
 add_subdirectory(android_game_engine)
-add_subdirectory(game_activity)
+
+# Concrete game targets
+#add_subdirectory(game_activity)
+add_subdirectory(game_activity_ar)

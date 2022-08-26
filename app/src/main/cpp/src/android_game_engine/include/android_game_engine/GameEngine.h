@@ -27,6 +27,8 @@ class Game;
 */
 namespace GameEngine {
 
+extern
+
 Game *getGame();
 
 /**

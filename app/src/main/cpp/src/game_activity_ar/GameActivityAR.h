@@ -18,7 +18,7 @@ namespace age {
 class GameObject;
 class Vehicle;
 
-class TestGameAR : public GameAR {
+class GameActivityAR : public GameAR {
 public:
     void onCreate() override;
 
