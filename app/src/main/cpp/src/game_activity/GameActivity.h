@@ -19,7 +19,7 @@ namespace age {
 
 class Box;
 
-class TestGame : public Game {
+class GameActivity : public Game {
 public:
     void onCreate() override;
 

@@ -14,7 +14,7 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     companion object {
         private val TAG = GameActivity::class.java.simpleName
 
-        init { System.loadLibrary("game") }
+        init { System.loadLibrary("game_activity") }
     }
 
     /// \name Game Functions

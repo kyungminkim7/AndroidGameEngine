@@ -1,4 +1,4 @@
-#include "TestGame.h"
+#include "GameActivity.h"
 
 #include <random>
 
@@ -8,26 +8,26 @@
 JNI_METHOD_DEFINITION(void, onSurfaceCreatedJNI)(JNIEnv *env, jobject activity,
                                                  int width, int height, int rotation) {
     age::GameEngine::onSurfaceCreated(width, height, rotation,
-                                      std::make_unique<age::TestGame>());
+                                      std::make_unique<age::GameActivity>());
 }
 
 JNI_METHOD_DEFINITION(void, onLeftJoystickInputJNI)(JNIEnv *env, jobject gameActivity,
         float x, float y) {
-    reinterpret_cast<age::TestGame*>(age::GameEngine::getGame())->onLeftJoystickInput(x, y);
+    reinterpret_cast<age::GameActivity*>(age::GameEngine::getGame())->onLeftJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onRightJoystickInputJNI)(JNIEnv *env, jobject gameActivity,
         float x, float y) {
-    reinterpret_cast<age::TestGame*>(age::GameEngine::getGame())->onRightJoystickInput(x, y);
+    reinterpret_cast<age::GameActivity*>(age::GameEngine::getGame())->onRightJoystickInput(x, y);
 }
 
 JNI_METHOD_DEFINITION(void, onResetJNI)(JNIEnv *env, jobject gameActivity) {
-    reinterpret_cast<age::TestGame*>(age::GameEngine::getGame())->onReset();
+    reinterpret_cast<age::GameActivity*>(age::GameEngine::getGame())->onReset();
 }
 
 namespace age {
 
-void TestGame::onCreate() {
+void GameActivity::onCreate() {
     Game::onCreate();
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -68,11 +68,11 @@ void TestGame::onCreate() {
     this->setRandomBoxPositions();
 }
 
-void TestGame::onLeftJoystickInput(float x, float y) { this->getCam()->onMove({x, y}); }
+void GameActivity::onLeftJoystickInput(float x, float y) { this->getCam()->onMove({x, y}); }
 
-void TestGame::onRightJoystickInput(float x, float y) { this->getCam()->onRotate({x, y}); }
+void GameActivity::onRightJoystickInput(float x, float y) { this->getCam()->onRotate({x, y}); }
 
-void TestGame::onReset() {
+void GameActivity::onReset() {
     for (auto& box : this->boxes) {
         box->clearForces();
         box->setLinearVelocity(glm::vec3(0.0f));
@@ -82,12 +82,12 @@ void TestGame::onReset() {
     this->setRandomBoxPositions();
 }
 
-void TestGame::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
-                                   const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
+void GameActivity::onGameObjectTouched(age::GameObject *gameObject, const glm::vec3 &touchPoint,
+                                       const glm::vec3 &touchDirection, const glm::vec3 &touchNormal) {
     gameObject->applyCentralForce(touchDirection * 1000.0f);
 }
 
-void TestGame::setRandomBoxPositions() {
+void GameActivity::setRandomBoxPositions() {
     std::mt19937 rand;
     std::uniform_real_distribution<float> xy(-2.0f, 2.0f);
     std::uniform_real_distribution<float> z(0.0f, 3.0f);

@@ -1,2 +1,2 @@
 add_subdirectory(android_game_engine)
-add_subdirectory(game)
+add_subdirectory(game_activity)
