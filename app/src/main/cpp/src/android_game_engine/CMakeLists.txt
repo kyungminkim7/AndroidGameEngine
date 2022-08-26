@@ -1,5 +1,6 @@
 include(GetBullet3)
 include(GetGLM)
+include(GetSTB)
 
 add_library(android_game_engine STATIC
     "ARCameraBackground.cpp"
@@ -61,5 +62,5 @@ target_link_libraries(android_game_engine
         log
         network::network
     PRIVATE
-        stb::stb
+        stb
 )
