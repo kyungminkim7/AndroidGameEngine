@@ -17,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidGameEngine">
 
+        <!-- Base Game Template -->
         <activity android:name=".GameActivity"
             android:exported="true"
             android:screenOrientation="landscape">
@@ -29,6 +30,8 @@
             </intent-filter>
         </activity>
 
+
+        <!-- AR Game Template -->
 <!--        <activity android:name=".GameActivityAR"-->
 <!--            android:exported="true"-->
 <!--            android:screenOrientation="landscape">-->
