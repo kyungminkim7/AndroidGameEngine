@@ -60,7 +60,6 @@ target_link_libraries(android_game_engine
         LinearMath
         glm::glm
         log
-        network::network
     PRIVATE
         stb
 )

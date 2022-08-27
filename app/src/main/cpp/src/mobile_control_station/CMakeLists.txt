@@ -1,3 +1,5 @@
+include(GetNetwork)
+
 # Set path to Java Activity class in game engine
 set(JNI_ENV_CLASS_PATH "com/example/androidgameengine/MobileControlStation")
 
@@ -19,4 +21,7 @@ target_include_directories(mobile_control_station PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
 )
 
-target_link_libraries(mobile_control_station PUBLIC android_game_engine)
+target_link_libraries(mobile_control_station PUBLIC
+    android_game_engine
+    network::network
+)
