@@ -3,6 +3,8 @@ include(GetBullet3)
 include(GetGLM)
 include(GetSTB)
 
+find_package(ARCORE REQUIRED)
+
 add_library(android_game_engine STATIC
     "ARCameraBackground.cpp"
     "ARPlane.cpp"
@@ -51,7 +53,7 @@ target_include_directories(android_game_engine PUBLIC
 
 target_link_libraries(android_game_engine
     PUBLIC
-        arcore
+        ARCORE::ARCORE
         assimp::assimp
         EGL
         GLESv3
