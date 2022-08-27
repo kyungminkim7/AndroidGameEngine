@@ -1,3 +1,4 @@
+include(GetAssimp)
 include(GetBullet3)
 include(GetGLM)
 include(GetSTB)
