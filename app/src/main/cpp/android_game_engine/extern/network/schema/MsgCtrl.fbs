@@ -1,3 +1,0 @@
-namespace msgs;
-
-enum MsgCtrl:uint8 { ACK = 1 }

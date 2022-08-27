@@ -7,14 +7,15 @@ import android.os.Bundle
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.androidgameengine.databinding.ActivityGameBinding
+import com.example.androidgameengine.databinding.StationControlMobileBinding
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
+class MobileControlStation : AppCompatActivity(), GLSurfaceView.Renderer {
     companion object {
-        private val TAG = GameActivity::class.java.simpleName
+        private val TAG = MobileControlStation::class.java.simpleName
 
-        init { System.loadLibrary("game_activity") }
+        init { System.loadLibrary("mobile_control_station") }
     }
 
     /// \name Game Functions
@@ -47,12 +48,12 @@ class GameActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     private external fun onTouchUpEventJNI(x: Float, y: Float)
     ///@}
 
-    private lateinit var binding: ActivityGameBinding
+    private lateinit var binding: StationControlMobileBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        this.binding = ActivityGameBinding.inflate(this.layoutInflater)
+        this.binding = StationControlMobileBinding.inflate(this.layoutInflater)
         this.setContentView(this.binding.root)
 
         // Set up renderer

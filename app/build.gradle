@@ -24,7 +24,7 @@ android {
                 cppFlags "-std=c++14"
                 arguments "-DANDROID_STL=c++_static",
                         "-DARCORE_LIBPATH=${arcore_libpath}/jni",
-                        "-DARCORE_INCLUDE=${project.rootDir}/app/src/main/cpp/android_game_engine/extern/arcore/libraries/include"
+                        "-DARCORE_INCLUDE=${project.rootDir}/app/src/main/cpp/extern/arcore/libraries/include"
             }
         }
     }
