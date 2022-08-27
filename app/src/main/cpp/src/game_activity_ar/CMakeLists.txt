@@ -11,7 +11,7 @@ target_compile_definitions(android_game_engine
 # game_activity_ar lib
 add_library(game_activity_ar SHARED GameActivityAR.cpp)
 
-target_include_directories(game_activity_ar INTERFACE
+target_include_directories(game_activity_ar PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
 )

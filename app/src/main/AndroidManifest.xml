@@ -32,31 +32,31 @@
 
 
         <!-- AR Game Template -->
-<!--        <activity android:name=".GameActivityAR"-->
-<!--            android:exported="true"-->
-<!--            android:screenOrientation="landscape">-->
-<!--            <meta-data android:name="android.app.lib_name"-->
-<!--                android:value="game_activity_ar"/>-->
-
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
-<!--        <meta-data android:name="com.google.ar.core" android:value="required" />-->
-
-        <!-- Mobile Control Station Template -->
-        <activity android:name=".MobileControlStation"
+        <activity android:name=".GameActivityAR"
             android:exported="true"
             android:screenOrientation="landscape">
             <meta-data android:name="android.app.lib_name"
-                       android:value="mobile_control_station"/>
+                android:value="game_activity_ar"/>
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data android:name="com.google.ar.core" android:value="required" />
+
+        <!-- Mobile Control Station Template -->
+<!--        <activity android:name=".MobileControlStation"-->
+<!--            android:exported="true"-->
+<!--            android:screenOrientation="landscape">-->
+<!--            <meta-data android:name="android.app.lib_name"-->
+<!--                       android:value="mobile_control_station"/>-->
+
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
 
 
     </application>
